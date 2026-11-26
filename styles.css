@@ -1,0 +1,2499 @@
+/* ==========================================================================
+   Spera – Földszínek, meleg terrakotta, lágy zsályazöld és púderes barack
+   Háttér: #FAF6F2 | Terrakotta: #C86D51 | Púderes barack: #E8C3A3 | Zsálya: #7DA690
+   ========================================================================== */
+
+:root {
+  --bg-page: #FAF6F2;
+  --bg-card: #FFFFFF;
+  --bg-warm: #F4ECE4;
+  --bg-subtle: #FBF8F5;
+  --border: #E8DFD7;
+  --border-strong: #D6C7BC;
+
+  --text-main: #2F2925;
+  --text-muted: #6B6059;
+  --text-light: #8D8179;
+
+  --coral: #C86D51;
+  --coral-hover: #AE573D;
+  --coral-soft: #F9EDE8;
+  --coral-border: #E8C5B8;
+
+  --peach: #E8C3A3;
+  --peach-soft: #FBF3EB;
+  --peach-border: #E6CEB8;
+  --peach-dark: #875C3B;
+
+  --sage: #7DA690;
+  --sage-hover: #628C76;
+  --sage-soft: #EDF4F0;
+  --sage-border: #C2D9CC;
+  --sage-dark: #345646;
+
+  --danger: #B24C43;
+  --danger-soft: #FCF0EE;
+  --danger-border: #E8BCB7;
+
+  --info: #536D7E;
+  --info-soft: #F0F4F6;
+  --info-border: #C9D6DE;
+
+  --radius-sm: 10px;
+  --radius-md: 15px;
+  --radius-lg: 22px;
+
+  --shadow-sm: 0 2px 10px rgba(58, 43, 34, 0.045);
+  --shadow-md: 0 8px 26px rgba(58, 43, 34, 0.07);
+  --shadow-lg: 0 20px 52px rgba(47, 41, 37, 0.13);
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --base-size: 15.5px;
+}
+
+html {
+  font-size: var(--base-size);
+  scroll-behavior: smooth;
+}
+
+html.large-text {
+  --base-size: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 0.98rem;
+}
+
+:focus-visible {
+  outline: 3px solid var(--coral);
+  outline-offset: 2px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Onboarding (Induló kérdőív)
+   ========================================================================== */
+
+.onboarding-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background:
+    radial-gradient(circle at 14% 16%, rgba(232, 195, 163, 0.32), transparent 46%),
+    radial-gradient(circle at 86% 84%, rgba(125, 166, 144, 0.22), transparent 46%),
+    var(--bg-page);
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 780px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem 2.2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+.onboarding-header {
+  display: flex;
+  gap: 1.15rem;
+  align-items: flex-start;
+  margin-bottom: 1.6rem;
+}
+
+.brand-mark-lg {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--peach-soft) 58%, var(--sage-soft) 100%);
+  color: var(--coral);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  border: 1px solid var(--peach-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.eyebrow-pill {
+  display: inline-block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coral-hover);
+  background: var(--coral-soft);
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  margin-bottom: 0.45rem;
+}
+
+.onboarding-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.onboarding-subtitle {
+  margin: 0.35rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.selectable-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.7rem;
+}
+
+.select-card {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.select-card input {
+  position: absolute;
+  opacity: 0;
+}
+
+.select-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  height: 100%;
+  padding: 0.85rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg-subtle);
+  transition: all 0.16s ease;
+}
+
+.select-card-body strong {
+  font-size: 0.9rem;
+  color: var(--text-main);
+}
+
+.select-card-body small {
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.select-card input:checked + .select-card-body {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+  box-shadow: 0 0 0 2px rgba(224, 122, 95, 0.16);
+}
+
+.mode-radio-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.mode-radio-pill {
+  flex: 1;
+  min-width: 150px;
+  cursor: pointer;
+  position: relative;
+}
+
+.mode-radio-pill input {
+  position: absolute;
+  opacity: 0;
+}
+
+.mode-radio-pill span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg-card);
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+}
+
+.mode-radio-pill input:checked + span {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #FFFFFF;
+}
+
+.onboarding-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.onboarding-jury-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.15rem;
+  border-top: 1px dashed var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Fejléc, Élethelyzet-váltó és Navigáció
+   ========================================================================== */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(62, 42, 32, 0.04);
+}
+
+.header-top {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--peach-soft) 60%, var(--sage-soft) 100%);
+  color: var(--coral);
+  border: 1px solid var(--peach-border);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(58, 43, 34, 0.05);
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.32rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  color: var(--text-main);
+}
+
+.brand-subtitle {
+  margin: 0.1rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Élethelyzet-váltó (Cikluskövetés ↔ Baba tervezése ↔ Várandósság) */
+.mode-switcher {
+  display: inline-flex;
+  background: var(--bg-warm);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.mode-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 0.42rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.mode-btn:hover {
+  color: var(--text-main);
+}
+
+.mode-btn.active {
+  background: var(--coral);
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(224, 122, 95, 0.3);
+}
+
+.mode-btn[data-mode="pregnancy"].active {
+  background: var(--sage-hover);
+  box-shadow: 0 2px 6px rgba(100, 149, 125, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.app-nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  gap: 0.2rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 0.95rem;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.15s ease;
+}
+
+.nav-tab:hover {
+  color: var(--coral-hover);
+  background: var(--coral-soft);
+}
+
+.nav-tab.active {
+  color: var(--coral-hover);
+  border-bottom-color: var(--coral);
+  background: rgba(224, 122, 95, 0.08);
+}
+
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  background: var(--bg-warm);
+  color: var(--text-muted);
+}
+
+.nav-tab.active .nav-badge {
+  background: var(--coral);
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Riasztási sáv (Gyógyszer-emlékeztető)
+   ========================================================================== */
+
+.alert-banner {
+  background: linear-gradient(90deg, #FDF5E6, #FCEEE9);
+  border-bottom: 2px solid var(--coral);
+  box-shadow: var(--shadow-md);
+}
+
+.alert-banner-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  flex-wrap: wrap;
+}
+
+.alert-banner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--coral);
+  color: #FFFFFF;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  animation: pulseRing 1.8s infinite;
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(224, 122, 95, 0.55); }
+  70% { box-shadow: 0 0 0 11px rgba(224, 122, 95, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(224, 122, 95, 0); }
+}
+
+.alert-banner-content {
+  flex: 1;
+  min-width: 220px;
+}
+
+.alert-banner-eyebrow {
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--coral-hover);
+}
+
+.alert-banner-title {
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.alert-banner-meta {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.alert-banner-actions {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   Fő konténer, kártyák, gombok
+   ========================================================================== */
+
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3.5rem;
+}
+
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header,
+.summary-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 1.48rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.panel-subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+  max-width: 760px;
+}
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.35rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.card-subtitle {
+  margin: 0.2rem 0 0.75rem;
+  font-size: 0.86rem;
+  color: var(--text-muted);
+}
+
+.card-header-inline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.58rem 1.05rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  line-height: 1.2;
+}
+
+.btn:active { transform: scale(0.98); }
+.btn-lg { padding: 0.75rem 1.35rem; font-size: 0.98rem; }
+.btn-sm { padding: 0.42rem 0.78rem; font-size: 0.83rem; }
+
+.btn-primary {
+  background: var(--coral);
+  color: #FFFFFF;
+  border-color: var(--coral);
+}
+.btn-primary:hover { background: var(--coral-hover); border-color: var(--coral-hover); }
+
+.btn-sage {
+  background: var(--sage);
+  color: #FFFFFF;
+  border-color: var(--sage);
+}
+.btn-sage:hover { background: var(--sage-hover); border-color: var(--sage-hover); }
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border-color: var(--border-strong);
+}
+.btn-secondary:hover { background: var(--bg-warm); border-color: var(--coral); color: var(--coral-hover); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--coral-hover);
+  border-color: var(--coral-border);
+}
+.btn-outline:hover { background: var(--coral-soft); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+.btn-ghost:hover { background: var(--bg-warm); color: var(--text-main); }
+.btn-ghost[aria-pressed="true"] { background: var(--coral-soft); color: var(--coral-hover); }
+
+.btn-danger-outline {
+  background: var(--bg-card);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+.btn-danger-outline:hover { background: var(--danger-soft); }
+
+.file-input-label { cursor: pointer; }
+
+/* ==========================================================================
+   Smart Alert, Dashboard Hero & Klinikai figyelmeztetések
+   ========================================================================== */
+
+.smart-alert {
+  background: linear-gradient(135deg, #FDF5E6, #FCEEE9);
+  border: 1.5px solid var(--peach);
+  border-left: 5px solid var(--coral);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.smart-alert-body strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 0.2rem;
+}
+
+.smart-alert-body p {
+  margin: 0;
+  font-size: 0.89rem;
+  color: var(--text-muted);
+}
+
+.smart-alert-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.hero-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FDF6F1 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 1.7rem;
+  margin-bottom: 1.25rem;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 1.5rem;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-card.pregnancy-mode {
+  background: linear-gradient(135deg, #FFFFFF 0%, #EEF6F1 100%);
+  border-color: var(--sage-border);
+}
+
+.cycle-ring-wrap {
+  position: relative;
+  width: 122px;
+  height: 122px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.cycle-ring-center {
+  position: absolute;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.cycle-ring-num {
+  display: block;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.cycle-ring-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.hero-main h2 {
+  margin: 0.25rem 0 0.35rem;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.hero-main p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.94rem;
+}
+
+.hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.hero-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 215px;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--border);
+}
+
+.hero-metric-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.88rem;
+}
+
+.hero-metric-row span { color: var(--text-muted); }
+.hero-metric-row strong { color: var(--text-main); }
+
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.35rem;
+}
+
+.clinical-alert-card {
+  border-radius: var(--radius-md);
+  padding: 0.95rem 1.1rem;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.clinical-alert-card.tone-coral {
+  background: var(--coral-soft);
+  border-color: var(--coral-border);
+}
+
+.clinical-alert-card.tone-sage {
+  background: var(--sage-soft);
+  border-color: var(--sage-border);
+}
+
+.clinical-alert-card.tone-peach {
+  background: var(--peach-soft);
+  border-color: var(--peach-border);
+}
+
+.clinical-alert-eyebrow {
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.clinical-alert-card strong {
+  font-size: 0.96rem;
+}
+
+.clinical-alert-card p {
+  margin: 0;
+  font-size: 0.87rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Interaktív Naptár + Oldalsáv
+   ========================================================================== */
+
+.dashboard-split {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.dashboard-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.calendar-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 6px;
+}
+
+.calendar-month-label {
+  min-width: 120px;
+  text-align: center;
+  font-size: 0.92rem;
+  text-transform: capitalize;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendar-weekdays {
+  margin: 0.5rem 0 0.35rem;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.cal-day {
+  position: relative;
+  min-height: 54px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.cal-day:hover {
+  border-color: var(--coral);
+  transform: translateY(-1px);
+}
+
+.cal-day.empty {
+  border: none;
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+
+.cal-day.is-today {
+  border: 2px solid var(--coral);
+  box-shadow: 0 0 0 2px rgba(224, 122, 95, 0.16);
+}
+
+.cal-day.phase-period {
+  background: #FCE6DF;
+  border-color: #F2B5A4;
+}
+
+.cal-day.phase-fertile {
+  background: var(--sage-soft);
+  border-color: var(--sage-border);
+}
+
+.cal-day.phase-ovulation {
+  background: var(--peach-soft);
+  border-color: var(--peach);
+}
+
+.cal-day-num {
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.cal-dots {
+  display: flex;
+  gap: 3px;
+  min-height: 7px;
+}
+
+.dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.dot-period { background: var(--coral); }
+.dot-fertile { background: var(--sage); }
+.dot-ovulation { background: #D99B38; }
+.dot-lab { background: var(--info); }
+.dot-symptom { background: #6E4C41; }
+
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  margin-top: 0.95rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.mini-meds-list,
+.mini-conditions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.mini-med-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+}
+
+.mini-med-item.taken {
+  background: var(--sage-soft);
+  border-color: var(--sage-border);
+}
+
+.mini-cond-item {
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  border-left: 4px solid var(--coral);
+}
+
+.mini-cond-item strong { display: block; font-size: 0.92rem; }
+.mini-cond-item span { font-size: 0.82rem; color: var(--text-muted); }
+
+/* ==========================================================================
+   Gyógyszerek, Emlékeztetők & Betegség-adattár
+   ========================================================================== */
+
+.clock-pill {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--coral-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.stats-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.stat-label {
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+}
+
+.stat-value-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.stat-value { font-size: 1.55rem; font-weight: 800; }
+.stat-percent { font-weight: 800; color: var(--sage-dark); }
+
+.progress-track {
+  width: 100%;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--bg-warm);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--coral), var(--sage));
+  transition: width 0.3s ease;
+}
+
+.stat-next-main { font-size: 1.05rem; font-weight: 800; }
+.stat-next-sub { font-size: 0.85rem; color: var(--text-muted); }
+
+.reminder-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.toggle-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.32rem 0.55rem;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.interactions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+.interaction-banner {
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: var(--peach-soft);
+  border: 1px solid var(--peach-border);
+  border-left: 5px solid #D99B38;
+  font-size: 0.9rem;
+}
+
+.interaction-banner.sev-high {
+  background: var(--coral-soft);
+  border-color: var(--coral-border);
+  border-left-color: var(--coral);
+}
+
+.interaction-banner strong { display: block; margin-bottom: 0.2rem; }
+
+.section-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.section-heading {
+  margin: 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.dose-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 5px solid var(--coral);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.1rem;
+  flex-wrap: wrap;
+  box-shadow: var(--shadow-sm);
+}
+
+.dose-row.status-taken {
+  border-left-color: var(--sage);
+  background: #F7FBF8;
+}
+
+.dose-row.status-overdue {
+  border-left-color: #D99B38;
+  background: #FFFBF4;
+}
+
+.dose-row.status-skipped {
+  border-left-color: var(--text-light);
+  opacity: 0.72;
+}
+
+.dose-time-box {
+  min-width: 72px;
+  text-align: center;
+  padding: 0.4rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: var(--coral-soft);
+  color: var(--coral-hover);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.dose-row.status-taken .dose-time-box {
+  background: var(--sage-soft);
+  color: var(--sage-dark);
+}
+
+.dose-info { flex: 1; min-width: 200px; }
+.dose-med-name { font-weight: 800; font-size: 1.02rem; }
+.dose-sub { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.15rem; }
+.dose-actions { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(335px, 1fr));
+  gap: 1rem;
+}
+
+.entity-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.15rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.entity-card.inactive-entity { opacity: 0.7; background: var(--bg-subtle); }
+
+.entity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.entity-title { margin: 0; font-size: 1.06rem; font-weight: 800; line-height: 1.3; }
+.entity-subtitle { font-size: 0.84rem; color: var(--text-muted); margin-top: 0.15rem; }
+
+.code-chip {
+  display: inline-block;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.08rem 0.42rem;
+  border-radius: 6px;
+  background: var(--bg-warm);
+  color: var(--text-muted);
+  margin-left: 0.3rem;
+}
+
+.phase-box {
+  padding: 0.55rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  border: 1px solid var(--border);
+}
+.phase-box-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.1rem;
+}
+
+.phase-stable { background: var(--sage-soft); border-color: var(--sage-border); color: var(--sage-dark); }
+.phase-early { background: var(--info-soft); border-color: var(--info-border); color: #274463; }
+.phase-progressive { background: var(--peach-soft); border-color: var(--peach-border); color: var(--peach-dark); }
+.phase-acute { background: var(--danger-soft); border-color: var(--danger-border); color: var(--danger); }
+.phase-remission { background: var(--sage-soft); border-color: var(--sage-border); color: var(--sage-dark); }
+.phase-monitoring { background: var(--bg-warm); border-color: var(--border-strong); color: var(--text-main); }
+
+.entity-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding-top: 0.35rem;
+  border-top: 1px dashed var(--border);
+}
+
+.entity-meta-list strong { color: var(--text-main); }
+
+.entity-footer {
+  margin-top: auto;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.79rem;
+  font-weight: 700;
+  background: var(--coral-soft);
+  color: var(--coral-hover);
+  border: 1px solid var(--coral-border);
+}
+
+.pill-sage {
+  background: var(--sage-soft);
+  color: var(--sage-dark);
+  border-color: var(--sage-border);
+}
+
+.pill-peach {
+  background: var(--peach-soft);
+  color: var(--peach-dark);
+  border-color: var(--peach-border);
+}
+
+.pill-neutral {
+  background: var(--bg-warm);
+  color: var(--text-muted);
+  border-color: var(--border);
+}
+
+.card-allergy-box {
+  border-left: 5px solid var(--danger);
+}
+
+.allergy-add-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.2fr 0.8fr auto;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.allergy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.38rem 0.68rem;
+  border-radius: 8px;
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+  font-size: 0.86rem;
+}
+.allergy-chip.sev-medium { background: var(--peach-soft); border-color: var(--peach-border); color: var(--peach-dark); }
+.allergy-chip.sev-low { background: var(--bg-warm); border-color: var(--border-strong); color: var(--text-main); }
+.allergy-chip button { border: none; background: transparent; color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1; }
+
+/* ==========================================================================
+   Tünetnaplózó
+   ========================================================================== */
+
+.symptom-group-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 0.95rem;
+  margin-bottom: 0.9rem;
+}
+
+.symptom-group-label {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--coral-hover);
+  margin-bottom: 0.55rem;
+}
+
+.symptom-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.sym-chip-btn {
+  padding: 0.4rem 0.78rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: #FFFFFF;
+  color: var(--text-main);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.sym-chip-btn:hover { border-color: var(--coral); }
+
+.sym-chip-btn.selected {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #FFFFFF;
+}
+
+.symptom-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 540px;
+  overflow-y: auto;
+}
+
+.symptom-log-card {
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-subtle);
+  cursor: pointer;
+  transition: border-color 0.14s ease;
+}
+
+.symptom-log-card:hover { border-color: var(--coral); }
+
+.symptom-log-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  font-size: 0.86rem;
+}
+
+/* ==========================================================================
+   Spera 4-szintű Önmenedzsment (Napi 30 mp + Biomarkerek + Heti + Kontroll)
+   ========================================================================== */
+
+.nav-badge-sage {
+  background: var(--sage-soft);
+  color: var(--sage-dark);
+  border: 1px solid var(--sage-border);
+}
+
+.toggle-pill-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.34rem 0.72rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.toggle-pill-inline input {
+  accent-color: var(--coral);
+  width: 15px;
+  height: 15px;
+}
+
+.card-checkin-mini {
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--coral-soft) 100%);
+  border-color: var(--coral-border);
+}
+
+.card-checkin-mini.is-done {
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--sage-soft) 100%);
+  border-color: var(--sage-border);
+}
+
+.checkin-mini-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.38rem;
+  margin: 0.55rem 0 0.75rem;
+}
+
+.checkin-context-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  padding: 0.8rem 1.05rem;
+  margin-bottom: 1.1rem;
+}
+
+.checkin-date-group {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.checkin-date-group label {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.checkin-date-group input[type="date"] {
+  padding: 0.42rem 0.65rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: #FFFFFF;
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.horizon-jump-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.horizon-jump-pills a.pill-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.self-mgmt-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.self-mgmt-main-col,
+.self-mgmt-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.checkin-tier-card {
+  position: relative;
+}
+
+.tier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tier-badge {
+  display: inline-block;
+  font-size: 0.73rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.35rem;
+}
+
+.tier-daily { background: var(--coral-soft); color: var(--coral-hover); border: 1px solid var(--coral-border); }
+.tier-cycle { background: var(--peach-soft); color: var(--peach-dark); border: 1px solid var(--peach-border); }
+.tier-weekly { background: var(--info-soft); color: var(--info); border: 1px solid var(--info-border); }
+.tier-visit { background: var(--sage-soft); color: var(--sage-dark); border: 1px solid var(--sage-border); }
+
+.checkin-question {
+  padding: 0.85rem 0;
+  border-bottom: 1px dashed var(--border);
+}
+
+.checkin-question:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0.25rem;
+}
+
+.cq-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  margin-bottom: 0.55rem;
+}
+
+.cq-title {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.cq-prompt {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.medical-why {
+  margin: 0.48rem 0 0;
+  padding: 0.42rem 0.68rem;
+  border-left: 3px solid var(--sage);
+  background: var(--bg-subtle);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.medical-why strong {
+  color: var(--sage-dark);
+}
+
+.hide-medical-why .medical-why {
+  display: none;
+}
+
+.seg-btn-row {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: nowrap;
+}
+
+.seg-btn-row.seg-wrap {
+  flex-wrap: wrap;
+}
+
+.seg-btn {
+  flex: 1 1 auto;
+  min-width: 78px;
+  padding: 0.52rem 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: #FFFFFF;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  text-align: center;
+}
+
+.seg-btn:hover {
+  border-color: var(--coral);
+  background: var(--bg-subtle);
+}
+
+.seg-btn.active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(224, 122, 95, 0.28);
+}
+
+.seg-btn.seg-btn-sage.active {
+  background: var(--sage-hover);
+  border-color: var(--sage-hover);
+  box-shadow: 0 2px 8px rgba(100, 149, 125, 0.28);
+}
+
+.seg-btn.seg-btn-warn.active {
+  background: var(--danger);
+  border-color: var(--danger);
+  box-shadow: 0 2px 8px rgba(184, 66, 59, 0.25);
+}
+
+.icon-scale-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.45rem;
+}
+
+.icon-scale-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  padding: 0.55rem 0.35rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: #FFFFFF;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: var(--text-main);
+}
+
+.icon-scale-btn:hover {
+  border-color: var(--coral);
+  transform: translateY(-1px);
+}
+
+.icon-scale-btn .scale-emoji {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  color: var(--sage-dark);
+  transition: color 0.15s ease;
+}
+
+.icon-scale-btn.active .scale-emoji {
+  color: var(--coral-hover);
+}
+
+.inline-ui-icon {
+  display: inline-block;
+  vertical-align: -3px;
+  margin-right: 0.25rem;
+  flex-shrink: 0;
+}
+
+.sheet-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.2rem;
+}
+
+.sheet-brand-emblem {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(145deg, #FFFFFF 0%, var(--peach-soft) 65%, var(--sage-soft) 100%);
+  border: 1px solid var(--peach-border);
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.icon-scale-btn .scale-num {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.icon-scale-btn .scale-lbl {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+}
+
+.icon-scale-btn.active {
+  background: var(--coral-soft);
+  border-color: var(--coral);
+  box-shadow: 0 0 0 2px rgba(224, 122, 95, 0.18);
+}
+
+.icon-scale-btn.active .scale-num,
+.icon-scale-btn.active .scale-lbl {
+  color: var(--coral-hover);
+}
+
+.sleep-control-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.sleep-slider-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.75rem;
+}
+
+.sleep-slider-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.83rem;
+  margin-bottom: 0.25rem;
+}
+
+.sleep-slider-top strong {
+  color: var(--coral-hover);
+  font-size: 0.94rem;
+}
+
+.sleep-slider-box input[type="range"] {
+  width: 100%;
+  accent-color: var(--coral);
+  cursor: pointer;
+  margin: 0.15rem 0;
+}
+
+.sleep-slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.71rem;
+  color: var(--text-light);
+}
+
+.biomarker-context-note {
+  background: var(--peach-soft);
+  border: 1px solid var(--peach-border);
+  color: var(--peach-dark);
+  border-radius: var(--radius-sm);
+  padding: 0.58rem 0.8rem;
+  font-size: 0.83rem;
+  margin-bottom: 0.5rem;
+}
+
+.biomarker-context-note.is-ttc {
+  background: var(--sage-soft);
+  border-color: var(--sage-border);
+  color: var(--sage-dark);
+}
+
+.bbt-inline-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.metabolic-enable-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px dashed var(--border-strong);
+  background: var(--bg-subtle);
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+.metabolic-enable-bar input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--coral);
+  flex-shrink: 0;
+}
+
+.metabolic-fields-wrap {
+  margin-top: 0.6rem;
+  padding-top: 0.3rem;
+}
+
+.extra-symptoms-details {
+  padding: 0.85rem 1.1rem;
+}
+
+.extra-symptoms-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-size: 0.92rem;
+  list-style: none;
+}
+
+.extra-symptoms-summary::-webkit-details-marker {
+  display: none;
+}
+
+.extra-symptoms-body {
+  margin-top: 0.95rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--border);
+}
+
+.checkin-save-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  padding: 0.95rem 1.15rem;
+  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  border: 1.5px solid var(--coral-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 4. Orvosi kontrollra felkészítő */
+.visit-prep-card {
+  border-top: 4px solid var(--sage);
+}
+
+.visit-countdown-banner {
+  border-radius: var(--radius-sm);
+  padding: 0.72rem 0.9rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.95rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+
+.visit-countdown-banner.is-soon {
+  background: var(--coral-soft);
+  border: 1.5px solid var(--coral-border);
+  color: var(--coral-hover);
+}
+
+.adherence-summary-box {
+  background: var(--sage-soft);
+  border: 1px solid var(--sage-border);
+  border-radius: var(--radius-sm);
+  padding: 0.78rem 0.95rem;
+  margin-bottom: 0.95rem;
+}
+
+.adherence-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.adherence-top strong {
+  color: var(--sage-dark);
+  font-size: 1.25rem;
+}
+
+.adherence-sub {
+  font-size: 0.79rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
+/* Elemzések – Önmenedzsment mintázatok */
+.self-mgmt-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.self-mgmt-kpi {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.78rem 0.9rem;
+}
+
+.self-mgmt-kpi-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-light);
+}
+
+.self-mgmt-kpi-val {
+  font-size: 1.32rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0.18rem 0 0.15rem;
+}
+
+.self-mgmt-kpi-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Orvosi PDF tetején lévő Konzultációs pontok kiemelt doboz */
+.sheet-consultation-box {
+  background: var(--sage-soft);
+  border: 2px solid var(--sage-border);
+  border-left: 6px solid var(--sage-hover);
+  border-radius: var(--radius-md);
+  padding: 1.05rem 1.2rem;
+  margin-bottom: 1.4rem;
+  break-inside: avoid;
+}
+
+.sheet-consultation-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.65rem;
+}
+
+.sheet-consultation-head h4 {
+  margin: 0;
+  font-size: 1.04rem;
+  font-weight: 800;
+  color: var(--sage-dark);
+}
+
+.sheet-consultation-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+}
+
+.sheet-consultation-questions {
+  background: #FFFFFF;
+  border: 1px solid var(--sage-border);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.9rem;
+  white-space: pre-line;
+  font-size: 0.92rem;
+}
+
+.sheet-consultation-patterns {
+  margin-top: 0.65rem;
+  font-size: 0.83rem;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   Elemzések & SVG Grafikonok
+   ========================================================================== */
+
+.chart-card {
+  margin-bottom: 1.2rem;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.biomarker-pills,
+.phase-selector-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.phase-selector-bar {
+  margin-bottom: 1.15rem;
+}
+
+.pill-btn {
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.83rem;
+  padding: 0.42rem 0.82rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.pill-btn:hover { border-color: var(--coral); color: var(--coral-hover); }
+
+.pill-btn.active {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #FFFFFF;
+}
+
+.svg-chart-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.svg-chart-wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.charts-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.15rem;
+}
+
+.lab-mini-table-wrap {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.data-table th {
+  font-size: 0.77rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-light);
+  background: var(--bg-subtle);
+}
+
+/* ==========================================================================
+   Étrend & Vitaminajánló
+   ========================================================================== */
+
+.nutrition-banner {
+  background: linear-gradient(135deg, var(--sage-soft), #FFFFFF);
+  border: 1px solid var(--sage-border);
+  border-radius: var(--radius-md);
+  padding: 1.15rem 1.35rem;
+  margin-bottom: 1.1rem;
+}
+
+.nutrition-banner h3 { margin: 0 0 0.25rem; color: var(--sage-dark); }
+.nutrition-banner p { margin: 0; color: var(--text-muted); }
+
+.interactions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 0.85rem;
+}
+
+/* ==========================================================================
+   Interaktív Betegúttérkép (Patient Journey)
+   ========================================================================== */
+
+.journey-map-card {
+  padding: 1.6rem;
+}
+
+.journey-stepper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.journey-step-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 0.4rem;
+  padding: 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  background: var(--bg-subtle);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  position: relative;
+}
+
+.journey-step-btn:hover {
+  border-color: var(--coral);
+  transform: translateY(-2px);
+}
+
+.journey-step-btn.active {
+  background: var(--coral-soft);
+  border-color: var(--coral);
+  box-shadow: var(--shadow-sm);
+}
+
+.journey-step-btn.is-current-user::after {
+  content: "Itt tartok";
+  position: absolute;
+  top: -10px;
+  right: 10px;
+  background: var(--sage-hover);
+  color: #FFFFFF;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.14rem 0.5rem;
+  border-radius: 999px;
+}
+
+.journey-num {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--border-strong);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--text-main);
+}
+
+.journey-step-btn.active .journey-num {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #FFFFFF;
+}
+
+.journey-step-title {
+  font-weight: 800;
+  font-size: 0.92rem;
+  color: var(--text-main);
+  line-height: 1.25;
+}
+
+.journey-step-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.journey-detail-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.35rem 1.5rem;
+}
+
+.journey-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.journey-pillar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.95rem 1rem;
+}
+
+.journey-pillar.pillar-bottleneck { border-top: 4px solid var(--coral); }
+.journey-pillar.pillar-decision { border-top: 4px solid var(--peach); }
+.journey-pillar.pillar-support { border-top: 4px solid var(--sage); }
+
+.journey-pillar h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.journey-pillar p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   Orvosi összefoglaló (Állapotlap)
+   ========================================================================== */
+
+.summary-sheet {
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border-bottom: 2px solid var(--coral);
+  padding-bottom: 1.1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.sheet-eyebrow {
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--coral-hover);
+}
+
+.sheet-patient-name {
+  margin: 0.2rem 0 0.35rem;
+  font-size: 1.65rem;
+  font-weight: 800;
+}
+
+.sheet-patient-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.sheet-allergy-alert {
+  padding: 0.95rem 1.15rem;
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  border: 2px solid var(--danger-border);
+  color: var(--danger);
+  margin-bottom: 1.4rem;
+}
+
+.sheet-allergy-alert.no-allergy {
+  background: var(--sage-soft);
+  border-color: var(--sage-border);
+  color: var(--sage-dark);
+}
+
+.sheet-section {
+  margin-bottom: 1.5rem;
+}
+
+.sheet-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--coral-hover);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.sheet-condition-item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1.05rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-subtle);
+  break-inside: avoid;
+}
+
+.sheet-notes-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.sheet-note-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.85rem 1rem;
+}
+
+.sheet-note-box h4 { margin: 0 0 0.35rem; font-size: 0.88rem; color: var(--text-muted); }
+.sheet-note-box p { margin: 0; white-space: pre-line; font-size: 0.92rem; }
+
+/* ==========================================================================
+   Űrlapok és Modalok
+   ========================================================================== */
+
+.form-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
+.form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.85rem; }
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.8rem;
+}
+
+.form-group label { font-size: 0.86rem; font-weight: 700; }
+
+.form-group input,
+.form-group select,
+.form-group textarea,
+.allergy-add-row input,
+.allergy-add-row select,
+.time-adder-row input {
+  width: 100%;
+  padding: 0.56rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: #FFFFFF;
+  color: var(--text-main);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.16);
+}
+
+.form-help { margin: 0.25rem 0 0; font-size: 0.82rem; color: var(--text-muted); }
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.checkbox-row input { width: 17px; height: 17px; accent-color: var(--coral); }
+
+.form-actions-right { display: flex; justify-content: flex-end; margin-top: 0.5rem; }
+.form-actions-between { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+.time-adder-row { display: flex; gap: 0.5rem; align-items: center; }
+.time-adder-row input { max-width: 145px; }
+
+.time-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  background: var(--coral-soft);
+  border: 1px solid var(--coral-border);
+  color: var(--coral-hover);
+  font-weight: 700;
+}
+.time-chip button { border: none; background: transparent; color: inherit; cursor: pointer; font-size: 1rem; }
+
+.days-selector { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.day-pill { position: relative; cursor: pointer; }
+.day-pill input { position: absolute; opacity: 0; }
+.day-pill span {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 42px; height: 36px; padding: 0 0.45rem;
+  border-radius: 8px; border: 1px solid var(--border-strong);
+  font-weight: 700; font-size: 0.84rem; color: var(--text-muted);
+}
+.day-pill input:checked + span { background: var(--coral); border-color: var(--coral); color: #FFFFFF; }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(46, 38, 35, 0.52);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-dialog {
+  width: 100%;
+  max-width: 660px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-dialog.modal-sm { max-width: 480px; }
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.3rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: #FFFFFF;
+}
+
+.modal-header h3 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+.btn-icon-close { border: none; background: transparent; font-size: 1.6rem; color: var(--text-muted); cursor: pointer; line-height: 1; }
+.modal-body { padding: 1.2rem 1.3rem; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 0.55rem; margin-top: 1.1rem; padding-top: 0.9rem; border-top: 1px solid var(--border); }
+
+.empty-state {
+  text-align: center;
+  padding: 2rem 1.25rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  grid-column: 1 / -1;
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 360px;
+}
+
+.toast {
+  background: var(--text-main);
+  color: #FFFFFF;
+  padding: 0.78rem 1rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-left: 4px solid var(--sage);
+}
+.toast.toast-error { border-left-color: var(--coral); }
+
+/* ==========================================================================
+   Reszponzív nézet
+   ========================================================================== */
+
+@media (max-width: 960px) {
+  .hero-card { grid-template-columns: 1fr; text-align: left; }
+  .hero-metrics { padding-left: 0; border-left: none; border-top: 1px solid var(--border); padding-top: 0.9rem; }
+  .dashboard-split,
+  .self-mgmt-layout,
+  .charts-grid-2,
+  .journey-detail-grid { grid-template-columns: 1fr; }
+  .journey-stepper { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid-3 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 700px) {
+  .selectable-cards-grid,
+  .form-grid-2,
+  .form-grid-3,
+  .sleep-control-grid,
+  .allergy-add-row,
+  .sheet-notes-grid,
+  .journey-stepper { grid-template-columns: 1fr; }
+  .icon-scale-row { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.3rem; }
+  .icon-scale-btn .scale-lbl { font-size: 0.65rem; }
+  .onboarding-card { padding: 1.35rem; }
+  .summary-sheet { padding: 1.2rem; }
+  .cards-grid { grid-template-columns: 1fr; }
+}
+
+/* ==========================================================================
+   Nyomtatási nézet (@media print) – Tiszta A4 orvosi állapotlap
+   ========================================================================== */
+
+@media print {
+  body { background: #FFFFFF; color: #000000; font-size: 10.5pt; }
+  .no-print,
+  .tab-panel:not(#panel-summary) { display: none !important; }
+  #appShell { display: block !important; }
+  #panel-summary { display: block !important; }
+  .app-main { max-width: 100%; padding: 0; }
+  .summary-sheet { border: none; box-shadow: none; padding: 0; }
+  .sheet-condition-item, .sheet-note-box, .sheet-allergy-alert, .sheet-consultation-box {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .sheet-allergy-alert, .sheet-consultation-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

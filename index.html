@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spera – Nőgyógyászati-Endokrinológiai Ciklus- és Egészségdashboard</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48' fill='none'%3E%3Crect width='48' height='48' rx='14' fill='%23FAF6F2'/%3E%3Cpath d='M11.5 17.5C14.5 7.5 29.5 6.5 36.2 14.8C41.2 21 39.5 30.8 32.8 35.8' stroke='%23C86D51' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M36.5 30.5C33.5 40.5 18.5 41.5 11.8 33.2C6.8 27 8.5 17.2 15.2 12.2' stroke='%237DA690' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M23.8 32.4C18.6 31.8 18.2 25.4 22.6 20.4C24.2 18.5 25.8 16.8 27.6 15.2C28.6 18.6 28.8 24.2 27 28.4C25.8 31 24.2 32.4 22.8 32.4C21.8 32.4 22.2 29.5 23.8 27.2' stroke='%234F7562' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='23.8' cy='25.8' r='2.1' fill='%23C86D51'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ====================================================================
+       INDULÓ KÉRDŐÍV (ONBOARDING) – Minden megnyitáskor üresen indul
+       + Diszkrét „Demó profil automatikus kitöltése” gomb a zsűrinek
+       ==================================================================== -->
+  <div id="onboardingScreen" class="onboarding-screen no-print">
+    <div class="onboarding-card">
+      <div class="onboarding-header">
+        <div class="brand-mark-lg" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="46" height="46" fill="none">
+            <!-- Két egymásba fonódó lágy ív (ciklikusság és hormonális egyensúly) -->
+            <path d="M11.5 17.5C14.5 7.5 29.5 6.5 36.2 14.8C41.2 21 39.5 30.8 32.8 35.8" stroke="#C86D51" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M36.5 30.5C33.5 40.5 18.5 41.5 11.8 33.2C6.8 27 8.5 17.2 15.2 12.2" stroke="#7DA690" stroke-width="2.2" stroke-linecap="round"/>
+            <!-- Púderes barack finom mag-aurája -->
+            <path d="M23.8 32.2C18.9 31.6 18.4 25.4 22.6 20.4C24.2 18.5 25.8 16.8 27.5 15.3C28.5 18.6 28.7 24.1 26.9 28.3C25.8 30.8 24.5 32.1 23.8 32.2Z" fill="#E8C3A3" opacity="0.34"/>
+            <!-- Folytonos vonallal rajzolt, finom mag/hajtás szimbólum -->
+            <path d="M23.8 32.4C18.6 31.8 18.2 25.4 22.6 20.4C24.2 18.5 25.8 16.8 27.6 15.2C28.6 18.6 28.8 24.2 27 28.4C25.8 31 24.2 32.4 22.8 32.4C21.8 32.4 22.2 29.5 23.8 27.2" stroke="#456B58" stroke-width="1.95" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="23.8" cy="25.8" r="2.1" fill="#C86D51"/>
+          </svg>
+        </div>
+        <div>
+          <span class="eyebrow-pill">FIESZTA 2026 • Betegközpontú egészségügyi dashboard</span>
+          <h1 class="onboarding-title">Üdvözöl a Spera!</h1>
+          <p class="onboarding-subtitle">
+            Állítsd be személyes nőgyógyászati-endokrinológiai profilodat, ciklusadataidat és élethelyzetedet.
+            Minden adat <strong>100%-ban helyben, offline</strong> marad a böngésződben.
+          </p>
+        </div>
+      </div>
+
+      <form id="onboardingForm" class="onboarding-form">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="obName">Név vagy becenév *</label>
+            <input type="text" id="obName" required placeholder="pl. Eszter" />
+          </div>
+          <div class="form-group">
+            <label for="obAge">Életkor *</label>
+            <input type="number" id="obAge" required min="14" max="65" placeholder="pl. 29" />
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label for="obCycleLen">Átlagos ciklushossz (nap) *</label>
+            <input type="number" id="obCycleLen" required min="20" max="60" placeholder="pl. 28" />
+          </div>
+          <div class="form-group">
+            <label for="obPeriodLen">Menstruáció hossza (nap) *</label>
+            <input type="number" id="obPeriodLen" required min="2" max="12" placeholder="pl. 5" />
+          </div>
+          <div class="form-group">
+            <label for="obLastPeriod">Utolsó menstruáció kezdete *</label>
+            <input type="date" id="obLastPeriod" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Endokrin érintettség(ek) – több is választható</label>
+          <div class="selectable-cards-grid">
+            <label class="select-card">
+              <input type="checkbox" name="obEndocrine" value="pcos" />
+              <span class="select-card-body">
+                <strong>PCOS / Inzulinrezisztencia (IR)</strong>
+                <small>Ciklus-szabályosság, HOMA-IR, ovuláció és vércukor támogatás</small>
+              </span>
+            </label>
+            <label class="select-card">
+              <input type="checkbox" name="obEndocrine" value="hashimoto" />
+              <span class="select-card-body">
+                <strong>Hashimoto / Pajzsmirigy-alulműködés</strong>
+                <small>TSH / fT4 trendek, L-tiroxin időzítés és kölcsönhatás-figyelő</small>
+              </span>
+            </label>
+            <label class="select-card">
+              <input type="checkbox" name="obEndocrine" value="endometriosis" />
+              <span class="select-card-body">
+                <strong>Endometriózis / Ösztrogéndominancia</strong>
+                <small>Fájdalom- és tünetkövetés, gyulladáscsökkentő étrend, vaspótlás</small>
+              </span>
+            </label>
+          </div>
+          <p class="form-help">Ha egyiket sem jelölöd be, a rendszer általános cikluskövetés / kivizsgálás alatti módban indul.</p>
+        </div>
+
+        <div class="form-group">
+          <label>Jelenlegi élethelyzet *</label>
+          <div class="mode-radio-row">
+            <label class="mode-radio-pill">
+              <input type="radio" name="obMode" value="cycle" checked />
+              <span>Cikluskövetés</span>
+            </label>
+            <label class="mode-radio-pill">
+              <input type="radio" name="obMode" value="ttc" />
+              <span>Baba tervezése</span>
+            </label>
+            <label class="mode-radio-pill">
+              <input type="radio" name="obMode" value="pregnancy" />
+              <span>Várandósság követése</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="onboarding-actions">
+          <button type="submit" class="btn btn-primary btn-lg">Dashboard indítása saját adatokkal</button>
+          <button type="button" id="btnResumeSaved" class="btn btn-secondary hidden">Korábban mentett profil folytatása</button>
+        </div>
+      </form>
+
+      <div class="onboarding-jury-footer">
+        <span><strong>Gyors bemutató a zsűrinek:</strong> Tölts be teljes szintetikus betegprofilt (ciklushossz-trendekkel, laborokkal, gyógyszerekkel és tünetekkel).</span>
+        <button type="button" id="btnFillDemo" class="btn btn-sage btn-sm">Demó profil automatikus kitöltése</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       FŐ ALKALMAZÁS KERET
+       ==================================================================== -->
+  <div id="appShell" class="app-shell hidden">
+    <!-- Fejléc -->
+    <header class="app-header no-print">
+      <div class="header-top">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="32" height="32" fill="none">
+              <path d="M11.5 17.5C14.5 7.5 29.5 6.5 36.2 14.8C41.2 21 39.5 30.8 32.8 35.8" stroke="#C86D51" stroke-width="2.35" stroke-linecap="round"/>
+              <path d="M36.5 30.5C33.5 40.5 18.5 41.5 11.8 33.2C6.8 27 8.5 17.2 15.2 12.2" stroke="#7DA690" stroke-width="2.35" stroke-linecap="round"/>
+              <path d="M23.8 32.2C18.9 31.6 18.4 25.4 22.6 20.4C24.2 18.5 25.8 16.8 27.5 15.3C28.5 18.6 28.7 24.1 26.9 28.3C25.8 30.8 24.5 32.1 23.8 32.2Z" fill="#E8C3A3" opacity="0.34"/>
+              <path d="M23.8 32.4C18.6 31.8 18.2 25.4 22.6 20.4C24.2 18.5 25.8 16.8 27.6 15.2C28.6 18.6 28.8 24.2 27 28.4C25.8 31 24.2 32.4 22.8 32.4C21.8 32.4 22.2 29.5 23.8 27.2" stroke="#456B58" stroke-width="2.05" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="23.8" cy="25.8" r="2.2" fill="#C86D51"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="brand-title">Spera</h1>
+            <p class="brand-subtitle" id="headerPatientSubtitle">Személyes endokrin &amp; ciklus dashboard</p>
+          </div>
+        </div>
+
+        <!-- Élethelyzet-váltó a fejlécben (jegyzet.md §2.3) -->
+        <div class="mode-switcher" role="group" aria-label="Élethelyzet-váltó">
+          <button type="button" class="mode-btn active" data-mode="cycle">Cikluskövetés</button>
+          <button type="button" class="mode-btn" data-mode="ttc">Baba tervezése</button>
+          <button type="button" class="mode-btn" data-mode="pregnancy">Várandósság</button>
+        </div>
+
+        <div class="header-actions">
+          <button type="button" id="btnToggleFont" class="btn btn-ghost btn-sm" aria-pressed="false" title="Nagyobb, könnyebben olvasható betűméret">A+</button>
+          <button type="button" id="btnOpenOnboarding" class="btn btn-ghost btn-sm" title="Kezdő kérdőív / profilváltás">Kérdőív</button>
+          <button type="button" id="btnQuickSummary" class="btn btn-primary btn-sm btn-summary-cta">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/>
+              <path d="M9 12h6M9 16h5"/>
+            </svg>
+            <span>Orvosi összefoglaló</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Fő navigáció -->
+      <nav class="app-nav" role="tablist" aria-label="Dashboard modulok">
+        <button type="button" class="nav-tab active" role="tab" aria-selected="true" data-tab="dashboard" id="tab-dashboard">
+          <span>Áttekintő &amp; Naptár</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-tab="meds" id="tab-meds">
+          <span>Gyógyszerek &amp; Betegségek</span>
+          <span class="nav-badge" id="badgePendingMeds">0</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-tab="symptoms" id="tab-symptoms">
+          <span>Önmenedzsment &amp; Napló</span>
+          <span class="nav-badge nav-badge-sage hidden" id="badgeDailyCheckin">30 mp</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-tab="analytics" id="tab-analytics">
+          <span>Elemzések &amp; Laborok</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-tab="nutrition" id="tab-nutrition">
+          <span>Étrend &amp; Vitaminok</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-tab="journey" id="tab-journey">
+          <span>Betegúttérkép</span>
+        </button>
+        <button type="button" class="nav-tab" role="tab" aria-selected="false" data-tab="summary" id="tab-summary">
+          <span>Orvosi összefoglaló</span>
+        </button>
+      </nav>
+    </header>
+
+    <!-- Aktív gyógyszer-emlékeztető riasztási sáv -->
+    <div id="activeAlertBanner" class="alert-banner hidden no-print" role="alert" aria-live="assertive">
+      <div class="alert-banner-inner">
+        <div class="alert-banner-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <div class="alert-banner-content">
+          <div class="alert-banner-eyebrow">Gyógyszerszedési emlékeztető</div>
+          <div class="alert-banner-title" id="alertBannerTitle">Gyógyszer neve</div>
+          <div class="alert-banner-meta" id="alertBannerMeta">Időpont és utasítás</div>
+        </div>
+        <div class="alert-banner-actions">
+          <button type="button" id="btnAlertTake" class="btn btn-sage btn-sm">Bevettem</button>
+          <button type="button" id="btnAlertSnooze" class="btn btn-secondary btn-sm">Halasztás (+10 p)</button>
+          <button type="button" id="btnAlertDismiss" class="btn btn-ghost btn-sm">Bezárás</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fő tartalom -->
+    <main class="app-main">
+      <!-- ================================================================
+           1. FÜL: ÁTTEKINTŐ & INTERAKTÍV NAPTÁR (+ VÁRANDÓSSÁG MÓD)
+           ================================================================ -->
+      <section id="panel-dashboard" class="tab-panel active" role="tabpanel" aria-labelledby="tab-dashboard">
+        <!-- Okos ciklushossz-módosító javaslat (Smart Alert) -->
+        <div id="smartAlertContainer"></div>
+
+        <!-- Felső hero áttekintő (dinamikusan vált Cikluskövetés / Baba tervezése / Várandósság között) -->
+        <div id="dashboardHero"></div>
+
+        <!-- Érthető klinikai figyelmeztetések (labor időzítés, endokrin terhességi / kontroll tippek) -->
+        <div id="clinicalAlertsGrid" class="alerts-grid"></div>
+
+        <!-- Kéthasábos fő rész: Interaktív Naptár + Mai gyors-gyógyszer & profil kártya -->
+        <div class="dashboard-split">
+          <div class="card calendar-card">
+            <div class="calendar-header">
+              <div>
+                <h2 class="card-title" id="calendarHeading">Ciklusnaptár</h2>
+                <p class="card-subtitle" id="calendarSubheading">Kattints bármely napra a tünetek megtekintéséhez vagy naplózásához.</p>
+              </div>
+              <div class="calendar-nav">
+                <button type="button" id="btnPrevMonth" class="btn btn-ghost btn-sm" aria-label="Előző hónap">&lsaquo;</button>
+                <strong id="calendarMonthLabel" class="calendar-month-label">Hónap</strong>
+                <button type="button" id="btnNextMonth" class="btn btn-ghost btn-sm" aria-label="Következő hónap">&rsaquo;</button>
+              </div>
+            </div>
+
+            <div class="calendar-weekdays">
+              <span>H</span><span>K</span><span>Sze</span><span>Cs</span><span>P</span><span>Szo</span><span>V</span>
+            </div>
+            <div id="calendarGrid" class="calendar-grid"></div>
+
+            <div class="calendar-legend" id="calendarLegend">
+              <span class="legend-item"><i class="dot dot-period"></i> Menstruáció</span>
+              <span class="legend-item"><i class="dot dot-fertile"></i> Termékeny ablak</span>
+              <span class="legend-item"><i class="dot dot-ovulation"></i> Ovuláció</span>
+              <span class="legend-item"><i class="dot dot-lab"></i> Ajánlott hormonlabor</span>
+              <span class="legend-item"><i class="dot dot-symptom"></i> Naplózott tünet</span>
+            </div>
+          </div>
+
+          <div class="dashboard-side-col">
+            <!-- Mai 30 másodperces Napi gyorsteszt gyors-kártya -->
+            <div class="card card-checkin-mini" id="dashboardCheckinCard"></div>
+
+            <!-- Mai gyógyszerek gyors-kártya -->
+            <div class="card">
+              <div class="card-header-inline">
+                <div>
+                  <h3 class="card-title">Mai gyógyszerek</h3>
+                  <p class="card-subtitle" id="miniMedProgress">0 / 0 adag bevéve</p>
+                </div>
+                <button type="button" class="btn btn-outline btn-sm" data-jump-tab="meds">Összes &rarr;</button>
+              </div>
+              <div id="dashboardMiniMeds" class="mini-meds-list"></div>
+            </div>
+
+            <!-- Aktív endokrin profil & gyors ugrás -->
+            <div class="card">
+              <div class="card-header-inline">
+                <h3 class="card-title">Aktív betegségek &amp; fázisok</h3>
+                <button type="button" class="btn btn-ghost btn-sm" data-jump-tab="meds">Kezelés</button>
+              </div>
+              <div id="dashboardConditionsMini" class="mini-conditions-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           2. FÜL: RENDSZERES GYÓGYSZER-EMLÉKEZTETŐ & BETEGSÉG-ADATTÁR
+           ================================================================ -->
+      <section id="panel-meds" class="tab-panel" role="tabpanel" aria-labelledby="tab-meds">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Gyógyszer-emlékeztető és Egészségügyi Adattár</h2>
+            <p class="panel-subtitle">
+              Rendszeres gyógyszerszedési emlékeztető, gyógyszer–vitamin kölcsönhatás-figyelő, valamint a betegségek pontos nevének, fázisának és leírásának tárolása orvosi vizitre.
+            </p>
+          </div>
+          <div class="clock-pill" aria-label="Pontos idő">
+            <span id="liveClock">--:--:--</span>
+          </div>
+        </div>
+
+        <!-- Emlékeztető vezérlő és napi státusz -->
+        <div class="stats-grid-3">
+          <div class="card stat-card">
+            <div class="stat-label">Mai gyógyszerbevétel</div>
+            <div class="stat-value-row">
+              <span class="stat-value" id="statTakenRatio">0 / 0</span>
+              <span class="stat-percent" id="statPercent">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="todayProgressFill" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-label">Következő esedékes adag</div>
+            <div class="stat-next-main" id="nextDoseText">Nincs több adag mára</div>
+            <div class="stat-next-sub" id="nextDoseSub">—</div>
+          </div>
+
+          <div class="card stat-card">
+            <div class="stat-label">Emlékeztető vezérlés</div>
+            <div class="reminder-controls-row">
+              <label class="toggle-inline">
+                <input type="checkbox" id="chkSoundEnabled" checked />
+                <span>Hang</span>
+              </label>
+              <button type="button" id="btnEnableBrowserNotif" class="btn btn-outline btn-sm">Értesítés</button>
+              <button type="button" id="btnTestReminder" class="btn btn-secondary btn-sm">Teszt emlékeztető</button>
+            </div>
+            <div class="form-help" id="notifStatusNote" style="margin:0;">Alkalmazáson belüli emlékeztető aktív.</div>
+          </div>
+        </div>
+
+        <!-- Gyógyszer–vitamin kölcsönhatás-figyelő -->
+        <div id="interactionAlertsContainer" class="interactions-stack"></div>
+
+        <!-- Mai időrendi bevételi lista -->
+        <div class="section-bar">
+          <h3 class="section-heading">Mai gyógyszerszedési terv</h3>
+          <button type="button" id="btnAddMedicationTop" class="btn btn-primary btn-sm">+ Új gyógyszer / vitamin</button>
+        </div>
+        <div id="todayScheduleList" class="schedule-list"></div>
+
+        <!-- Tárolt gyógyszerek listája -->
+        <div class="section-bar" style="margin-top: 2rem;">
+          <h3 class="section-heading">Rögzített gyógyszerek és szedési rend</h3>
+        </div>
+        <div id="medicationsList" class="cards-grid"></div>
+
+        <!-- Részletes betegség- és fázis-adattár -->
+        <div class="section-bar" style="margin-top: 2.25rem;">
+          <div>
+            <h3 class="section-heading">Betegségek pontos neve, fázisa és állapotleírása</h3>
+            <p class="card-subtitle">Orvosi viziten innen vagy az „Orvosi összefoglaló” nézetből minden lényeges részlet azonnal elmondható.</p>
+          </div>
+          <button type="button" id="btnAddCondition" class="btn btn-primary btn-sm">+ Új betegség / állapot</button>
+        </div>
+        <div id="conditionsList" class="cards-grid"></div>
+
+        <!-- Allergiák, kórelőzmény, adatmentés -->
+        <div class="cards-grid" style="margin-top: 2rem;">
+          <div class="card card-allergy-box">
+            <h3 class="card-title">Allergiák és gyógyszerérzékenységek</h3>
+            <p class="card-subtitle">Kiemelt figyelmeztetésként jelenik meg az Orvosi összefoglaló tetején.</p>
+            <div class="allergy-add-row">
+              <input type="text" id="allergyNameInput" placeholder="Allergén (pl. Penicillin)" />
+              <input type="text" id="allergyReactionInput" placeholder="Reakció (pl. kiütés)" />
+              <select id="allergySeverityInput" aria-label="Súlyosság">
+                <option value="high">Súlyos</option>
+                <option value="medium" selected>Közepes</option>
+                <option value="low">Enyhe</option>
+              </select>
+              <button type="button" id="btnAddAllergy" class="btn btn-danger-outline btn-sm">+ Hozzáad</button>
+            </div>
+            <div id="allergiesEditorList" class="chips-row"></div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Alapadatok, kórelőzmény és orvosi jegyzetek</h3>
+            <form id="profileExtraForm">
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="profBloodType">Vércsoport</label>
+                  <select id="profBloodType">
+                    <option value="">Ismeretlen</option>
+                    <option value="A Rh+">A Rh+</option><option value="A Rh-">A Rh-</option>
+                    <option value="B Rh+">B Rh+</option><option value="B Rh-">B Rh-</option>
+                    <option value="AB Rh+">AB Rh+</option><option value="AB Rh-">AB Rh-</option>
+                    <option value="0 Rh+">0 Rh+</option><option value="0 Rh-">0 Rh-</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="profEmergencyPhone">Vészhelyzeti kontakt (név / tel.)</label>
+                  <input type="text" id="profEmergencyPhone" placeholder="pl. Szabó Dávid +36 30..." />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="profMedicalHistory">Kórelőzmény, korábbi műtétek</label>
+                <textarea id="profMedicalHistory" rows="2"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="profDoctorNotes">Aktuális kérdések, megjegyzések a következő orvosi vizitre</label>
+                <textarea id="profDoctorNotes" rows="2"></textarea>
+              </div>
+              <div class="form-actions-between">
+                <div class="data-mini-tools">
+                  <button type="button" id="btnExportJson" class="btn btn-ghost btn-sm">JSON mentés</button>
+                  <label class="btn btn-ghost btn-sm file-input-label">
+                    JSON import
+                    <input type="file" id="inputImportJson" accept=".json,application/json" hidden />
+                  </label>
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Jegyzetek mentése</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           3. FÜL: SPERA ÖNMENEDZSMENT & TÜNETNAPLÓ (4 IDŐSÍK / 30–45 MP)
+           ================================================================ -->
+      <section id="panel-symptoms" class="tab-panel" role="tabpanel" aria-labelledby="tab-symptoms">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Önmenedzsment &amp; Tünetnapló</h2>
+            <p class="panel-subtitle" id="symptomContextSubtitle">
+              Három idősíkra bontott, 30–45 másodperc alatt kitölthető, orvosilag releváns mintázatkövetés és kontroll-előkészítés.
+            </p>
+          </div>
+          <div class="header-actions">
+            <label class="toggle-inline toggle-pill-inline" title="Orvosi háttér-magyarázatok megjelenítése a kérdések alatt">
+              <input type="checkbox" id="chkShowMedicalWhy" checked />
+              <span>Orvosi háttér</span>
+            </label>
+            <span class="pill pill-sage" id="checkinTimeBadge">&#9201; Napi check-in: ~30 mp</span>
+          </div>
+        </div>
+
+        <!-- Idősík-gyorsugró és dátumválasztó sáv -->
+        <div class="checkin-context-bar card">
+          <div class="checkin-date-group">
+            <label for="symDate">Naplózott dátum:</label>
+            <input type="date" id="symDate" required />
+            <span class="pill" id="symCycleContextPill">Ciklusnap</span>
+          </div>
+          <div class="horizon-jump-pills" aria-label="Önmenedzsment idősíkok">
+            <a href="#secDailyCheckin" class="pill-btn active">1. Napi gyorsteszt (30 mp)</a>
+            <a href="#secCycleBiomarkers" class="pill-btn">2. Ciklus-biomarkerek</a>
+            <a href="#secMetabolicMicro" class="pill-btn">3. Heti mikrotünetek</a>
+            <a href="#secVisitPrep" class="pill-btn">4. Orvosi kontroll előtt</a>
+          </div>
+        </div>
+
+        <div class="self-mgmt-layout">
+          <!-- BAL OSZLOP: 1. Napi gyorsteszt + 2. Fázis-biomarkerek + 3. Heti mikrotünetek -->
+          <form id="symptomForm" class="self-mgmt-main-col">
+            <!-- 1. NAPI GYORSTESZT (DAILY CHECK-IN – 30 MÁSODPERC) -->
+            <div class="card checkin-tier-card" id="secDailyCheckin">
+              <div class="tier-header">
+                <div>
+                  <span class="tier-badge tier-daily">1. Napi gyorsteszt • Daily Check-in</span>
+                  <h3 class="card-title">Napi 30 másodperces állapotfelmérés</h3>
+                </div>
+                <span class="pill pill-neutral" id="dailyCompletionPill">Egykattintásos rögzítés</span>
+              </div>
+
+              <!-- 1.1 Gyógyszerbevételi szabály -->
+              <div class="checkin-question">
+                <div class="cq-head">
+                  <label class="cq-title">Gyógyszerbevételi szabály</label>
+                  <span class="cq-prompt">Sikerült ma szabályosan (pl. éhgyomorra, kávé/étel előtt 30 p) bevenned?</span>
+                </div>
+                <div class="seg-btn-row" data-radio-group="medRule" role="group" aria-label="Gyógyszerbevételi szabály">
+                  <button type="button" class="seg-btn" data-value="yes">&#10003; Igen</button>
+                  <button type="button" class="seg-btn" data-value="no">&#10005; Nem</button>
+                  <button type="button" class="seg-btn" data-value="later">&#9200; Később</button>
+                </div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> Pl. éhgyomri tiroxin bevétele kávé/étel előtt 30 perccel. A kihagyások magyarázzák a laborkilengéseket.
+                </p>
+              </div>
+
+              <!-- 1.2 Energiaszint és kimerültség (1-5 skála ikonokkal) -->
+              <div class="checkin-question">
+                <div class="cq-head">
+                  <label class="cq-title">Energiaszint és kimerültség</label>
+                  <span class="cq-prompt">Mennyire érzed magad kipihentnek és energikusnak ma? (1–5)</span>
+                </div>
+                <div class="icon-scale-row" id="energyScaleRow" role="group" aria-label="Energiaszint 1-5"></div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> A krónikus fáradtság a nem megfelelően beállított pajzsmirigy- vagy mellékvese-működés első tünete.
+                </p>
+              </div>
+
+              <!-- 1.3 Agyköd (Brain fog) -->
+              <div class="checkin-question">
+                <div class="cq-head">
+                  <label class="cq-title">„Agyköd” (Brain fog)</label>
+                  <span class="cq-prompt">Tapasztaltál ma koncentrációs nehézséget, tompaságot vagy szótalálási zavart?</span>
+                </div>
+                <div class="seg-btn-row" data-radio-group="brainFog" role="group" aria-label="Agyköd">
+                  <button type="button" class="seg-btn" data-value="no">Nem</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="yes">Igen</button>
+                </div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> Gyakori tünet pajzsmirigy-alulműködésnél és inzulinrezisztenciánál; jól korrelál a laborértékekkel.
+                </p>
+              </div>
+
+              <!-- 1.4 Alvásminőség és ébredés -->
+              <div class="checkin-question">
+                <div class="cq-head">
+                  <label class="cq-title" for="symSleepHours">Alvásminőség és ébredés</label>
+                  <span class="cq-prompt">Alvásidő (óraszám) és ébredési érzet</span>
+                </div>
+                <div class="sleep-control-grid">
+                  <div class="sleep-slider-box">
+                    <div class="sleep-slider-top">
+                      <span>Alvás hossza:</span>
+                      <strong id="sleepHoursDisplay">7,5 óra</strong>
+                    </div>
+                    <input type="range" id="symSleepHours" min="3" max="12" step="0.5" value="7.5" />
+                    <div class="sleep-slider-ticks"><span>3 ó</span><span>6 ó</span><span>9 ó</span><span>12 ó</span></div>
+                  </div>
+                  <div class="seg-btn-row" data-radio-group="sleepQuality" role="group" aria-label="Alvásminőség">
+                    <button type="button" class="seg-btn seg-btn-sage" data-value="restful">
+                      <svg class="inline-ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"/></svg>Pihentető
+                    </button>
+                    <button type="button" class="seg-btn seg-btn-warn" data-value="restless">
+                      <svg class="inline-ui-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2.5-6 5 12 2.5-6h4"/></svg>Zaklatott
+                    </button>
+                  </div>
+                </div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> A kortizolritmus és az inzulinérzékenység közvetlen indikátora.
+                </p>
+              </div>
+
+              <!-- 1.5 Hangulat és szorongás -->
+              <div class="checkin-question">
+                <div class="cq-head">
+                  <label class="cq-title">Hangulat és szorongás</label>
+                  <span class="cq-prompt">1–5 skála és gyors hangulatcímkék</span>
+                </div>
+                <div class="icon-scale-row" id="moodScaleRow" role="group" aria-label="Hangulat 1-5"></div>
+                <div class="symptom-chips" id="moodTagsRow" style="margin-top:0.55rem;"></div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> A hormonális kilengések (ösztrogéndominancia, progeszteronhiány, PMS/PMDD) azonnal tükröződnek a mentális állapotban.
+                </p>
+              </div>
+            </div>
+
+            <!-- 2. CIKLUS- ÉS TERMÉKENYSÉGI BIOMARKEREK (FÁZIS-SPECIFIKUS) -->
+            <div class="card checkin-tier-card" id="secCycleBiomarkers">
+              <div class="tier-header">
+                <div>
+                  <span class="tier-badge tier-cycle">2. Ciklus- és termékenységi biomarkerek • Fázis-specifikus</span>
+                  <h3 class="card-title">Fázishoz és babatervezéshez igazított kérdések</h3>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" id="btnToggleAllBiomarkers">Összes mutatása</button>
+              </div>
+              <div class="biomarker-context-note" id="biomarkerContextBanner"></div>
+
+              <!-- 2.1 Vérzés jellege és intenzitása -->
+              <div class="checkin-question" id="qBleedingWrap">
+                <div class="cq-head">
+                  <label class="cq-title">Vérzés jellege és intenzitása</label>
+                  <span class="cq-prompt">„Milyen a vérzés jellege?”</span>
+                </div>
+                <div class="seg-btn-row seg-wrap" data-radio-group="bleeding" role="group" aria-label="Vérzés jellege">
+                  <button type="button" class="seg-btn" data-value="none">Nincs</button>
+                  <button type="button" class="seg-btn" data-value="spotting">Pecsételő</button>
+                  <button type="button" class="seg-btn" data-value="light">Enyhe</button>
+                  <button type="button" class="seg-btn" data-value="medium">Közepes</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="heavy">Erős</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="clots">Rögös darabokkal kísért</button>
+                </div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> A sárgatest-elégtelenségre (alacsony progeszteron) gyakran a menzesz előtti napokig tartó barna pecsételés utal.
+                </p>
+              </div>
+
+              <!-- 2.2 Méhnyaknyák (Cervical mucus) -->
+              <div class="checkin-question" id="qMucusWrap">
+                <div class="cq-head">
+                  <label class="cq-title">Méhnyaknyák (Cervical mucus)</label>
+                  <span class="cq-prompt">„Tapasztaltál váladékot a mai napon?”</span>
+                </div>
+                <div class="seg-btn-row seg-wrap" data-radio-group="cervicalMucus" role="group" aria-label="Méhnyaknyák">
+                  <button type="button" class="seg-btn" data-value="">Nem rögzítem</button>
+                  <button type="button" class="seg-btn" data-value="dry">Száraz</button>
+                  <button type="button" class="seg-btn" data-value="creamy">Krémes</button>
+                  <button type="button" class="seg-btn" data-value="watery">Vizes</button>
+                  <button type="button" class="seg-btn seg-btn-sage" data-value="eggwhite">Nyúlós, tojásfehérje jellegű</button>
+                </div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> Rendszertelen ciklusnál az ösztrogéncsúcs és a közeledő ovuláció legmegbízhatóbb természetes jele.
+                </p>
+              </div>
+
+              <!-- 2.3 Alhasi fájdalom vagy feszülés -->
+              <div class="checkin-question" id="qPelvicPainWrap">
+                <div class="cq-head">
+                  <label class="cq-title">Alhasi fájdalom vagy feszülés</label>
+                  <span class="cq-prompt">„Érzel kismedencei diszkomfortot?”</span>
+                </div>
+                <div class="seg-btn-row seg-wrap" data-radio-group="pelvicPain" role="group" aria-label="Alhasi fájdalom">
+                  <button type="button" class="seg-btn" data-value="none">Nincs</button>
+                  <button type="button" class="seg-btn" data-value="dull_tension">Tompa feszülés</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="sharp_one_side">Éles egyoldali szúrás</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="strong_cramps">Erős görcsök</button>
+                </div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> Segít beazonosítani a középidős ovulációs fájdalmat (Mittelschmerz) vagy az endometriózisra utaló krónikus kismedencei fájdalmat.
+                </p>
+              </div>
+
+              <!-- Opcionális BBT alaphőmérséklet -->
+              <div class="bbt-inline-row">
+                <div class="form-group" style="margin-bottom:0; max-width: 240px;">
+                  <label for="symBbt">Reggeli alaphőmérséklet – BBT (°C, opcionális)</label>
+                  <input type="number" id="symBbt" step="0.01" min="35.0" max="39.0" placeholder="pl. 36.45" />
+                </div>
+                <div class="form-group" style="margin-bottom:0; max-width: 260px;">
+                  <label for="symIntensity">Összesített tünetterhelés (1–3)</label>
+                  <select id="symIntensity">
+                    <option value="1">1 – Enyhe / jól viselhető</option>
+                    <option value="2" selected>2 – Közepes / érezhető</option>
+                    <option value="3">3 – Erős / mindennapokat zavaró</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. METABOLIKUS ÉS HORMONÁLIS MIKROTÜNETEK (HETI 1-2× VAGY TÜNET ESETÉN) -->
+            <div class="card checkin-tier-card" id="secMetabolicMicro">
+              <div class="tier-header">
+                <div>
+                  <span class="tier-badge tier-weekly">3. Metabolikus &amp; hormonális mikrotünetek • Heti 1–2× / tünet esetén</span>
+                  <h3 class="card-title">Életmód- és gyógyszerhatékonyság monitorozása</h3>
+                </div>
+                <span class="pill pill-peach" id="metabolicDueBadge">Heti ellenőrzés</span>
+              </div>
+
+              <label class="metabolic-enable-bar">
+                <input type="checkbox" id="chkLogMetabolic" />
+                <span><strong>Rögzítem a heti / tüneti metabolikus kérdéssort ehhez a naphoz</strong> (ha ma nincs új tünet, nyugodtan átugorható)</span>
+              </label>
+
+              <div id="metabolicFieldsWrap" class="metabolic-fields-wrap hidden">
+                <!-- 3.1 Reaktív hipoglikémia / Cukoréhség -->
+                <div class="checkin-question">
+                  <div class="cq-head">
+                    <label class="cq-title">Reaktív hipoglikémia / Cukoréhség (IR monitorozás)</label>
+                    <span class="cq-prompt">„Éreztél étkezés után hirtelen fellépő álmosságot, kézremegést vagy erős vágyat édességre?”</span>
+                  </div>
+                  <div class="seg-btn-row" data-radio-group="reactiveHypo" role="group" aria-label="Reaktív hipoglikémia">
+                    <button type="button" class="seg-btn" data-value="no">Nem</button>
+                    <button type="button" class="seg-btn seg-btn-warn" data-value="yes">Igen</button>
+                  </div>
+                  <p class="medical-why">
+                    <strong>Orvosi háttér:</strong> A postprandiális hipoglikémia jelzi, ha a szénhidrátbevitel vagy a metformin/mio-inozitol adagolása finomhangolásra szorul.
+                  </p>
+                </div>
+
+                <!-- 3.2 Emésztés és puffadás -->
+                <div class="checkin-question">
+                  <div class="cq-head">
+                    <label class="cq-title">Emésztés és puffadás</label>
+                    <span class="cq-prompt">„Tapasztaltál kifejezett haspuffadást vagy székrekedést?”</span>
+                  </div>
+                  <div class="seg-btn-row" data-radio-group="bloatingConstipation" role="group" aria-label="Emésztés és puffadás">
+                    <button type="button" class="seg-btn" data-value="no">Nem</button>
+                    <button type="button" class="seg-btn seg-btn-warn" data-value="yes">Igen</button>
+                  </div>
+                  <p class="medical-why">
+                    <strong>Orvosi háttér:</strong> A lelassult bélperisztaltika pajzsmirigy-alulműködésre utalhat, a puffadás pedig a mikrobiom-zavar vagy a gyógyszermellékhatások (pl. metformin) kísérője.
+                  </p>
+                </div>
+
+                <!-- 3.3 Hőháztartás és ödéma -->
+                <div class="checkin-question">
+                  <div class="cq-head">
+                    <label class="cq-title">Hőháztartás és ödéma</label>
+                    <span class="cq-prompt">„Fáztál a megszokottnál jobban ma, vagy tapasztaltál kéz-, láb- vagy szemkörüli duzzanatot?”</span>
+                  </div>
+                  <div class="seg-btn-row" data-radio-group="coldEdema" role="group" aria-label="Hőháztartás és ödéma">
+                    <button type="button" class="seg-btn" data-value="no">Nem</button>
+                    <button type="button" class="seg-btn seg-btn-warn" data-value="yes">Igen</button>
+                  </div>
+                  <p class="medical-why">
+                    <strong>Orvosi háttér:</strong> A perifériás ödéma és a hidegintolerancia a dekompenzált hypothyreosis klasszikus jelei.
+                  </p>
+                </div>
+
+                <!-- 3.4 Bőr- és hajtünetek (Androgén felesleg) -->
+                <div class="checkin-question">
+                  <div class="cq-head">
+                    <label class="cq-title">Bőr- és hajtünetek (Androgén felesleg)</label>
+                    <span class="cq-prompt">„Változott-e a hajhullás mértéke vagy a bőrtünetek (pattanások a nyak/áll vonalán)?”</span>
+                  </div>
+                  <div class="seg-btn-row" data-radio-group="skinHairTrend" role="group" aria-label="Bőr- és hajtünetek">
+                    <button type="button" class="seg-btn seg-btn-sage" data-value="decreased">Csökkent</button>
+                    <button type="button" class="seg-btn" data-value="unchanged">Változatlan</button>
+                    <button type="button" class="seg-btn seg-btn-warn" data-value="increased">Erősödött</button>
+                  </div>
+                  <p class="medical-why">
+                    <strong>Orvosi háttér:</strong> A PCOS-re jellemző hyperandrogenaemia (magas tesztoszteron/DHEA-S) fizikális megnyilvánulásai.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- KIEGÉSZÍTŐ FÁZIS- ÉS KÓRKÉPSPECIFIKUS TÜNETCÍMKÉK + JEGYZET (OPCIONÁLIS) -->
+            <details class="card extra-symptoms-details">
+              <summary class="extra-symptoms-summary">
+                <span><strong>Kiegészítő tünetcímkék és napi jegyzet</strong> (opcionális részletezés)</span>
+                <span class="pill pill-neutral" id="extraSymCountPill">0 kijelölve</span>
+              </summary>
+              <div class="extra-symptoms-body">
+                <div class="symptom-group-box">
+                  <div class="symptom-group-label" id="prioritySymptomLabel">
+                    Kiemelt tünetek az aktuális fázisodra és endokrin profilodra:
+                  </div>
+                  <div id="prioritySymptomChips" class="symptom-chips"></div>
+                </div>
+                <div class="symptom-group-box">
+                  <div class="symptom-group-label">További általános tünetek:</div>
+                  <div id="generalSymptomChips" class="symptom-chips"></div>
+                </div>
+                <div class="form-group">
+                  <label for="symCustom">Egyéb tünet hozzáadása (vesszővel elválasztva)</label>
+                  <input type="text" id="symCustom" placeholder="pl. szédülés, hányinger" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="symNote">Megjegyzés a naphoz</label>
+                  <textarea id="symNote" rows="2" placeholder="pl. Stresszesebb nap, kevesebb alvás, délutáni séta enyhítette a görcsöt."></textarea>
+                </div>
+              </div>
+            </details>
+
+            <div class="checkin-save-bar">
+              <span class="form-help" style="margin:0;">A napi adatok automatikusan frissítik a mintázat-elemzést és az orvosi PDF-et.</span>
+              <button type="submit" class="btn btn-primary btn-lg">Napi gyorsteszt mentése</button>
+            </div>
+          </form>
+
+          <!-- JOBB OSZLOP: 4. Orvosi kontrollra felkészítő + Korábbi bejegyzések -->
+          <div class="self-mgmt-side-col">
+            <!-- 4. ORVOSI KONTROLLRA FELKÉSZÍTŐ (HAVONTA VAGY VIZIT ELŐTT 7 NAPPAL) -->
+            <div class="card checkin-tier-card visit-prep-card" id="secVisitPrep">
+              <div class="tier-header">
+                <div>
+                  <span class="tier-badge tier-visit">4. Orvosi kontrollra felkészítő • Vizit előtt 7 nappal</span>
+                  <h3 class="card-title">Endokrinológiai / nőgyógyászati vizit-előkészítő</h3>
+                </div>
+              </div>
+
+              <div id="visitCountdownBanner" class="visit-countdown-banner"></div>
+
+              <form id="visitPrepForm">
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="vpVisitDate">Következő kontroll dátuma</label>
+                    <input type="date" id="vpVisitDate" />
+                  </div>
+                  <div class="form-group">
+                    <label for="vpVisitType">Kontroll típusa</label>
+                    <select id="vpVisitType">
+                      <option value="Endokrinológiai kontroll">Endokrinológiai kontroll</option>
+                      <option value="Nőgyógyászati kontroll">Nőgyógyászati kontroll</option>
+                      <option value="Endokrinológiai és nőgyógyászati kontroll">Endokrin. &amp; nőgyógyászati</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Összesített adherence-arány doboz -->
+                <div class="adherence-summary-box" id="adherenceSummaryBox"></div>
+
+                <!-- 4.1 Elmúlt 30 nap gyógyszerkihagyás -->
+                <div class="form-group">
+                  <label for="vpMissedChoice">1. Volt-e olyan gyógyszeradag az elmúlt 30 napban, amit elfelejtettél bevenni?</label>
+                  <select id="vpMissedChoice">
+                    <option value="none">Nem, minden adag megvolt (0 kihagyás)</option>
+                    <option value="1-2">1–2 alkalommal kimaradt</option>
+                    <option value="3-5">3–5 alkalommal kimaradt</option>
+                    <option value="more">Többször (6+ alkalommal)</option>
+                  </select>
+                </div>
+                <div class="form-group" id="vpMissedCountGroup">
+                  <label for="vpMissedCount">Kihagyott adagok / napok becsült száma (30 nap alatt)</label>
+                  <input type="number" id="vpMissedCount" min="0" max="30" value="0" />
+                </div>
+
+                <!-- 4.2 Váratlan testsúlyváltozás (kg) -->
+                <div class="form-group">
+                  <label for="vpWeightType">2. Történt-e váratlan testsúlyváltozás az elmúlt hónapban?</label>
+                  <select id="vpWeightType">
+                    <option value="none">Nem történt váratlan változás</option>
+                    <option value="gain">Igen – súlygyarapodás (+ kg)</option>
+                    <option value="loss">Igen – súlycsökkenés (− kg)</option>
+                  </select>
+                </div>
+                <div class="form-grid-2">
+                  <div class="form-group">
+                    <label for="vpWeightDelta">Változás mértéke (kg)</label>
+                    <input type="number" id="vpWeightDelta" step="0.1" min="0" max="30" placeholder="pl. 1.5" />
+                  </div>
+                  <div class="form-group">
+                    <label for="vpCurrentWeight">Aktuális testsúly (kg, opc.)</label>
+                    <input type="number" id="vpCurrentWeight" step="0.1" min="30" max="200" placeholder="pl. 64.5" />
+                  </div>
+                </div>
+
+                <!-- 4.3 Konkrét panasz / kérdés a kezelőorvosnak → Orvosi PDF tetejére -->
+                <div class="form-group">
+                  <label for="vpQuestions">
+                    3. Van-e konkrét panaszod vagy kérdésed a kezelőorvoshoz?
+                    <span class="pill pill-sage" style="margin-left:0.25rem;">PDF tetejére kerül</span>
+                  </label>
+                  <textarea id="vpQuestions" rows="4" placeholder="Írd ide a kérdéseidet – közvetlenül az Orvosi összefoglaló PDF tetején, a Konzultációs pontok között fog megjelenni."></textarea>
+                </div>
+
+                <div class="form-actions-between">
+                  <button type="button" class="btn btn-outline btn-sm" data-jump-tab="summary">Előnézet PDF-ben &rarr;</button>
+                  <button type="submit" class="btn btn-sage btn-sm">Kontroll-előkészítő mentése</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Korábbi bejegyzések -->
+            <div class="card">
+              <h3 class="card-title">Korábbi napi bejegyzések</h3>
+              <p class="card-subtitle">Kattints bármely napra a betöltéséhez és szerkesztéséhez.</p>
+              <div id="symptomHistoryList" class="symptom-history-list"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           4. FÜL: ELEMZÉSEK & ADATVIZUALIZÁCIÓ (100% offline SVG grafikonok)
+           ================================================================ -->
+      <section id="panel-analytics" class="tab-panel" role="tabpanel" aria-labelledby="tab-analytics">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Elemzések és Endokrin Adatvizualizáció</h2>
+            <p class="panel-subtitle">
+              Ciklushossz-trendek, hormonlaborok célértéksávokkal és a ciklusfázis–tünet–alaphőmérséklet (BBT) összefüggései.
+            </p>
+          </div>
+          <div class="header-actions">
+            <button type="button" id="btnAddCycle" class="btn btn-secondary btn-sm">+ Ciklushossz rögzítése</button>
+            <button type="button" id="btnAddLab" class="btn btn-primary btn-sm">+ Új laboreredmény</button>
+          </div>
+        </div>
+
+        <!-- 0. Önmenedzsment mintázatok (30 napos összesítő a napi & heti check-in alapján) -->
+        <div id="selfMgmtAnalyticsCard" class="card chart-card"></div>
+
+        <!-- 1. Endokrin laboreredmények grafikon -->
+        <div class="card chart-card">
+          <div class="chart-header">
+            <div>
+              <h3 class="card-title">Endokrin laboreredmények időbeli alakulása</h3>
+              <p class="card-subtitle" id="labChartHint">Válassz biomarkert a referencia- és optimális (babatervezési) célértéksáv megtekintéséhez.</p>
+            </div>
+            <div id="biomarkerFilterBar" class="biomarker-pills"></div>
+          </div>
+          <div id="labChartContainer" class="svg-chart-wrap"></div>
+          <div id="labLatestTable" class="lab-mini-table-wrap"></div>
+        </div>
+
+        <!-- 2. Ciklushossz-trend + 3. BBT & Tünet korreláció -->
+        <div class="charts-grid-2">
+          <div class="card chart-card">
+            <div class="chart-header">
+              <div>
+                <h3 class="card-title">Ciklushossz-trend és szabályosság</h3>
+                <p class="card-subtitle" id="cycleTrendSummary">Referencia-tartomány: 21–35 nap</p>
+              </div>
+            </div>
+            <div id="cycleChartContainer" class="svg-chart-wrap"></div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="chart-header">
+              <div>
+                <h3 class="card-title">Ciklusfázis – Tünet &amp; Alaphőmérséklet (BBT)</h3>
+                <p class="card-subtitle">A hőmérséklet-emelkedés (ovuláció után) és a tünetintenzitás összefüggése</p>
+              </div>
+            </div>
+            <div id="bbtChartContainer" class="svg-chart-wrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           5. FÜL: ÉTREND- ÉS VITAMINAJÁNLÓ + KÖLCSÖNHATÁS-FIGYELŐ
+           ================================================================ -->
+      <section id="panel-nutrition" class="tab-panel" role="tabpanel" aria-labelledby="tab-nutrition">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Étrend- és Vitaminajánló (Prevenció és Önmenedzsment)</h2>
+            <p class="panel-subtitle" id="nutritionHeaderSub">
+              Aktuális ciklusfázisodra és endokrin profilodra szabott mikrotápanyag- és étkezési javaslatok.
+            </p>
+          </div>
+        </div>
+
+        <!-- Fázisválasztó pillék (böngészhető a többi fázis is) -->
+        <div class="phase-selector-bar" id="nutritionPhaseBar">
+          <button type="button" class="pill-btn" data-nutr-phase="menstruation">Menstruáció</button>
+          <button type="button" class="pill-btn" data-nutr-phase="follicular">Follikuláris</button>
+          <button type="button" class="pill-btn" data-nutr-phase="ovulation">Ovuláció</button>
+          <button type="button" class="pill-btn" data-nutr-phase="luteal">Luteális fázis</button>
+          <button type="button" class="pill-btn" data-nutr-phase="pregnancy">Várandósság</button>
+        </div>
+
+        <div id="nutritionContent"></div>
+
+        <!-- Gyógyszer–vitamin kölcsönhatás-útmutató -->
+        <div class="card" style="margin-top: 1.5rem;">
+          <h3 class="card-title">Gyógyszer–vitamin időzítési és kölcsönhatás-figyelő</h3>
+          <p class="card-subtitle">Kiemelt endokrinológiai szabályok a hatékony felszívódásért (a saját rögzített gyógyszereid alapján kiemelve).</p>
+          <div id="nutritionInteractionsList" class="interactions-grid"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           6. FÜL: INTERAKTÍV BETEGÚTTÉRKÉP (2. kötelező pályázati elem)
+           ================================================================ -->
+      <section id="panel-journey" class="tab-panel" role="tabpanel" aria-labelledby="tab-journey">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Interaktív Nőgyógyászati-Endokrin Betegúttérkép</h2>
+            <p class="panel-subtitle">
+              Az ellátási állomások, tipikus betegút-elakadások és a Spera prevenciós támogatási pontjai. Kattints bármelyik állomásra a részletekért, és jelöld meg, hol tartasz jelenleg!
+            </p>
+          </div>
+        </div>
+
+        <!-- Vizuális folyamatábra -->
+        <div class="card journey-map-card">
+          <div id="journeyStepper" class="journey-stepper"></div>
+          <div id="journeyDetailBox" class="journey-detail-box"></div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           7. NÉZET: EGYKATTINTÁSOS ORVOSI ÖSSZEFOGLALÓ (NYOMTATHATÓ A4)
+           ================================================================ -->
+      <section id="panel-summary" class="tab-panel" role="tabpanel" aria-labelledby="tab-summary">
+        <div class="summary-toolbar no-print">
+          <div>
+            <h2 class="panel-title">Orvosi vizit összefoglaló (Állapotlap)</h2>
+            <p class="panel-subtitle">
+              Egy képernyőn minden lényeges adat a nőgyógyász, endokrinológus vagy háziorvos számára: betegség pontos neve és fázisa, allergiák, gyógyszerek, ciklusadatok és legutóbbi laborok.
+            </p>
+          </div>
+          <div class="header-actions">
+            <button type="button" id="btnCopySummary" class="btn btn-secondary btn-sm">Szöveg másolása</button>
+            <button type="button" id="btnPrintSummary" class="btn btn-primary btn-sm">Nyomtatás / PDF mentés</button>
+          </div>
+        </div>
+
+        <article id="medicalSummarySheet" class="summary-sheet"></article>
+      </section>
+    </main>
+  </div>
+
+  <!-- ====================================================================
+       MODALOK (Betegség, Gyógyszer, Laboreredmény, Ciklushossz)
+       ==================================================================== -->
+
+  <!-- Betegség / fázis modal -->
+  <div id="conditionModal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-labelledby="conditionModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="conditionModalTitle">Betegség és fázis rögzítése</h3>
+        <button type="button" class="btn-icon-close" data-close-modal="conditionModal" aria-label="Bezárás">&times;</button>
+      </div>
+      <form id="conditionForm" class="modal-body">
+        <input type="hidden" id="condId" />
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="condName">Betegség pontos neve *</label>
+            <input type="text" id="condName" required placeholder="pl. Endometriózis / PCOS / Hashimoto" />
+          </div>
+          <div class="form-group">
+            <label for="condIcd">BNO-kód (opcionális)</label>
+            <input type="text" id="condIcd" placeholder="pl. N80, E28.2, E06.3" />
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="condPhaseCategory">Állapot kategória *</label>
+            <select id="condPhaseCategory" required>
+              <option value="stable">Krónikus – stabil / egyensúlyban</option>
+              <option value="early">Korai / kezdeti szakasz</option>
+              <option value="progressive">Aktív kezelés / stádium alatt</option>
+              <option value="acute">Akut fellángolás / romlás</option>
+              <option value="remission">Remisszió / gyógyulóban</option>
+              <option value="monitoring">Kivizsgálás / megfigyelés alatt</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="condPhase">Pontos fázis / stádium leírása *</label>
+            <input type="text" id="condPhase" required placeholder="pl. II. stádium (rASRM), gyógyszerrel kontrollált" />
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="condDate">Diagnózis dátuma</label>
+            <input type="date" id="condDate" />
+          </div>
+          <div class="form-group">
+            <label for="condDoctor">Kezelőorvos / szakrendelés</label>
+            <input type="text" id="condDoctor" placeholder="pl. Dr. Kovács Zsófia – Endokrinológia" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="condDescription">Részletes állapotleírás (amit az orvosnak el kell mondani) *</label>
+          <textarea id="condDescription" rows="3" required placeholder="pl. Legutóbbi ultrahang, laboreredmények, kezelésre adott válasz..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="condSymptoms">Jellemző tünetek</label>
+          <textarea id="condSymptoms" rows="2" placeholder="pl. Luteális fázisban fáradtság, cikluszavar..."></textarea>
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="condActive" checked />
+          <span>Aktív, jelenleg fennálló állapot</span>
+        </label>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-close-modal="conditionModal">Mégse</button>
+          <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Gyógyszer modal -->
+  <div id="medicationModal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-labelledby="medicationModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="medicationModalTitle">Gyógyszer / vitamin rögzítése</h3>
+        <button type="button" class="btn-icon-close" data-close-modal="medicationModal" aria-label="Bezárás">&times;</button>
+      </div>
+      <form id="medicationForm" class="modal-body">
+        <input type="hidden" id="medId" />
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="medName">Gyógyszer / készítmény neve *</label>
+            <input type="text" id="medName" required placeholder="pl. Letrox 50 µg / Merckformin XR 500 mg" />
+          </div>
+          <div class="form-group">
+            <label for="medIngredient">Hatóanyag</label>
+            <input type="text" id="medIngredient" placeholder="pl. levotiroxin-nátrium" />
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="medDosage">Egyszeri adag *</label>
+            <input type="text" id="medDosage" required placeholder="pl. 1 tabletta (50 µg)" />
+          </div>
+          <div class="form-group">
+            <label for="medCondition">Kapcsolódó betegség</label>
+            <select id="medCondition">
+              <option value="">— Nincs konkrét betegséghez kötve —</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Napi emlékeztető időpontok *</label>
+          <div class="time-adder-row">
+            <input type="time" id="medNewTime" value="08:00" />
+            <button type="button" id="btnAddMedTime" class="btn btn-secondary btn-sm">+ Időpont</button>
+          </div>
+          <div id="medTimesList" class="chips-row" style="margin-top:0.5rem;"></div>
+        </div>
+        <div class="form-group">
+          <label>Szedés napjai *</label>
+          <div class="days-selector" id="medDaysSelector">
+            <label class="day-pill"><input type="checkbox" value="1" checked /><span>H</span></label>
+            <label class="day-pill"><input type="checkbox" value="2" checked /><span>K</span></label>
+            <label class="day-pill"><input type="checkbox" value="3" checked /><span>Sze</span></label>
+            <label class="day-pill"><input type="checkbox" value="4" checked /><span>Cs</span></label>
+            <label class="day-pill"><input type="checkbox" value="5" checked /><span>P</span></label>
+            <label class="day-pill"><input type="checkbox" value="6" checked /><span>Szo</span></label>
+            <label class="day-pill"><input type="checkbox" value="0" checked /><span>V</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="medMeal">Étkezési / bevételi utasítás</label>
+          <select id="medMeal">
+            <option value="Éhgyomorra, étkezés és kávé előtt 45 perccel">Éhgyomorra, étkezés és kávé előtt 45 perccel</option>
+            <option value="Étkezés közben vagy közvetlenül utána">Étkezés közben vagy közvetlenül utána</option>
+            <option value="Étkezés előtt">Étkezés előtt</option>
+            <option value="Étkezéstől függetlenül">Étkezéstől függetlenül</option>
+            <option value="Lefekvés előtt">Lefekvés előtt</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="medNotes">Megjegyzés, mellékhatás, kölcsönhatás</label>
+          <textarea id="medNotes" rows="2" placeholder="pl. Vasat legalább 4 órával később bevenni."></textarea>
+        </div>
+        <label class="checkbox-row">
+          <input type="checkbox" id="medActive" checked />
+          <span>Aktív (emlékeztető bekapcsolva)</span>
+        </label>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-close-modal="medicationModal">Mégse</button>
+          <button type="submit" class="btn btn-primary">Mentés</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Új laboreredmény modal -->
+  <div id="labModal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-labelledby="labModalTitle">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3 id="labModalTitle">Új endokrin laboreredmény</h3>
+        <button type="button" class="btn-icon-close" data-close-modal="labModal" aria-label="Bezárás">&times;</button>
+      </div>
+      <form id="labForm" class="modal-body">
+        <div class="form-group">
+          <label for="labBiomarker">Biomarker *</label>
+          <select id="labBiomarker" required></select>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="labDate">Vérvétel dátuma *</label>
+            <input type="date" id="labDate" required />
+          </div>
+          <div class="form-group">
+            <label for="labValue">Mért érték *</label>
+            <input type="number" id="labValue" step="0.01" required placeholder="pl. 1.85" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="labNote">Megjegyzés (ciklusnap, gyógyszerdózis)</label>
+          <input type="text" id="labNote" placeholder="pl. 3. ciklusnap / 50 µg Letrox mellett" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-close-modal="labModal">Mégse</button>
+          <button type="submit" class="btn btn-primary">Rögzítés</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Új ciklushossz modal -->
+  <div id="cycleModal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-labelledby="cycleModalTitle">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3 id="cycleModalTitle">Tényleges ciklushossz rögzítése</h3>
+        <button type="button" class="btn-icon-close" data-close-modal="cycleModal" aria-label="Bezárás">&times;</button>
+      </div>
+      <form id="cycleForm" class="modal-body">
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="cycMonthLabel">Hónap megnevezése *</label>
+            <input type="text" id="cycMonthLabel" required placeholder="pl. 26. nov." />
+          </div>
+          <div class="form-group">
+            <label for="cycLength">Ciklus hossza (nap) *</label>
+            <input type="number" id="cycLength" required min="18" max="90" placeholder="pl. 34" />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-close-modal="cycleModal">Mégse</button>
+          <button type="submit" class="btn btn-primary">Hozzáadás</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container no-print" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
