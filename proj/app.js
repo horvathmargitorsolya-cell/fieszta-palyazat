@@ -68,12 +68,13 @@
   // ------------------------------------------------------------------------
   let state = createEmptyState();
   let currentTab = "dashboard";
-  let calendarViewDate = new Date();
+  let calendarAnchorDate = new Date();
   let selectedBiomarker = "tsh";
   let selectedNutritionPhase = null; // null => automatikusan aktuális fázis
   let selectedJourneyStep = 1;
   let selectedSymptomSet = new Set();
   let showAllBiomarkers = false;
+  let isSummaryExpanded = false;
   let checkinDraft = createDefaultCheckinDraft();
   let editingMedTimes = [];
   let activeAlert = null;
@@ -92,11 +93,20 @@
       bleeding: "none",
       cervicalMucus: "",
       pelvicPain: "none",
-      metabolicLogged: false,
+      lhTest: "",
+      metabolicLogged: true,
       reactiveHypo: false,
       bloatingConstipation: false,
       coldEdema: false,
-      skinHairTrend: "unchanged"
+      palpitations: false,
+      skinHairTrend: "unchanged",
+      bpSys: "",
+      bpDia: "",
+      glucoseFasting: "",
+      glucosePostMeal: "",
+      pregWeight: "",
+      fetalMovement: "",
+      pregRedFlags: []
     };
   }
 
@@ -138,6 +148,8 @@
       intakeLogs: {},
       cycleHistory: [],
       smartAlertDismissedForAvg: null,
+      prenatalChecklist: {},
+      ttcChecklist: {},
       labResults: [],
       symptomLogs: [],
       settings: {
@@ -179,6 +191,8 @@
       medications: Array.isArray(raw.medications) ? raw.medications : [],
       intakeLogs: raw.intakeLogs && typeof raw.intakeLogs === "object" ? raw.intakeLogs : {},
       cycleHistory: Array.isArray(raw.cycleHistory) ? raw.cycleHistory : [],
+      prenatalChecklist: raw.prenatalChecklist && typeof raw.prenatalChecklist === "object" ? raw.prenatalChecklist : {},
+      ttcChecklist: raw.ttcChecklist && typeof raw.ttcChecklist === "object" ? raw.ttcChecklist : {},
       labResults: Array.isArray(raw.labResults) ? raw.labResults : [],
       symptomLogs: Array.isArray(raw.symptomLogs) ? raw.symptomLogs : [],
       settings: { ...base.settings, ...(raw.settings || {}) }
@@ -464,7 +478,7 @@
           mealRelation: dose.med.mealRelation,
           isTest: false
         });
-        renderMedsAndConditions();
+        renderDashboard();
         break;
       }
     }
@@ -518,11 +532,9 @@
   function renderAll() {
     applySettingsAndHeader();
     renderDashboard();
-    renderMedsAndConditions();
     renderSymptomLogger();
     renderAnalytics();
-    renderNutrition();
-    renderJourneyMap();
+    renderJourneyAndMedicalData();
     renderMedicalSummary();
   }
 
@@ -543,9 +555,6 @@
       btn.classList.toggle("active", btn.dataset.mode === state.mode);
     });
 
-    const pendingMeds = getTodayDoses().filter((d) => !d.log).length;
-    document.getElementById("badgePendingMeds").textContent = String(pendingMeds);
-
     // Napi 30 mp gyorsteszt jelvény
     const todayLog = (state.symptomLogs || []).find((l) => l.date === getTodayKey() && l.dailyCheckin);
     const badgeDaily = document.getElementById("badgeDailyCheckin");
@@ -553,10 +562,10 @@
       badgeDaily.classList.remove("hidden");
       if (todayLog) {
         badgeDaily.textContent = "✓";
-        badgeDaily.title = "Mai 30 mp-es gyorsteszt rögzítve";
+        badgeDaily.title = "Mai gyorsteszt rögzítve";
       } else {
         badgeDaily.textContent = "30 mp";
-        badgeDaily.title = "Mai 30 mp-es gyorsteszt még hátravan";
+        badgeDaily.title = "Mai gyorsteszt még hátravan";
       }
     }
 
@@ -630,6 +639,7 @@
     const reactiveHypoCount = metaLogs.filter((l) => l.metabolic.reactiveHypo).length;
     const bloatingCount = metaLogs.filter((l) => l.metabolic.bloatingConstipation).length;
     const coldEdemaCount = metaLogs.filter((l) => l.metabolic.coldEdema).length;
+    const palpitationsCount = metaLogs.filter((l) => l.metabolic.palpitations).length;
     const latestSkinHair = metaLogs[0]?.metabolic?.skinHairTrend || "";
 
     // Ciklus- és termékenységi biomarkerek
@@ -662,6 +672,7 @@
       reactiveHypoCount,
       bloatingCount,
       coldEdemaCount,
+      palpitationsCount,
       latestSkinHair,
       eggWhiteDays,
       spottingDays,
@@ -724,6 +735,13 @@
     const heroEl = document.getElementById("dashboardHero");
     if (state.mode === "pregnancy") {
       const preg = getPregnancyStatus();
+      const milestone = (DATA.PREGNANCY_MILESTONES || []).find((m) => m.week === Math.min(40, Math.max(4, preg.week))) || {
+        week: preg.week,
+        sizeHu: "Kisbaba",
+        lengthCm: "—",
+        weightG: "—",
+        devNote: ""
+      };
       const circum = 2 * Math.PI * 50;
       const dashOffset = circum * (1 - preg.progressPct / 100);
       heroEl.innerHTML = `
@@ -743,10 +761,10 @@
           <div class="hero-main">
             <span class="pill pill-sage">Várandósság követése • ${preg.trimester}. trimeszter</span>
             <h2>${preg.week}. terhességi hét (${preg.progressPct}%)</h2>
-            <p>
-              Várható szülés időpontja (EDD): <strong>${escapeHtml(formatHuDate(preg.eddIso))}</strong> (${preg.daysRemaining} nap múlva).
-              Az endokrin profilod alapján kiemelt pajzsmirigy-, vércukor- és trimeszter-vitamin ajánlások aktívak.
-            </p>
+            <div class="baby-size-badge">
+              <span>Ezen a héten akkora, mint egy <strong>${escapeHtml(milestone.sizeHu)}</strong> (${escapeHtml(milestone.lengthCm)}, ~${escapeHtml(milestone.weightG)})</span>
+            </div>
+            <p>${escapeHtml(milestone.devNote)} Várható szülés (EDD): <strong>${escapeHtml(formatHuDate(preg.eddIso))}</strong> (${preg.daysRemaining} nap múlva).</p>
             <div class="hero-pills">
               <span class="pill pill-sage">Aktív folát (5-MTHF)</span>
               <span class="pill pill-sage">DHA / Omega-3</span>
@@ -757,8 +775,8 @@
             <div class="hero-metric-row"><span>Trimeszter:</span><strong>${preg.trimester}. trimeszter</strong></div>
             <div class="hero-metric-row"><span>Várható szülés:</span><strong>${escapeHtml(formatHuDate(preg.eddIso))}</strong></div>
             <div class="hero-metric-row"><span>Endokrin profil:</span><strong>${endo.length || 0} aktív kórkép</strong></div>
-            <button type="button" class="btn btn-sage btn-sm" data-jump-tab="nutrition" style="margin-top:0.25rem;">
-              Trimeszter-vitaminok &rarr;
+            <button type="button" class="btn btn-sage btn-sm" data-jump-tab="symptoms" style="margin-top:0.25rem;">
+              Vérnyomás &amp; vércukor rögzítése &rarr;
             </button>
           </div>
         </div>
@@ -771,7 +789,7 @@
         <div class="hero-card">
           <div class="cycle-ring-wrap">
             <svg viewBox="0 0 120 120" width="122" height="122">
-              <circle cx="60" cy="60" r="50" fill="none" stroke="#F0E5DE" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#E7DACB" stroke-width="10"/>
               <circle cx="60" cy="60" r="50" fill="none" stroke="${cyc.phaseInfo.color}" stroke-width="10"
                 stroke-linecap="round" stroke-dasharray="${circum}" stroke-dashoffset="${dashOffset}"
                 transform="rotate(-90 60 60)"/>
@@ -792,11 +810,11 @@
             </div>
           </div>
           <div class="hero-metrics">
-            <div class="hero-metric-row"><span>Következő menstruáció:</span><strong>${escapeHtml(formatHuDate(cyc.nextPeriodIso))}</strong></div>
+            <div class="hero-metric-row"><span>Várható menstruáció:</span><strong>${escapeHtml(formatHuDate(cyc.nextPeriodIso))} (${cyc.daysUntilNextPeriod} nap)</strong></div>
             <div class="hero-metric-row"><span>3–5. napi hormonpanel:</span><strong>3–5. ciklusnap</strong></div>
             <div class="hero-metric-row"><span>Progeszteron labor:</span><strong>${cyc.progLabDay}. nap (ovul. +7)</strong></div>
             <button type="button" class="btn btn-primary btn-sm" data-jump-tab="symptoms" style="margin-top:0.25rem;">
-              Mai tünetek naplózása &rarr;
+              Mai gyorsteszt &amp; tünetek &rarr;
             </button>
           </div>
         </div>
@@ -877,10 +895,16 @@
       )
       .join("");
 
-    // 4) Interaktív Naptár
+    // 4) Élethelyzet-specifikus orvosi fókusz (Babatervezés / Várandósság)
+    renderModeFocusSection();
+
+    // 5) 1,5 hónapos (6 hetes) 4-fázisos Interaktív Naptár
     renderCalendar();
 
-    // 5) Mai 30 másodperces Napi gyorsteszt gyors-kártya
+    // 6) Aktuális fázis étrend- és vitaminajánlója a főoldalon
+    renderDashboardNutrition();
+
+    // 7) Mai gyorsteszt gyors-kártya
     const todayEntry = (state.symptomLogs || []).find((l) => l.date === todayKey && l.dailyCheckin);
     const miniCheckinEl = document.getElementById("dashboardCheckinCard");
     if (miniCheckinEl) {
@@ -891,7 +915,7 @@
           <div class="card-header-inline">
             <div>
               <h3 class="card-title">Mai gyorsteszt kész &#10003;</h3>
-              <p class="card-subtitle">30 másodperces Daily Check-in rögzítve</p>
+              <p class="card-subtitle">Napi orvosi állapotfelmérés rögzítve</p>
             </div>
             <span class="pill pill-sage">Kész</span>
           </div>
@@ -902,26 +926,26 @@
             <span class="pill pill-neutral">Alvás: ${String(dc.sleepHours).replace(".", ",")} ó (${escapeHtml(DATA.SELF_MANAGEMENT_META.sleepQuality[dc.sleepQuality] || "")})</span>
             ${dc.brainFog ? `<span class="pill">Agyköd: Igen</span>` : `<span class="pill pill-sage">Agyköd: Nem</span>`}
           </div>
-          <button type="button" class="btn btn-outline btn-sm" data-jump-tab="symptoms">Szerkesztés / Heti mikrotünetek &rarr;</button>
+          <button type="button" class="btn btn-outline btn-sm" data-jump-tab="symptoms">Szerkesztés / Klinikai jelek &rarr;</button>
         `;
       } else {
         miniCheckinEl.innerHTML = `
           <div class="card-header-inline">
             <div>
-              <h3 class="card-title">Napi gyorsteszt (30 mp)</h3>
-              <p class="card-subtitle">5 egykattintásos orvosi paraméter mára</p>
+              <h3 class="card-title">Orvosi gyorsteszt (30 mp)</h3>
+              <p class="card-subtitle">Gyógyszerhűség, energia, ciklus- és endokrin jelek</p>
             </div>
             <span class="pill">Esedékes</span>
           </div>
           <p class="form-help" style="margin:0.4rem 0 0.75rem;">
-            Gyógyszerszabály, energiaszint, agyköd, alvásminőség és hangulat – túlterhelés nélkül.
+            Egységes, endokrinológiai szempontú napi állapotfelmérés egyetlen helyen.
           </p>
-          <button type="button" class="btn btn-primary btn-sm" data-jump-tab="symptoms">30 mp-es check-in indítása &rarr;</button>
+          <button type="button" class="btn btn-primary btn-sm" data-jump-tab="symptoms">Gyorsteszt indítása &rarr;</button>
         `;
       }
     }
 
-    // 5) Mini gyógyszerek & aktív betegségek oldalsáv
+    // 8) Mini gyógyszerek oldalsáv
     const doses = getTodayDoses();
     const taken = doses.filter((d) => d.log?.status === "taken").length;
     document.getElementById("miniMedProgress").textContent = `${taken} / ${doses.length} mai adag bevéve`;
@@ -948,62 +972,248 @@
         })
         .join("");
     }
+  }
 
-    const activeConds = state.conditions.filter((c) => c.active);
-    const miniCondsEl = document.getElementById("dashboardConditionsMini");
-    if (activeConds.length === 0) {
-      miniCondsEl.innerHTML = `<p class="form-help">Nincs részletes betegség rögzítve. Adj hozzá állapotot a Gyógyszerek &amp; Betegségek fülön!</p>`;
-    } else {
-      miniCondsEl.innerHTML = activeConds
-        .map(
-          (c) => `
-          <div class="mini-cond-item">
-            <strong>${escapeHtml(c.name)}</strong>
-            <span>Fázis: ${escapeHtml(c.phase)}</span>
+  function renderModeFocusSection() {
+    const el = document.getElementById("modeFocusSection");
+    if (!el) return;
+
+    if (state.mode === "ttc") {
+      const cyc = getCycleStatusForDate(getTodayKey());
+      const daysToOvul = cyc.ovulationDay - cyc.cycleDay;
+      const ovulText =
+        daysToOvul === 0
+          ? "Ma várható az ovuláció csúcsa!"
+          : daysToOvul > 0
+          ? `${daysToOvul} nap múlva várható ovuláció (${cyc.ovulationDay}. ciklusnap)`
+          : `Ovulációs ablak után (${cyc.cycleDay}. ciklusnap, luteális fázis)`;
+      const ttcDone = state.ttcChecklist || {};
+      const doneCount = (DATA.TTC_CHECKLIST || []).filter((item) => ttcDone[item.id]).length;
+
+      el.innerHTML = `
+        <div class="mode-focus-grid">
+          <div class="card">
+            <span class="tier-badge tier-cycle">Baba tervezése • Termékenységi fókusz</span>
+            <h3 class="card-title">${escapeHtml(ovulText)}</h3>
+            <p class="card-subtitle">Termékeny ablak: ${cyc.fertileStart}–${cyc.fertileEnd}. ciklusnap • Következő menzesz: ${escapeHtml(formatHuDate(cyc.nextPeriodIso))}</p>
+            <p class="form-help" style="margin-bottom:0.75rem;">
+              Babatervezésnél rögzítsd a napi gyorstesztben a <strong>méhnyaknyákot</strong>, az <strong>LH-tesztet</strong> és a <strong>reggeli alaphőmérsékletet (BBT)</strong> a pontos ovuláció-igazoláshoz.
+            </p>
+            <button type="button" class="btn btn-primary btn-sm" data-jump-tab="symptoms">LH-teszt &amp; BBT rögzítése &rarr;</button>
           </div>
-        `
-        )
-        .join("");
+          <div class="card">
+            <div class="card-header-inline">
+              <div>
+                <h3 class="card-title">Prekoncepciós orvosi ellenőrzőlista</h3>
+                <p class="card-subtitle" style="margin-bottom:0;">${doneCount} / ${(DATA.TTC_CHECKLIST || []).length} mérföldkő teljesítve</p>
+              </div>
+              <span class="pill pill-sage">Orvosi alap</span>
+            </div>
+            <div class="checklist-stack">
+              ${(DATA.TTC_CHECKLIST || [])
+                .map((item) => {
+                  const checked = Boolean(ttcDone[item.id]);
+                  return `
+                    <label class="checklist-row ${checked ? "is-checked" : ""}">
+                      <input type="checkbox" data-ttc-check="${escapeHtml(item.id)}" ${checked ? "checked" : ""} />
+                      <div>
+                        <strong>${escapeHtml(item.title)}</strong> <span class="pill pill-neutral">${escapeHtml(item.target)}</span>
+                        <div class="entity-subtitle">${escapeHtml(item.detail)}</div>
+                      </div>
+                    </label>
+                  `;
+                })
+                .join("")}
+            </div>
+          </div>
+        </div>
+      `;
+      return;
     }
+
+    if (state.mode === "pregnancy") {
+      const preg = getPregnancyStatus();
+      const milestone = (DATA.PREGNANCY_MILESTONES || []).find((m) => m.week === Math.min(40, Math.max(4, preg.week))) || {};
+      const preDone = state.prenatalChecklist || {};
+      const doneCount = (DATA.PRENATAL_CHECKLIST || []).filter((item) => preDone[item.id]).length;
+      const latestVitalsLog = [...(state.symptomLogs || [])]
+        .filter((l) => l.pregnancyCheckin && (l.pregnancyCheckin.bpSys || l.pregnancyCheckin.glucoseFasting || l.pregnancyCheckin.weightKg))
+        .sort((a, b) => b.date.localeCompare(a.date))[0];
+      const pv = latestVitalsLog?.pregnancyCheckin || null;
+
+      el.innerHTML = `
+        <div class="mode-focus-grid">
+          <div class="card">
+            <span class="tier-badge tier-visit">Várandóssági orvosi adatok &amp; fejlődés</span>
+            <h3 class="card-title">${preg.week}. hét: ${escapeHtml(milestone.sizeHu || "Kisbaba")} (${escapeHtml(milestone.lengthCm || "—")}, ~${escapeHtml(milestone.weightG || "—")})</h3>
+            <p class="card-subtitle">${escapeHtml(milestone.devNote || "")}</p>
+            <div class="checkin-mini-stats">
+              <span class="pill pill-sage">Vérnyomás: ${pv?.bpSys && pv?.bpDia ? `${pv.bpSys}/${pv.bpDia} Hgmm` : "Még nincs mérve"}</span>
+              <span class="pill pill-peach">Éhgyomri vc.: ${pv?.glucoseFasting ? `${pv.glucoseFasting} mmol/l` : "—"}</span>
+              <span class="pill pill-neutral">Étkezés u. vc.: ${pv?.glucosePostMeal ? `${pv.glucosePostMeal} mmol/l` : "—"}</span>
+              <span class="pill pill-neutral">Testsúly: ${pv?.weightKg ? `${pv.weightKg} kg` : "—"}</span>
+            </div>
+            <button type="button" class="btn btn-sage btn-sm" data-jump-tab="symptoms">Vérnyomás, vércukor &amp; magzatmozgás rögzítése &rarr;</button>
+          </div>
+          <div class="card">
+            <div class="card-header-inline">
+              <div>
+                <h3 class="card-title">Várandóssági kötelező szűrések &amp; endokrin kontrollok</h3>
+                <p class="card-subtitle" style="margin-bottom:0;">${doneCount} / ${(DATA.PRENATAL_CHECKLIST || []).length} szűrés teljesítve</p>
+              </div>
+            </div>
+            <div class="checklist-stack">
+              ${(DATA.PRENATAL_CHECKLIST || [])
+                .map((item) => {
+                  const checked = Boolean(preDone[item.id]);
+                  return `
+                    <label class="checklist-row ${checked ? "is-checked" : ""}">
+                      <input type="checkbox" data-prenatal-check="${escapeHtml(item.id)}" ${checked ? "checked" : ""} />
+                      <div>
+                        <strong>${escapeHtml(item.weekRange)} – ${escapeHtml(item.title)}</strong>
+                        <span class="pill pill-peach">${escapeHtml(item.endocrineTag)}</span>
+                        <div class="entity-subtitle">${escapeHtml(item.detail)}</div>
+                      </div>
+                    </label>
+                  `;
+                })
+                .join("")}
+            </div>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    el.innerHTML = "";
+  }
+
+  function renderDashboardNutrition() {
+    const el = document.getElementById("dashboardNutritionCard");
+    if (!el) return;
+    const cyc = getCycleStatusForDate(getTodayKey());
+    const activePhase = selectedNutritionPhase || (state.mode === "pregnancy" ? "pregnancy" : cyc.phase);
+    const guide = DATA.NUTRITION_GUIDE[activePhase] || DATA.NUTRITION_GUIDE.follicular;
+    const activeInteractions = getActiveInteractions();
+
+    const phaseTabs = [
+      { key: "menstruation", label: "Menstr." },
+      { key: "follicular", label: "Follik." },
+      { key: "ovulation", label: "Ovul." },
+      { key: "luteal", label: "Luteális" },
+      { key: "pregnancy", label: "Terhesség" }
+    ];
+
+    el.innerHTML = `
+      <div class="card-header-inline">
+        <div>
+          <h3 class="card-title">Étrend &amp; Vitamin ajánló</h3>
+          <p class="card-subtitle" style="margin-bottom:0;">${escapeHtml(guide.title)}</p>
+        </div>
+      </div>
+      <div class="phase-selector-bar" style="margin:0.55rem 0 0.65rem;">
+        ${phaseTabs
+          .map(
+            (t) => `<button type="button" class="pill-btn ${t.key === activePhase ? "active" : ""}" data-nutr-phase="${t.key}">${t.label}</button>`
+          )
+          .join("")}
+      </div>
+      <p class="form-help" style="margin-top:0;">${escapeHtml(guide.focus)}</p>
+      <div class="nutr-mini-list">
+        ${guide.items
+          .map(
+            (item) => `
+            <div class="nutr-mini-item">
+              <strong>${escapeHtml(item.name)}</strong>
+              <div>${escapeHtml(item.why)}</div>
+              <div class="entity-subtitle"><strong>Időzítés:</strong> ${escapeHtml(item.timing)}</div>
+            </div>
+          `
+          )
+          .join("")}
+      </div>
+      <div class="form-help" style="margin-top:0.4rem;">
+        <strong>Étrendi tippek:</strong> ${guide.dietTips.map((t) => escapeHtml(t)).join(" • ")}
+      </div>
+      ${
+        activeInteractions.length > 0
+          ? `<div class="interaction-banner sev-high" style="margin-top:0.75rem; margin-bottom:0; font-size:0.82rem; padding:0.65rem 0.85rem;">
+               <strong>&#9888; Aktív kölcsönhatás:</strong>
+               <span>${escapeHtml(activeInteractions[0].title)} – ${escapeHtml(activeInteractions[0].message)}</span>
+             </div>`
+          : ""
+      }
+    `;
   }
 
   function renderCalendar() {
-    const year = calendarViewDate.getFullYear();
-    const month = calendarViewDate.getMonth();
-    const monthName = new Date(year, month, 1).toLocaleDateString("hu-HU", {
-      year: "numeric",
-      month: "long"
-    });
-    document.getElementById("calendarMonthLabel").textContent = monthName;
-    document.getElementById("calendarHeading").textContent =
-      state.mode === "pregnancy" ? "Várandóssági & tünetnaptár" : "Interaktív ciklusnaptár";
-
-    const firstDay = new Date(year, month, 1);
-    const startOffset = (firstDay.getDay() + 6) % 7; // Hétfő = 0
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
     const todayKey = getTodayKey();
-    const logDates = new Set((state.symptomLogs || []).map((l) => l.date));
+    const cycToday = getCycleStatusForDate(todayKey);
 
-    let html = "";
-    for (let i = 0; i < startOffset; i++) {
-      html += `<div class="cal-day empty"></div>`;
+    // 1,5 hónapos (6 hetes = 42 napos) gördülő naptár: 1 hét vissza + 5 hét előre
+    const base = new Date(calendarAnchorDate);
+    base.setHours(12, 0, 0, 0);
+    base.setDate(base.getDate() - 7);
+    const dow = (base.getDay() + 6) % 7; // Hétfő = 0
+    const startDate = new Date(base);
+    startDate.setDate(base.getDate() - dow);
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 41);
+
+    const startLbl = startDate.toLocaleDateString("hu-HU", { year: "numeric", month: "short" });
+    const endLbl = endDate.toLocaleDateString("hu-HU", { month: "short" });
+    document.getElementById("calendarMonthLabel").textContent =
+      startDate.getMonth() === endDate.getMonth() ? startLbl : `${startLbl} – ${endLbl}`;
+
+    document.getElementById("calendarHeading").textContent =
+      state.mode === "pregnancy" ? "Várandóssági & tünetnaptár (6 hetes)" : "Ciklusnaptár (6 hetes / 1,5 hónapos nézet)";
+
+    const nextPillEl = document.getElementById("calendarNextPeriodPill");
+    if (nextPillEl) {
+      if (state.mode === "pregnancy") {
+        const preg = getPregnancyStatus();
+        nextPillEl.innerHTML = `<span class="pill pill-sage">Várható szülés (EDD): ${escapeHtml(formatHuDate(preg.eddIso))} (${preg.daysRemaining} nap múlva)</span>`;
+      } else {
+        nextPillEl.innerHTML = `<span class="pill">Következő menstruáció várhatóan: ${escapeHtml(formatHuDate(cycToday.nextPeriodIso))} (${cycToday.daysUntilNextPeriod} nap múlva)</span>`;
+      }
     }
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const logDates = new Set((state.symptomLogs || []).map((l) => l.date));
+    let html = "";
+
+    for (let i = 0; i < 42; i++) {
+      const cur = new Date(startDate);
+      cur.setDate(startDate.getDate() + i);
+      const iso = toIsoDate(cur);
+      const dayNum = cur.getDate();
       const isToday = iso === todayKey;
       const hasSymptom = logDates.has(iso);
+      const isFirstOfMonth = dayNum === 1 || i === 0;
+      const monthShort = isFirstOfMonth ? cur.toLocaleDateString("hu-HU", { month: "short" }) : "";
+
       let cls = "cal-day";
       let dots = "";
+      let cycleSub = "";
       let tooltip = formatHuDate(iso);
 
       if (state.mode !== "pregnancy") {
         const info = getCycleStatusForDate(iso);
         tooltip = `${formatHuDate(iso)} • ${info.cycleDay}. ciklusnap (${info.phaseInfo.name})`;
-        if (info.isPeriod) cls += " phase-period";
-        else if (info.isOvulationPeak) cls += " phase-ovulation";
-        else if (info.isFertile) cls += " phase-fertile";
+        cycleSub = `${info.cycleDay}.n`;
 
+        if (info.phase === "menstruation") cls += " phase-period";
+        else if (info.phase === "follicular") cls += " phase-follicular";
+        else if (info.phase === "ovulation") {
+          cls += info.isOvulationPeak ? " phase-ovulation phase-ovulation-peak" : " phase-ovulation";
+        } else {
+          cls += " phase-luteal";
+        }
+
+        if (iso === cycToday.nextPeriodIso) {
+          cls += " is-expected-period-start";
+          tooltip += " • Várható menstruáció kezdete";
+        }
         if (info.isOvulationPeak) dots += `<i class="dot dot-ovulation" title="Várható ovuláció"></i>`;
         if (info.isHormonePanelDay || info.isProgLabDay) {
           dots += `<i class="dot dot-lab" title="Ajánlott hormonlabor nap"></i>`;
@@ -1014,7 +1224,11 @@
 
       html += `
         <button type="button" class="${cls}" data-cal-date="${iso}" title="${escapeHtml(tooltip)}">
-          <span class="cal-day-num">${day}</span>
+          <div class="cal-day-top">
+            <span class="cal-day-num">${dayNum}</span>
+            ${monthShort ? `<span class="cal-month-tag">${escapeHtml(monthShort)}</span>` : ""}
+          </div>
+          ${cycleSub ? `<span class="cal-day-cycle">${escapeHtml(cycleSub)}</span>` : ""}
           <span class="cal-dots">${dots}</span>
         </button>
       `;
@@ -1023,169 +1237,110 @@
   }
 
   // ------------------------------------------------------------------------
-  // 2. Gyógyszerek, Emlékeztetők & Betegség-adattár
+  // 4. Betegúttérkép + Orvosi összefoglaló + Fontos Orvosi Adataim
   // ------------------------------------------------------------------------
-  function renderMedsAndConditions() {
-    const doses = getTodayDoses();
-    const total = doses.length;
-    const takenCount = doses.filter((d) => d.log?.status === "taken").length;
-    const pct = total > 0 ? Math.round((takenCount / total) * 100) : 0;
-
-    document.getElementById("statTakenRatio").textContent = `${takenCount} / ${total}`;
-    document.getElementById("statPercent").textContent = `${pct}%`;
-    document.getElementById("todayProgressFill").style.width = `${pct}%`;
-
-    const pending = doses.filter((d) => !d.log);
-    const nextEl = document.getElementById("nextDoseText");
-    const nextSub = document.getElementById("nextDoseSub");
-    if (total === 0) {
-      nextEl.textContent = "Nincs mai gyógyszer";
-      nextSub.textContent = "Adj hozzá rendszeres gyógyszert vagy vitamint.";
-    } else if (pending.length === 0) {
-      nextEl.textContent = "Minden mai adag kész!";
-      nextSub.textContent = "Ma nincs több esedékes bevétel.";
-    } else {
-      const n = pending[0];
-      nextEl.textContent = `${n.time} – ${n.med.name}`;
-      nextSub.textContent = `${n.med.dosage} • ${n.med.mealRelation}`;
-    }
+  function renderJourneyAndMedicalData() {
+    renderJourneyMap();
 
     // Kölcsönhatás-figyelő
     const interactions = getActiveInteractions();
-    document.getElementById("interactionAlertsContainer").innerHTML = interactions
-      .map(
-        (rule) => `
-        <div class="interaction-banner sev-${rule.severity}">
-          <strong>&#9888; ${escapeHtml(rule.title)}</strong>
-          <span>${escapeHtml(rule.message)}</span>
-        </div>
-      `
-      )
-      .join("");
-
-    // Mai időrendi lista
-    const schedEl = document.getElementById("todayScheduleList");
-    if (doses.length === 0) {
-      schedEl.innerHTML = `<div class="empty-state">Még nincs mára ütemezett gyógyszer. Kattints a „+ Új gyógyszer / vitamin” gombra!</div>`;
-    } else {
-      schedEl.innerHTML = doses
-        .map((d) => {
-          const cond = state.conditions.find((c) => c.id === d.med.conditionId);
-          const statusCls = d.log
-            ? d.log.status === "taken"
-              ? "status-taken"
-              : "status-skipped"
-            : d.isOverdue
-            ? "status-overdue"
-            : "";
-          let btns = "";
-          if (d.log?.status === "taken") {
-            btns = `<span class="pill pill-sage">&#10003; Bevéve (${escapeHtml(d.log.timestamp)})</span>
-                    <button type="button" class="btn btn-ghost btn-sm" data-dose-action="undo" data-dose-key="${escapeHtml(d.key)}">Visszavon</button>`;
-          } else if (d.log?.status === "skipped") {
-            btns = `<span class="pill pill-neutral">Kihagyva</span>
-                    <button type="button" class="btn btn-ghost btn-sm" data-dose-action="undo" data-dose-key="${escapeHtml(d.key)}">Visszavon</button>`;
-          } else {
-            btns = `${d.isOverdue ? '<span class="pill pill-peach">Esedékes</span>' : ""}
-                    <button type="button" class="btn btn-sage btn-sm" data-dose-action="take" data-dose-key="${escapeHtml(d.key)}">Bevettem</button>
-                    <button type="button" class="btn btn-ghost btn-sm" data-dose-action="skip" data-dose-key="${escapeHtml(d.key)}">Kihagyva</button>`;
-          }
-          return `
-            <div class="dose-row ${statusCls}">
-              <div class="dose-time-box">${escapeHtml(d.time)}</div>
-              <div class="dose-info">
-                <div class="dose-med-name">${escapeHtml(d.med.name)} <span class="pill pill-neutral">${escapeHtml(d.med.dosage)}</span></div>
-                <div class="dose-sub">
-                  ${escapeHtml(d.med.mealRelation || "")}
-                  ${cond ? ` • Betegség: <strong>${escapeHtml(cond.name)}</strong>` : ""}
-                </div>
-              </div>
-              <div class="dose-actions">${btns}</div>
-            </div>
-          `;
-        })
+    const interEl = document.getElementById("interactionAlertsContainer");
+    if (interEl) {
+      interEl.innerHTML = interactions
+        .map(
+          (rule) => `
+          <div class="interaction-banner sev-${rule.severity}">
+            <strong>&#9888; ${escapeHtml(rule.title)}</strong>
+            <span>${escapeHtml(rule.message)}</span>
+          </div>
+        `
+        )
         .join("");
     }
 
     // Tárolt gyógyszerek kártyái
     const medsListEl = document.getElementById("medicationsList");
-    if (state.medications.length === 0) {
-      medsListEl.innerHTML = `<div class="empty-state">Nincs rögzített gyógyszer.</div>`;
-    } else {
-      medsListEl.innerHTML = state.medications
-        .map((m) => {
-          const cond = state.conditions.find((c) => c.id === m.conditionId);
-          return `
-            <article class="entity-card ${m.active ? "" : "inactive-entity"}">
-              <div class="entity-header">
-                <div>
-                  <h4 class="entity-title">${escapeHtml(m.name)}</h4>
-                  <div class="entity-subtitle">${m.activeIngredient ? `${escapeHtml(m.activeIngredient)} • ` : ""}<strong>${escapeHtml(m.dosage)}</strong></div>
+    if (medsListEl) {
+      if (state.medications.length === 0) {
+        medsListEl.innerHTML = `<div class="empty-state">Nincs rögzített gyógyszer.</div>`;
+      } else {
+        medsListEl.innerHTML = state.medications
+          .map((m) => {
+            const cond = state.conditions.find((c) => c.id === m.conditionId);
+            return `
+              <article class="entity-card ${m.active ? "" : "inactive-entity"}">
+                <div class="entity-header">
+                  <div>
+                    <h4 class="entity-title">${escapeHtml(m.name)}</h4>
+                    <div class="entity-subtitle">${m.activeIngredient ? `${escapeHtml(m.activeIngredient)} • ` : ""}<strong>${escapeHtml(m.dosage)}</strong></div>
+                  </div>
+                  <span class="pill ${m.active ? "pill-sage" : "pill-neutral"}">${m.active ? "Aktív" : "Szünet"}</span>
                 </div>
-                <span class="pill ${m.active ? "pill-sage" : "pill-neutral"}">${m.active ? "Aktív" : "Szünet"}</span>
-              </div>
-              <div class="chips-row">
-                ${(m.times || []).map((t) => `<span class="pill">${escapeHtml(t)}</span>`).join("")}
-                <span class="pill pill-neutral">${escapeHtml(formatDaysSummary(m.days))}</span>
-              </div>
-              <div class="entity-meta-list">
-                <div><strong>Bevétel:</strong> ${escapeHtml(m.mealRelation || "—")}</div>
-                ${cond ? `<div><strong>Betegség:</strong> ${escapeHtml(cond.name)}</div>` : ""}
-                ${m.notes ? `<div><strong>Megjegyzés:</strong> ${escapeHtml(m.notes)}</div>` : ""}
-              </div>
-              <div class="entity-footer">
-                <button type="button" class="btn btn-ghost btn-sm" data-toggle-med="${escapeHtml(m.id)}">${m.active ? "Szüneteltet" : "Aktivál"}</button>
-                <div class="header-actions">
-                  <button type="button" class="btn btn-secondary btn-sm" data-edit-med="${escapeHtml(m.id)}">Szerkesztés</button>
-                  <button type="button" class="btn btn-danger-outline btn-sm" data-delete-med="${escapeHtml(m.id)}">Törlés</button>
+                <div class="chips-row">
+                  ${(m.times || []).map((t) => `<span class="pill">${escapeHtml(t)}</span>`).join("")}
+                  <span class="pill pill-neutral">${escapeHtml(formatDaysSummary(m.days))}</span>
                 </div>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
+                <div class="entity-meta-list">
+                  <div><strong>Bevétel:</strong> ${escapeHtml(m.mealRelation || "—")}</div>
+                  ${cond ? `<div><strong>Betegség:</strong> ${escapeHtml(cond.name)}</div>` : ""}
+                  ${m.notes ? `<div><strong>Megjegyzés:</strong> ${escapeHtml(m.notes)}</div>` : ""}
+                </div>
+                <div class="entity-footer">
+                  <button type="button" class="btn btn-ghost btn-sm" data-toggle-med="${escapeHtml(m.id)}">${m.active ? "Szüneteltet" : "Aktivál"}</button>
+                  <div class="header-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" data-edit-med="${escapeHtml(m.id)}">Szerkesztés</button>
+                    <button type="button" class="btn btn-danger-outline btn-sm" data-delete-med="${escapeHtml(m.id)}">Törlés</button>
+                  </div>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+      }
     }
 
     // Betegségek & fázisok kártyái
     const condsEl = document.getElementById("conditionsList");
-    if (state.conditions.length === 0) {
-      condsEl.innerHTML = `<div class="empty-state">Még nincs rögzített betegség és fázisleírás. Kattints a „+ Új betegség / állapot” gombra!</div>`;
-    } else {
-      condsEl.innerHTML = state.conditions
-        .map((c) => {
-          const meta = COND_PHASE_META[c.phaseCategory] || COND_PHASE_META.stable;
-          return `
-            <article class="entity-card ${c.active ? "" : "inactive-entity"}">
-              <div class="entity-header">
-                <div>
-                  <h4 class="entity-title">
-                    ${escapeHtml(c.name)}
-                    ${c.icdCode ? `<span class="code-chip">BNO: ${escapeHtml(c.icdCode)}</span>` : ""}
-                  </h4>
-                  ${c.diagnosedDate ? `<div class="entity-subtitle">Diagnózis: ${escapeHtml(formatHuDate(c.diagnosedDate))}</div>` : ""}
+    if (condsEl) {
+      if (state.conditions.length === 0) {
+        condsEl.innerHTML = `<div class="empty-state">Még nincs rögzített betegség és fázisleírás. Kattints a „+ Új betegség / állapot” gombra!</div>`;
+      } else {
+        condsEl.innerHTML = state.conditions
+          .map((c) => {
+            const meta = COND_PHASE_META[c.phaseCategory] || COND_PHASE_META.stable;
+            return `
+              <article class="entity-card ${c.active ? "" : "inactive-entity"}">
+                <div class="entity-header">
+                  <div>
+                    <h4 class="entity-title">
+                      ${escapeHtml(c.name)}
+                      ${c.icdCode ? `<span class="code-chip">BNO: ${escapeHtml(c.icdCode)}</span>` : ""}
+                    </h4>
+                    ${c.diagnosedDate ? `<div class="entity-subtitle">Diagnózis: ${escapeHtml(formatHuDate(c.diagnosedDate))}</div>` : ""}
+                  </div>
+                  <span class="pill ${c.active ? "pill-sage" : "pill-neutral"}">${c.active ? "Aktív" : "Korábbi"}</span>
                 </div>
-                <span class="pill ${c.active ? "pill-sage" : "pill-neutral"}">${c.active ? "Aktív" : "Korábbi"}</span>
-              </div>
-              <div class="phase-box ${meta.cls}">
-                <span class="phase-box-label">Fázis / stádium (${escapeHtml(meta.label)})</span>
-                <strong>${escapeHtml(c.phase)}</strong>
-              </div>
-              <p style="margin:0; font-size:0.9rem;">${escapeHtml(c.description)}</p>
-              <div class="entity-meta-list">
-                ${c.symptoms ? `<div><strong>Tünetek:</strong> ${escapeHtml(c.symptoms)}</div>` : ""}
-                ${c.doctor ? `<div><strong>Szakorvos:</strong> ${escapeHtml(c.doctor)}</div>` : ""}
-              </div>
-              <div class="entity-footer">
-                <span class="entity-subtitle">Orvosi összefoglalóban szerepel</span>
-                <div class="header-actions">
-                  <button type="button" class="btn btn-secondary btn-sm" data-edit-cond="${escapeHtml(c.id)}">Szerkesztés</button>
-                  <button type="button" class="btn btn-danger-outline btn-sm" data-delete-cond="${escapeHtml(c.id)}">Törlés</button>
+                <div class="phase-box ${meta.cls}">
+                  <span class="phase-box-label">Fázis / stádium (${escapeHtml(meta.label)})</span>
+                  <strong>${escapeHtml(c.phase)}</strong>
                 </div>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
+                <p style="margin:0; font-size:0.9rem;">${escapeHtml(c.description)}</p>
+                <div class="entity-meta-list">
+                  ${c.symptoms ? `<div><strong>Tünetek:</strong> ${escapeHtml(c.symptoms)}</div>` : ""}
+                  ${c.doctor ? `<div><strong>Szakorvos:</strong> ${escapeHtml(c.doctor)}</div>` : ""}
+                </div>
+                <div class="entity-footer">
+                  <span class="entity-subtitle">Orvosi összefoglalóban szerepel</span>
+                  <div class="header-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" data-edit-cond="${escapeHtml(c.id)}">Szerkesztés</button>
+                    <button type="button" class="btn btn-danger-outline btn-sm" data-delete-cond="${escapeHtml(c.id)}">Törlés</button>
+                  </div>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
+      }
     }
 
     // Allergiák + Profil jegyzetek
@@ -1234,6 +1389,7 @@
     }
     const dc = existing.dailyCheckin || {};
     const meta = existing.metabolic || {};
+    const pv = existing.pregnancyCheckin || {};
     checkinDraft = {
       medRule: dc.medRule || def.medRule,
       energy: Number(dc.energy) || def.energy,
@@ -1245,11 +1401,20 @@
       bleeding: existing.bleeding || "none",
       cervicalMucus: existing.cervicalMucus || "",
       pelvicPain: existing.pelvicPain || "none",
-      metabolicLogged: Boolean(existing.metabolicLogged),
+      lhTest: existing.lhTest || "",
+      metabolicLogged: true,
       reactiveHypo: Boolean(meta.reactiveHypo),
       bloatingConstipation: Boolean(meta.bloatingConstipation),
       coldEdema: Boolean(meta.coldEdema),
-      skinHairTrend: meta.skinHairTrend || "unchanged"
+      palpitations: Boolean(meta.palpitations),
+      skinHairTrend: meta.skinHairTrend || "unchanged",
+      bpSys: pv.bpSys || "",
+      bpDia: pv.bpDia || "",
+      glucoseFasting: pv.glucoseFasting || "",
+      glucosePostMeal: pv.glucosePostMeal || "",
+      pregWeight: pv.weightKg || "",
+      fetalMovement: pv.fetalMovement || "",
+      pregRedFlags: Array.isArray(pv.redFlags) ? [...pv.redFlags] : []
     };
   }
 
@@ -1315,9 +1480,12 @@
       bleeding: checkinDraft.bleeding,
       cervicalMucus: checkinDraft.cervicalMucus,
       pelvicPain: checkinDraft.pelvicPain,
+      lhTest: checkinDraft.lhTest,
+      fetalMovement: checkinDraft.fetalMovement,
       reactiveHypo: checkinDraft.reactiveHypo ? "yes" : "no",
       bloatingConstipation: checkinDraft.bloatingConstipation ? "yes" : "no",
       coldEdema: checkinDraft.coldEdema ? "yes" : "no",
+      palpitations: checkinDraft.palpitations ? "yes" : "no",
       skinHairTrend: checkinDraft.skinHairTrend
     };
 
@@ -1329,12 +1497,18 @@
       });
     });
 
-    // Heti metabolikus szekció nyitása / zárása
-    const chkMeta = document.getElementById("chkLogMetabolic");
-    const metaWrap = document.getElementById("metabolicFieldsWrap");
-    if (chkMeta && metaWrap) {
-      chkMeta.checked = Boolean(checkinDraft.metabolicLogged);
-      metaWrap.classList.toggle("hidden", !checkinDraft.metabolicLogged);
+    // Várandóssági riasztó tünetek chipek
+    const redFlagsEl = document.getElementById("pregRedFlagsRow");
+    if (redFlagsEl) {
+      redFlagsEl.innerHTML = (DATA.SELF_MANAGEMENT_META.pregnancyRedFlags || [])
+        .map(
+          (flag) => `
+          <button type="button" class="sym-chip-btn ${checkinDraft.pregRedFlags.includes(flag) ? "selected" : ""}" data-preg-flag="${escapeHtml(flag)}">
+            ${escapeHtml(flag)}
+          </button>
+        `
+        )
+        .join("");
     }
 
     // Kiegészítő tünet számláló
@@ -1372,6 +1546,12 @@
       document.getElementById("symIntensity").value = String(existing?.intensity || 2);
       document.getElementById("symNote").value = existing?.note || "";
       document.getElementById("symCustom").value = "";
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ""; };
+      setVal("pregBpSys", checkinDraft.bpSys);
+      setVal("pregBpDia", checkinDraft.bpDia);
+      setVal("pregGlucoseFasting", checkinDraft.glucoseFasting);
+      setVal("pregGlucosePost", checkinDraft.glucosePostMeal);
+      setVal("pregWeight", checkinDraft.pregWeight);
     }
 
     const dailyPill = document.getElementById("dailyCompletionPill");
@@ -1393,10 +1573,13 @@
     const showBleeding = showAllBiomarkers || isTTC || isPreMenstrualOrPeriod || (checkinDraft.bleeding && checkinDraft.bleeding !== "none");
     const showMucus = showAllBiomarkers || isTTC || isFertileOrFollicular || Boolean(checkinDraft.cervicalMucus);
     const showPain = showAllBiomarkers || isTTC || cyc.phase === "menstruation" || cyc.phase === "ovulation" || cyc.phase === "luteal" || (checkinDraft.pelvicPain && checkinDraft.pelvicPain !== "none");
+    const showLh = showAllBiomarkers || isTTC || Boolean(checkinDraft.lhTest);
 
     document.getElementById("qBleedingWrap")?.classList.toggle("hidden", !showBleeding);
     document.getElementById("qMucusWrap")?.classList.toggle("hidden", !showMucus);
     document.getElementById("qPelvicPainWrap")?.classList.toggle("hidden", !showPain);
+    document.getElementById("qLhTestWrap")?.classList.toggle("hidden", !showLh);
+    document.getElementById("secPregnancyVitals")?.classList.toggle("hidden", state.mode !== "pregnancy");
 
     const bioBanner = document.getElementById("biomarkerContextBanner");
     if (bioBanner) {
@@ -1417,22 +1600,6 @@
     const btnToggleAllBio = document.getElementById("btnToggleAllBiomarkers");
     if (btnToggleAllBio) {
       btnToggleAllBio.textContent = showAllBiomarkers ? "Csak fázis-specifikusak" : "Összes mutatása";
-    }
-
-    // 3. Heti metabolikus esedékességi jelvény
-    const stats = computeSelfManagementStats();
-    const metaDueEl = document.getElementById("metabolicDueBadge");
-    if (metaDueEl) {
-      if (stats.daysSinceMetabolic === null) {
-        metaDueEl.className = "pill pill-peach";
-        metaDueEl.textContent = "Még nem rögzítve – ajánlott";
-      } else if (stats.daysSinceMetabolic >= 4) {
-        metaDueEl.className = "pill";
-        metaDueEl.textContent = `Heti ellenőrzés ajánlott (${stats.daysSinceMetabolic} napja)`;
-      } else {
-        metaDueEl.className = "pill pill-sage";
-        metaDueEl.textContent = stats.daysSinceMetabolic === 0 ? "Ma rögzítve ✓" : `Friss (${stats.daysSinceMetabolic} napja rögzítve)`;
-      }
     }
 
     // Kiegészítő fázis + betegségspecifikus chipek
@@ -1896,63 +2063,8 @@
     `;
   }
 
-  // ------------------------------------------------------------------------
-  // 5. Étrend- és Vitaminajánló
-  // ------------------------------------------------------------------------
-  function renderNutrition() {
-    const cyc = getCycleStatusForDate(getTodayKey());
-    const activePhase = selectedNutritionPhase || (state.mode === "pregnancy" ? "pregnancy" : cyc.phase);
-
-    document.querySelectorAll("[data-nutr-phase]").forEach((btn) => {
-      btn.classList.toggle("active", btn.dataset.nutrPhase === activePhase);
-    });
-
-    const guide = DATA.NUTRITION_GUIDE[activePhase] || DATA.NUTRITION_GUIDE.follicular;
-    document.getElementById("nutritionContent").innerHTML = `
-      <div class="nutrition-banner">
-        <h3>${escapeHtml(guide.title)}</h3>
-        <p>${escapeHtml(guide.focus)}</p>
-      </div>
-      <div class="cards-grid">
-        ${guide.items
-          .map(
-            (item) => `
-            <article class="entity-card">
-              <h4 class="entity-title">${escapeHtml(item.name)}</h4>
-              <div class="chips-row">
-                ${item.tags.map((t) => `<span class="pill pill-sage">${escapeHtml(t)}</span>`).join("")}
-              </div>
-              <p style="margin:0; font-size:0.9rem;">${escapeHtml(item.why)}</p>
-              <div class="entity-meta-list">
-                <div><strong>Ajánlott időzítés:</strong> ${escapeHtml(item.timing)}</div>
-              </div>
-            </article>
-          `
-          )
-          .join("")}
-      </div>
-      <div class="card" style="margin-top:1rem;">
-        <h4 class="card-title">Gyakorlati étrendi tippek erre az időszakra</h4>
-        <ul style="margin:0.5rem 0 0; padding-left:1.25rem; color:var(--text-muted);">
-          ${guide.dietTips.map((t) => `<li style="margin-bottom:0.3rem;">${escapeHtml(t)}</li>`).join("")}
-        </ul>
-      </div>
-    `;
-
-    const activeIds = new Set(getActiveInteractions().map((r) => r.id));
-    document.getElementById("nutritionInteractionsList").innerHTML = DATA.INTERACTION_RULES.map((rule) => {
-      const matched = activeIds.has(rule.id);
-      return `
-        <div class="interaction-banner ${matched ? "sev-high" : ""}">
-          <strong>${matched ? "&#9888; Aktív a gyógyszereid alapján: " : ""}${escapeHtml(rule.title)}</strong>
-          <span>${escapeHtml(rule.message)}</span>
-        </div>
-      `;
-    }).join("");
-  }
-
-  // ------------------------------------------------------------------------
-  // 6. Interaktív Betegúttérkép (Patient Journey Map)
+    // ------------------------------------------------------------------------
+  // 5. Interaktív Betegúttérkép (Patient Journey Map)
   // ------------------------------------------------------------------------
   function renderJourneyMap() {
     const stepper = document.getElementById("journeyStepper");
@@ -1969,6 +2081,10 @@
     }).join("");
 
     const item = DATA.PATIENT_JOURNEY.find((j) => j.step === selectedJourneyStep) || DATA.PATIENT_JOURNEY[0];
+    const actionBtnHtml = item.actionOpenSummary
+      ? `<button type="button" class="btn btn-primary btn-sm" data-open-summary="true">${escapeHtml(item.actionLabel)} &rarr;</button>`
+      : `<button type="button" class="btn btn-primary btn-sm" data-jump-tab="${item.actionTab}">${escapeHtml(item.actionLabel)} &rarr;</button>`;
+
     document.getElementById("journeyDetailBox").innerHTML = `
       <div class="card-header-inline">
         <div>
@@ -1980,9 +2096,7 @@
           <button type="button" class="btn btn-outline btn-sm" id="btnMarkJourneyHere">
             ${state.journeyStep === item.step ? "&#10003; Jelenleg itt tartok" : "Jelölés: jelenleg itt tartok"}
           </button>
-          <button type="button" class="btn btn-primary btn-sm" data-jump-tab="${item.actionTab}">
-            ${escapeHtml(item.actionLabel)} &rarr;
-          </button>
+          ${actionBtnHtml}
         </div>
       </div>
       <div class="journey-detail-grid">
@@ -2054,11 +2168,19 @@
     if (stats.reactiveHypoCount) patternParts.push(`Reaktív hipoglikémia/cukoréhség: ${stats.reactiveHypoCount}×`);
     if (stats.bloatingCount) patternParts.push(`Haspuffadás/székrekedés: ${stats.bloatingCount}×`);
     if (stats.coldEdemaCount) patternParts.push(`Fázékonyság/ödéma: ${stats.coldEdemaCount}×`);
+    if (stats.palpitationsCount) patternParts.push(`Szívdobogásérzés: ${stats.palpitationsCount}×`);
     if (stats.latestSkinHair) patternParts.push(`Bőr/hajtünet: ${M.skinHairTrend[stats.latestSkinHair]}`);
     if (stats.eggWhiteDays) patternParts.push(`Tojásfehérje nyák: ${stats.eggWhiteDays} nap`);
     if (stats.sharpPainDays) patternParts.push(`Egyoldali ovulációs szúrás: ${stats.sharpPainDays} nap`);
     if (stats.spottingDays) patternParts.push(`Pecsételés: ${stats.spottingDays} nap`);
     if (stats.clotDays) patternParts.push(`Rögös vérzés: ${stats.clotDays} nap`);
+
+    const latestPregLog = [...(state.symptomLogs || [])]
+      .filter((l) => l.pregnancyCheckin && (l.pregnancyCheckin.bpSys || l.pregnancyCheckin.glucoseFasting || l.pregnancyCheckin.weightKg))
+      .sort((a, b) => b.date.localeCompare(a.date))[0];
+    const pv = latestPregLog?.pregnancyCheckin || null;
+    const preDoneCount = (DATA.PRENATAL_CHECKLIST || []).filter((i) => state.prenatalChecklist?.[i.id]).length;
+    const ttcDoneCount = (DATA.TTC_CHECKLIST || []).filter((i) => state.ttcChecklist?.[i.id]).length;
 
     const consultText = (vp.consultationQuestions || p.doctorNotes || "").trim();
 
@@ -2136,6 +2258,13 @@
         </div>
         <div class="sheet-consultation-patterns">
           <strong>30 napos önmenedzsment mintázatok:</strong> ${escapeHtml(patternParts.join(" • "))}
+          ${
+            state.mode === "pregnancy"
+              ? `<br/><strong>Várandóssági mérések:</strong> Vérnyomás: ${pv?.bpSys && pv?.bpDia ? `${pv.bpSys}/${pv.bpDia} Hgmm` : "—"} • Éhgyomri vércukor: ${pv?.glucoseFasting || "—"} mmol/l • Étkezés u.: ${pv?.glucosePostMeal || "—"} mmol/l • Szűrések: ${preDoneCount}/${(DATA.PRENATAL_CHECKLIST || []).length} teljesítve`
+              : state.mode === "ttc"
+              ? `<br/><strong>Prekoncepciós felkészülés:</strong> ${ttcDoneCount}/${(DATA.TTC_CHECKLIST || []).length} orvosi mérföldkő teljesítve`
+              : ""
+          }
         </div>
       </section>
 
@@ -2308,9 +2437,26 @@
     document.querySelectorAll(".tab-panel").forEach((p) => {
       p.classList.toggle("active", p.id === `panel-${tabName}`);
     });
-    if (tabName === "summary") renderMedicalSummary();
+    if (tabName === "journey") {
+      renderJourneyAndMedicalData();
+      renderMedicalSummary();
+    }
     if (tabName === "analytics") renderAnalytics();
     window.scrollTo(0, 0);
+  }
+
+  function openMedicalSummary() {
+    switchTab("journey");
+    isSummaryExpanded = true;
+    const sec = document.getElementById("medicalSummarySection");
+    const btn = document.getElementById("btnToggleSummarySheet");
+    if (sec) sec.classList.remove("hidden");
+    if (btn) {
+      btn.textContent = "Állapotlap elrejtése";
+      btn.setAttribute("aria-expanded", "true");
+    }
+    renderMedicalSummary();
+    document.getElementById("summaryFeatureCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function openModal(id) {
@@ -2481,7 +2627,24 @@
     });
 
     document.getElementById("btnOpenOnboarding").addEventListener("click", showOnboarding);
-    document.getElementById("btnQuickSummary").addEventListener("click", () => switchTab("summary"));
+    document.getElementById("btnQuickSummary").addEventListener("click", openMedicalSummary);
+    document.getElementById("btnPreviewSummaryFromPrep")?.addEventListener("click", openMedicalSummary);
+    document.getElementById("btnQuickAddMed")?.addEventListener("click", () => openMedicationModal());
+    document.getElementById("btnJumpMedsConfig")?.addEventListener("click", () => {
+      switchTab("journey");
+      setTimeout(() => document.getElementById("medsManagementAnchor")?.scrollIntoView({ behavior: "smooth" }), 80);
+    });
+    document.getElementById("btnToggleSummarySheet")?.addEventListener("click", () => {
+      isSummaryExpanded = !isSummaryExpanded;
+      const sec = document.getElementById("medicalSummarySection");
+      const btn = document.getElementById("btnToggleSummarySheet");
+      if (sec) sec.classList.toggle("hidden", !isSummaryExpanded);
+      if (btn) {
+        btn.textContent = isSummaryExpanded ? "Állapotlap elrejtése" : "Állapotlap megnyitása";
+        btn.setAttribute("aria-expanded", String(isSummaryExpanded));
+      }
+      if (isSummaryExpanded) renderMedicalSummary();
+    });
 
     // Navigációs fülek
     document.querySelectorAll(".nav-tab").forEach((btn) => {
@@ -2542,12 +2705,28 @@
       if (segBtn) {
         const group = segBtn.closest("[data-radio-group]").dataset.radioGroup;
         const val = segBtn.dataset.value;
-        if (group === "brainFog" || group === "reactiveHypo" || group === "bloatingConstipation" || group === "coldEdema") {
+        if (group === "brainFog" || group === "reactiveHypo" || group === "bloatingConstipation" || group === "coldEdema" || group === "palpitations") {
           checkinDraft[group] = val === "yes";
         } else {
           checkinDraft[group] = val;
         }
         syncCheckinControlsToDom();
+        return;
+      }
+      const pregFlagBtn = e.target.closest("[data-preg-flag]");
+      if (pregFlagBtn) {
+        const flag = pregFlagBtn.dataset.pregFlag;
+        if (checkinDraft.pregRedFlags.includes(flag)) {
+          checkinDraft.pregRedFlags = checkinDraft.pregRedFlags.filter((f) => f !== flag);
+        } else {
+          checkinDraft.pregRedFlags.push(flag);
+        }
+        syncCheckinControlsToDom();
+        return;
+      }
+      const openSumBtn = e.target.closest("[data-open-summary]");
+      if (openSumBtn) {
+        openMedicalSummary();
         return;
       }
       const loadSym = e.target.closest("[data-load-sym-date]");
@@ -2566,7 +2745,7 @@
       const nutrBtn = e.target.closest("[data-nutr-phase]");
       if (nutrBtn) {
         selectedNutritionPhase = nutrBtn.dataset.nutrPhase;
-        renderNutrition();
+        renderDashboardNutrition();
         return;
       }
       const journeyBtn = e.target.closest("[data-journey-step]");
@@ -2577,13 +2756,35 @@
       }
     });
 
-    // Naptár hónap léptetés
+    document.addEventListener("change", (e) => {
+      const ttcCb = e.target.closest("[data-ttc-check]");
+      if (ttcCb) {
+        if (!state.ttcChecklist) state.ttcChecklist = {};
+        state.ttcChecklist[ttcCb.dataset.ttcCheck] = ttcCb.checked;
+        saveState();
+        renderModeFocusSection();
+        return;
+      }
+      const preCb = e.target.closest("[data-prenatal-check]");
+      if (preCb) {
+        if (!state.prenatalChecklist) state.prenatalChecklist = {};
+        state.prenatalChecklist[preCb.dataset.prenatalCheck] = preCb.checked;
+        saveState();
+        renderModeFocusSection();
+      }
+    });
+
+    // Naptár 2 hetes léptetés (6 hetes / 1,5 hónapos ablak)
     document.getElementById("btnPrevMonth").addEventListener("click", () => {
-      calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+      calendarAnchorDate.setDate(calendarAnchorDate.getDate() - 14);
+      renderCalendar();
+    });
+    document.getElementById("btnTodayCal")?.addEventListener("click", () => {
+      calendarAnchorDate = new Date();
       renderCalendar();
     });
     document.getElementById("btnNextMonth").addEventListener("click", () => {
-      calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+      calendarAnchorDate.setDate(calendarAnchorDate.getDate() + 14);
       renderCalendar();
     });
 
@@ -2638,14 +2839,6 @@
     // Gyógyszer & Betegség műveletek
     document.getElementById("btnAddMedicationTop").addEventListener("click", () => openMedicationModal());
     document.getElementById("btnAddCondition").addEventListener("click", () => openConditionModal());
-
-    document.getElementById("todayScheduleList").addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-dose-action]");
-      if (!btn) return;
-      const act = btn.dataset.doseAction;
-      setDoseStatus(btn.dataset.doseKey, act === "take" ? "taken" : act === "skip" ? "skipped" : null);
-      showToast(act === "take" ? "Gyógyszer bevéve." : act === "skip" ? "Kihagyva." : "Visszavonva.");
-    });
 
     document.getElementById("medicationsList").addEventListener("click", (e) => {
       const edit = e.target.closest("[data-edit-med]");
@@ -2854,11 +3047,6 @@
       renderSymptomLogger();
     });
 
-    document.getElementById("chkLogMetabolic").addEventListener("change", (e) => {
-      checkinDraft.metabolicLogged = e.target.checked;
-      syncCheckinControlsToDom();
-    });
-
     document.getElementById("symptomForm").addEventListener("submit", (e) => {
       e.preventDefault();
       const date = document.getElementById("symDate").value;
@@ -2871,6 +3059,12 @@
         });
       }
       const bbtVal = document.getElementById("symBbt").value;
+      const bpSysVal = document.getElementById("pregBpSys")?.value;
+      const bpDiaVal = document.getElementById("pregBpDia")?.value;
+      const glucFVal = document.getElementById("pregGlucoseFasting")?.value;
+      const glucPVal = document.getElementById("pregGlucosePost")?.value;
+      const pregWVal = document.getElementById("pregWeight")?.value;
+
       const entry = {
         date,
         cycleDay: cyc.cycleDay,
@@ -2888,15 +3082,27 @@
         bleeding: checkinDraft.bleeding || "none",
         cervicalMucus: checkinDraft.cervicalMucus || "",
         pelvicPain: checkinDraft.pelvicPain || "none",
-        metabolicLogged: Boolean(checkinDraft.metabolicLogged),
-        metabolic: checkinDraft.metabolicLogged
-          ? {
-              reactiveHypo: Boolean(checkinDraft.reactiveHypo),
-              bloatingConstipation: Boolean(checkinDraft.bloatingConstipation),
-              coldEdema: Boolean(checkinDraft.coldEdema),
-              skinHairTrend: checkinDraft.skinHairTrend || "unchanged"
-            }
-          : null,
+        lhTest: checkinDraft.lhTest || "",
+        metabolicLogged: true,
+        metabolic: {
+          reactiveHypo: Boolean(checkinDraft.reactiveHypo),
+          bloatingConstipation: Boolean(checkinDraft.bloatingConstipation),
+          coldEdema: Boolean(checkinDraft.coldEdema),
+          palpitations: Boolean(checkinDraft.palpitations),
+          skinHairTrend: checkinDraft.skinHairTrend || "unchanged"
+        },
+        pregnancyCheckin:
+          state.mode === "pregnancy" || bpSysVal || glucFVal || pregWVal
+            ? {
+                bpSys: bpSysVal ? Number(bpSysVal) : null,
+                bpDia: bpDiaVal ? Number(bpDiaVal) : null,
+                glucoseFasting: glucFVal ? Number(glucFVal) : null,
+                glucosePostMeal: glucPVal ? Number(glucPVal) : null,
+                weightKg: pregWVal ? Number(pregWVal) : null,
+                fetalMovement: checkinDraft.fetalMovement || "",
+                redFlags: [...(checkinDraft.pregRedFlags || [])]
+              }
+            : null,
         intensity: Number(document.getElementById("symIntensity").value) || 2,
         symptoms,
         note: document.getElementById("symNote").value.trim()

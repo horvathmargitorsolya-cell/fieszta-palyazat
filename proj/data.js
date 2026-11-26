@@ -167,7 +167,24 @@ window.SPERA_DATA = (function () {
       none: "Nem történt váratlan változás",
       gain: "Váratlan súlygyarapodás (+)",
       loss: "Váratlan súlycsökkenés (−)"
-    }
+    },
+    lhTest: {
+      "": "Nem végeztem",
+      negative: "Negatív",
+      high: "Erősödő",
+      peak: "Pozitív (LH-csúcs)"
+    },
+    fetalMovement: {
+      "": "Nem releváns / 24. hét előtt",
+      normal: "Rendszeres, élénk",
+      reduced: "Csökkent (orvosi jelzés!)"
+    },
+    pregnancyRedFlags: [
+      "Vérzés / barnázás",
+      "Erős fejfájás / látászavar",
+      "Hirtelen arc- vagy kézödéma",
+      "Rendszeres haskeményedés"
+    ]
   };
 
   // ------------------------------------------------------------------------
@@ -565,9 +582,9 @@ window.SPERA_DATA = (function () {
       bottleneck:
         "A tünetek szétszórtak (vérzés külön appban, fáradtság és akne nincs összekötve a ciklusfázissal), ezért a betegek átlagosan több évig halogatják a kivizsgálást.",
       speraSupport:
-        "A 30 másodperces Napi gyorsteszt, a fázis-specifikus biomarkerek és a heti metabolikus szűrés megmutatja a visszatérő hormonális mintázatokat anélkül, hogy túlterhelné a felhasználót.",
+        "A 30 másodperces Napi gyorsteszt, a fázis-specifikus biomarkerek és az endokrin klinikai jelek megmutatják a visszatérő hormonális mintázatokat anélkül, hogy túlterhelnék a felhasználót.",
       actionTab: "symptoms",
-      actionLabel: "Önmenedzsment & Napló megnyitása"
+      actionLabel: "Gyorsteszt & Napló megnyitása"
     },
     {
       step: 2,
@@ -578,8 +595,9 @@ window.SPERA_DATA = (function () {
         "Tipikus elakadás a tünetek elbagatellizálása, kivizsgálás nélküli fogamzásgátló felírása, illetve hogy a beteg a 10 perces viziten elfelejti a pontos adatokat.",
       speraSupport:
         "Az 1 kattintásos, nyomtatható Orvosi összefoglaló tetejére automatikusan bekerülnek a vizit előtti konzultációs pontok, az adherence-arány és a 30 napos tünetmintázatok.",
-      actionTab: "summary",
-      actionLabel: "Orvosi összefoglaló megtekintése"
+      actionTab: "journey",
+      actionOpenSummary: true,
+      actionLabel: "Orvosi összefoglaló megnyitása"
     },
     {
       step: 3,
@@ -602,8 +620,8 @@ window.SPERA_DATA = (function () {
         "A bonyolult bevételi szabályok (pl. L-tiroxin éhgyomorra, vas csak 4 órával később) és az elmaradó gyógyszerbevételek rontják a terápia eredményességét.",
       speraSupport:
         "Rendszeres gyógyszerszedési emlékeztető, pontos betegség-fázis adattár, valamint beépített gyógyszer–vitamin kölcsönhatás-figyelő és 30 napos adherence-követés.",
-      actionTab: "meds",
-      actionLabel: "Gyógyszerek & Betegségadatok"
+      actionTab: "journey",
+      actionLabel: "Betegség- és gyógyszeradatok lentebb"
     },
     {
       step: 5,
@@ -616,6 +634,133 @@ window.SPERA_DATA = (function () {
         "Egykattintásos Élethelyzet-váltó (Baba tervezése / Várandósság mód), kontroll előtti összegzés, trimeszter-specifikus ajánló és azonnali endokrin terhességi figyelmeztetések.",
       actionTab: "dashboard",
       actionLabel: "Áttekintő & Élethelyzet-váltó"
+    }
+  ];
+
+  // ------------------------------------------------------------------------
+  // 6B. Várandóssági fejlődési mérföldkövek (4–40. hét) és szűrési listák
+  // ------------------------------------------------------------------------
+  const PREGNANCY_MILESTONES = [
+    { week: 4, sizeHu: "Mákszem", lengthCm: "0,2 cm", weightG: "< 1 g", devNote: "Beágyazódás és a korai hCG-termelés kezdete." },
+    { week: 5, sizeHu: "Szezámmag", lengthCm: "0,3 cm", weightG: "< 1 g", devNote: "Kialakul a velőcső és a kezdeti szívcső." },
+    { week: 6, sizeHu: "Lencseszem", lengthCm: "0,5 cm", weightG: "< 1 g", devNote: "Elindul a szívverés és az alapvető szervtelepek." },
+    { week: 7, sizeHu: "Áfonya", lengthCm: "1,0 cm", weightG: "1 g", devNote: "Gyors agy- és végtagbimbó-fejlődés." },
+    { week: 8, sizeHu: "Málna", lengthCm: "1,6 cm", weightG: "1–2 g", devNote: "Formálódnak az ujjacskák és a belső szervek." },
+    { week: 9, sizeHu: "Szőlőszem", lengthCm: "2,3 cm", weightG: "2 g", devNote: "Az embrionális szervtelepek zöme kialakult, a szív négyüregűvé válik." },
+    { week: 10, sizeHu: "Eper", lengthCm: "3,1 cm", weightG: "4 g", devNote: "A magzati korszak kezdete, aktív apró mozgások." },
+    { week: 11, sizeHu: "Füge", lengthCm: "4,1 cm", weightG: "7 g", devNote: "Fejlődik a rekeszizom és a külső nemi szervek." },
+    { week: 12, sizeHu: "Szilva", lengthCm: "5,4 cm", weightG: "14 g", devNote: "I. trimeszteri genetikai UH és kombinált szűrés ideje." },
+    { week: 13, sizeHu: "Őszibarack", lengthCm: "7,4 cm", weightG: "23 g", devNote: "Kialakulnak az ujjlenyomatok, a méhlepény átveszi a hormontermelést." },
+    { week: 14, sizeHu: "Citrom", lengthCm: "8,7 cm", weightG: "43 g", devNote: "II. trimeszter eleje; megjelennek az arcizom-mozgások." },
+    { week: 15, sizeHu: "Alma", lengthCm: "10,1 cm", weightG: "70 g", devNote: "Erősödnek a csontok, a magzat hallja a belső hangokat." },
+    { week: 16, sizeHu: "Avokádó", lengthCm: "11,6 cm", weightG: "100 g", devNote: "Pajzsmirigye már működik; II. trimeszteri TSH-kontroll ideje." },
+    { week: 17, sizeHu: "Körte", lengthCm: "13,0 cm", weightG: "140 g", devNote: "Elkezdődik a zsírraktározás és a hallás finomodása." },
+    { week: 18, sizeHu: "Édesburgonya", lengthCm: "14,2 cm", weightG: "190 g", devNote: "II. genetikai UH időszaka; az első magzatmozgások érezhetővé válhatnak." },
+    { week: 19, sizeHu: "Mangó", lengthCm: "15,3 cm", weightG: "240 g", devNote: "Kialakul a magzatmáz (vernix), fejlődnek az érzékszervek." },
+    { week: 20, sizeHu: "Banán", lengthCm: "25,6 cm", weightG: "300 g", devNote: "Félidő! Teljes hossz (tető–sarok) mérésre váltunk." },
+    { week: 21, sizeHu: "Sárgarépa", lengthCm: "26,7 cm", weightG: "360 g", devNote: "Fejlődik az emésztőrendszer és a nyelőreflex." },
+    { week: 22, sizeHu: "Papaya", lengthCm: "27,8 cm", weightG: "430 g", devNote: "Kialakulnak a szemöldökök és az alvás–ébrenlét ciklusok." },
+    { week: 23, sizeHu: "Grapefruit", lengthCm: "28,9 cm", weightG: "500 g", devNote: "Gyors tüdőérési előkészület és súlygyarapodás." },
+    { week: 24, sizeHu: "Kukoricacső", lengthCm: "30,0 cm", weightG: "600 g", devNote: "OGTT (terheléses vércukor) ablak kezdete; rendszeres magzatmozgás-figyelés." },
+    { week: 25, sizeHu: "Karalábé", lengthCm: "34,6 cm", weightG: "660 g", devNote: "Finomodik a bőr alatti érhálózat és a légzőmozgások." },
+    { week: 26, sizeHu: "Cukkini", lengthCm: "35,6 cm", weightG: "760 g", devNote: "Kinyílnak a szemhéjak, élénk reakció hangokra és fényre." },
+    { week: 27, sizeHu: "Karfiol", lengthCm: "36,6 cm", weightG: "875 g", devNote: "II. trimeszter vége; intenzív agykéreg-barázdálódás." },
+    { week: 28, sizeHu: "Padlizsán", lengthCm: "37,6 cm", weightG: "1000 g", devNote: "III. trimeszter kezdete; vérnyomás- és vércukor-kontroll kiemelt." },
+    { week: 29, sizeHu: "Sütőtök (kicsi)", lengthCm: "38,6 cm", weightG: "1150 g", devNote: "Erősödnek az izmok és a csontozat (kalcium- és D-vitamin igény nő)." },
+    { week: 30, sizeHu: "Káposztafej", lengthCm: "39,9 cm", weightG: "1320 g", devNote: "III. trimeszteri növekedési UH időszaka." },
+    { week: 31, sizeHu: "Kókuszdió", lengthCm: "41,1 cm", weightG: "1500 g", devNote: "Agyi idegpályák gyors érése, hőszabályozás fejlődése." },
+    { week: 32, sizeHu: "Póréhagyma csokor", lengthCm: "42,4 cm", weightG: "1700 g", devNote: "A magzat gyakran fejvégű fekvésbe fordul." },
+    { week: 33, sizeHu: "Ananász", lengthCm: "43,7 cm", weightG: "1900 g", devNote: "Erősödik az immunrendszer és a csontok ásványianyag-tartalma." },
+    { week: 34, sizeHu: "Sárgadinnye", lengthCm: "45,0 cm", weightG: "2150 g", devNote: "A tüdő felületaktív anyaga (surfactant) érik." },
+    { week: 35, sizeHu: "Kókuszdinnye", lengthCm: "46,2 cm", weightG: "2380 g", devNote: "A vesék teljesen működnek, gyors zsírpárna-növekedés." },
+    { week: 36, sizeHu: "Római saláta", lengthCm: "47,4 cm", weightG: "2620 g", devNote: "GBS szűrés és heti NST (CTG) vizsgálatok kezdete." },
+    { week: 37, sizeHu: "Mángold", lengthCm: "48,6 cm", weightG: "2860 g", devNote: "Érett korai terminusközeli állapot; szülésre felkészülés." },
+    { week: 38, sizeHu: "Görögdinnye (kicsi)", lengthCm: "49,8 cm", weightG: "3080 g", devNote: "A szervek készen állnak a méhen kívüli életre." },
+    { week: 39, sizeHu: "Görögdinnye", lengthCm: "50,7 cm", weightG: "3290 g", devNote: "Terminus; rendszeres vérnyomás- és magzatmozgás-figyelés." },
+    { week: 40, sizeHu: "Sütőtök (nagy)", lengthCm: "51,2 cm", weightG: "3460 g", devNote: "Várható szülési időpont (EDD) hete." }
+  ];
+
+  const PRENATAL_CHECKLIST = [
+    {
+      id: "pre_tsh1",
+      weekRange: "6–8. hét",
+      title: "Korai TSH, fT4 és éhgyomri vércukor kontroll",
+      detail: "Hashimoto esetén azonnali L-tiroxin dózisfelülvizsgálat; PCOS/IR-nél korai anyagcsere-szűrés.",
+      endocrineTag: "Hashimoto / PCOS"
+    },
+    {
+      id: "pre_comb",
+      weekRange: "12. hét",
+      title: "I. trimeszteri genetikai UH és kombinált teszt",
+      detail: "Tarkóredő-mérés, vérkép, ferritin, vizeletvizsgálat.",
+      endocrineTag: "Alap szűrés"
+    },
+    {
+      id: "pre_tsh2",
+      weekRange: "16. hét",
+      title: "II. trimeszteri TSH / fT4 és ferritin ellenőrzés",
+      detail: "Pajzsmirigy-célérték követése és vashiány megelőzése.",
+      endocrineTag: "Hashimoto / Endo"
+    },
+    {
+      id: "pre_ogtt",
+      weekRange: "24–28. hét",
+      title: "Terheléses vércukor (OGTT – GDM szűrés)",
+      detail: "PCOS/IR érintettségnél kiemelten fontos a terhességi diabétesz kiszűrése.",
+      endocrineTag: "PCOS / IR prioritás"
+    },
+    {
+      id: "pre_uh3",
+      weekRange: "30–32. hét",
+      title: "Növekedési UH, vérnyomás- és vizeletfehérje-kontroll",
+      detail: "Magzati növekedési ütem és praeeclampsia-szűrés ellenőrzése.",
+      endocrineTag: "Szülészeti kontroll"
+    },
+    {
+      id: "pre_gbs",
+      weekRange: "36. hét",
+      title: "GBS szűrés, NST (CTG) és szülészeti terv",
+      detail: "B-csoportú Streptococcus szűrés és szülés utáni endokrin terv egyeztetése.",
+      endocrineTag: "Szülés előtt"
+    }
+  ];
+
+  const TTC_CHECKLIST = [
+    {
+      id: "ttc_tsh",
+      title: "Pajzsmirigy (TSH) optimalizálása",
+      target: "0,8–2,0 mIU/l",
+      detail: "ATA irányelv alapján babatervezés előtt érdemes 2,0 mIU/l alá stabilizálni."
+    },
+    {
+      id: "ttc_folate",
+      title: "Aktív folát (5-MTHF) szedése",
+      target: "min. 3 hónapja",
+      detail: "Napi 400–800 µg a velőcső-záródási rendellenességek megelőzésére."
+    },
+    {
+      id: "ttc_vitd",
+      title: "25(OH) D-vitamin szint ellenőrzése",
+      target: "> 100 nmol/l",
+      detail: "Támogatja a beágyazódást, az immunrendszert és a petesejt-minőséget."
+    },
+    {
+      id: "ttc_ferritin",
+      title: "Vasraktár (ferritin) és vérkép",
+      target: "> 50 µg/l",
+      detail: "Megelőzi a terhesség alatti korai vashiányt és fáradtságot."
+    },
+    {
+      id: "ttc_ir",
+      title: "Inzulinérzékenység (HOMA-IR / OGTT)",
+      target: "HOMA-IR < 1,8",
+      detail: "PCOS/IR esetén segíti a rendszeres ovulációt és csökkenti a korai vetélés kockázatát."
+    },
+    {
+      id: "ttc_gyn",
+      title: "Nőgyógyászati rákszűrés és kismedencei UH",
+      target: "12 hónapon belül",
+      detail: "Friss citológia, kismedencei státusz és fogászati góckutatás."
     }
   ];
 
@@ -773,6 +918,14 @@ window.SPERA_DATA = (function () {
         { id: "cyc_5", label: shiftMonthLabel(1), length: 33, startDate: shiftDate(-45) }
       ],
       smartAlertDismissedForAvg: null,
+      prenatalChecklist: {
+        pre_tsh1: true
+      },
+      ttcChecklist: {
+        ttc_tsh: true,
+        ttc_vitd: true,
+        ttc_ferritin: true
+      },
       // Endokrin laboreredmények időbeli sorozata
       labResults: [
         { id: "lab_1", biomarker: "tsh", date: shiftDate(-270), value: 5.4, note: "Kezelés előtt" },
@@ -997,8 +1150,15 @@ window.SPERA_DATA = (function () {
           bleeding: "none",
           cervicalMucus: "eggwhite",
           pelvicPain: "sharp_one_side",
-          metabolicLogged: false,
-          metabolic: null,
+          lhTest: "high",
+          metabolicLogged: true,
+          metabolic: {
+            reactiveHypo: false,
+            bloatingConstipation: false,
+            coldEdema: false,
+            palpitations: false,
+            skinHairTrend: "unchanged"
+          },
           intensity: 2,
           symptoms: ["Tojásfehérje-szerű nyák", "Ovulációs szúrás"],
           note: "Enyhe jobb oldali szúrás (Mittelschmerz)."
@@ -1020,8 +1180,24 @@ window.SPERA_DATA = (function () {
           bleeding: "none",
           cervicalMucus: "eggwhite",
           pelvicPain: "sharp_one_side",
-          metabolicLogged: false,
-          metabolic: null,
+          lhTest: "peak",
+          metabolicLogged: true,
+          metabolic: {
+            reactiveHypo: false,
+            bloatingConstipation: false,
+            coldEdema: false,
+            palpitations: false,
+            skinHairTrend: "unchanged"
+          },
+          pregnancyCheckin: {
+            bpSys: 116,
+            bpDia: 74,
+            glucoseFasting: 4.8,
+            glucosePostMeal: 6.2,
+            weightKg: 64.5,
+            fetalMovement: "",
+            redFlags: []
+          },
           intensity: 1,
           symptoms: ["Ovulációs szúrás", "Elhúzódó nyákváltozás"],
           note: "Reggeli hőemelkedés kezdete (+0,33 °C)."
@@ -1030,7 +1206,8 @@ window.SPERA_DATA = (function () {
       settings: {
         largeText: false,
         soundEnabled: true,
-        notificationsEnabled: false
+        notificationsEnabled: false,
+        showMedicalWhy: true
       }
     };
   }
@@ -1043,6 +1220,9 @@ window.SPERA_DATA = (function () {
     NUTRITION_GUIDE,
     INTERACTION_RULES,
     PATIENT_JOURNEY,
+    PREGNANCY_MILESTONES,
+    PRENATAL_CHECKLIST,
+    TTC_CHECKLIST,
     createDemoState,
     shiftDate
   };
