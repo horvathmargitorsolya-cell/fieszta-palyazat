@@ -102,12 +102,12 @@ A \textbf{Spera célja}, hogy mindezeket egyetlen, nyugodt és átlátható fel�
 \subsection{A prototípus főbb funkciói (7 integrált nézet)}
 \begin{itemize}
   \item \textbf{Áttekintő \& Naptár:} aktuális ciklusnap és fázis, becsült következő menstruáció és termékeny ablak, \textit{Smart Alert} (ha a mért átlagos ciklushossz eltér a beállítottól, 1 kattintással frissíthető), ciklusnap-függő hormonlabor-emlékeztető (3--5. napi panel; ovuláció + 7. napi progeszteron), napi gyógyszerbevételi lista és élő vizit-visszaszámláló.
-  \item \textbf{Egykattintásos Élethelyzet-váltó:} a fejlécben bármikor váltható a \textit{Cikluskövetés}, \textit{Baba tervezése} és \textit{Várandósság követése} mód. Várandósság módban a felület 1--40. terhességi hétre és trimeszterre áll át, azonnali endokrin riasztásokkal (Hashimoto esetén TSH-ellenőrzés, PCOS/IR esetén korai OGTT-szűrés).
-  \item \textbf{Gyógyszerek \& Betegségadatok:} strukturált kórkép-adattár (BNO-kód, fázis, kezelőorvos), gyógyszer- és vitamin-ütemező hang- és vizuális emlékeztetővel, allergialista.
-  \item \textbf{Önmenedzsment \& Napló (4-szintű rendszer):} (1) napi gyors check-in (gyógyszerszabály, energia, agyi köd, alvás, hangulat), (2) ciklusfázis-biomarkerek és bazális testhőmérséklet (BBT), (3) heti metabolikus mikrotünetek, (4) vizit előtti felkészítő űrlap. Első helyen a fázisnak és kórképnek megfelelő tüneteket ajánlja fel.
-  \item \textbf{Elemzések:} interaktív, inline SVG grafikonok -- ciklushossz-trend (21--35 napos referencia-sávval), szűrhető endokrin labor-grafikon normál és optimális célérték-sávokkal, valamint BBT- és tünetintenzitás-görbe.
-  \item \textbf{Étrend \& Vitamin + Kölcsönhatás-figyelő:} fázis- és kórképspecifikus mikrotápanyag-útmutató, valamint automatikus időzítési figyelmeztetések (pl. L-tiroxin $\leftrightarrow$ vas/kalcium $\ge 4$ óra, kávé $\ge 45$ perc).
-  \item \textbf{Betegút \& Orvosi összefoglaló:} interaktív 5 állomásos betegúttérkép és 1 képernyős, nyomtatható (\texttt{.no-print} szabályokkal optimalizált) orvosi összefoglaló szöveges másolás funkcióval.
+  \item \textbf{Egykattintásos Élethelyzet-váltó és akadálymentesség:} a fejlécben bármikor váltható a \textit{Cikluskövetés}, \textit{Baba tervezése} és \textit{Várandósság követése} mód, valamint elérhető az \texttt{A+} nagyobb betűméret-kapcsoló. Várandósság módban a felület 1--40. terhességi hétre és trimeszterre áll át, azonnali endokrin riasztásokkal (Hashimoto esetén TSH-ellenőrzés, PCOS/IR esetén korai OGTT-szűrés).
+  \item \textbf{Gyógyszerek \& Betegségek:} strukturált kórkép-adattár (BNO-kód, fázis, kezelőorvos), gyógyszer- és vitamin-ütemező hang- és vizuális emlékeztetővel, allergialista, valamint helyi JSON export/import biztonsági mentés.
+  \item \textbf{Önmenedzsment \& Napló (4-szintű rendszer):} (1) napi gyors check-in (gyógyszerszabály, energia, agyi köd, alvás, hangulat), (2) ciklusfázis-biomarkerek és bazális testhőmérséklet (BBT), (3) heti metabolikus mikrotünetek, (4) vizit előtti felkészítő űrlap. Első helyen a fázisnak és kórképnek megfelelő tüneteket ajánlja fel, a kérdések alatt kikapcsolható \textit{Orvosi háttér} magyarázatokkal.
+  \item \textbf{Elemzések \& Laborok:} 30 napos önmenedzsment-mintázatok összesítő és interaktív, inline SVG grafikonok -- ciklushossz-trend (21--35 napos referencia-sávval), szűrhető endokrin labor-grafikon normál és optimális célérték-sávokkal, valamint BBT- és tünetintenzitás-görbe.
+  \item \textbf{Étrend \& Vitaminok + Kölcsönhatás-figyelő:} fázis- és kórképspecifikus mikrotápanyag-útmutató, valamint automatikus időzítési figyelmeztetések (pl. L-tiroxin $\leftrightarrow$ vas/kalcium $\ge 4$ óra, kávé $\ge 45$ perc).
+  \item \textbf{Betegúttérkép \& Orvosi összefoglaló:} interaktív 5 állomásos betegúttérkép és 1 képernyős, nyomtatható (\texttt{.no-print} szabályokkal optimalizált) orvosi összefoglaló szöveges másolás funkcióval.
 \end{itemize}
 
 \subsection{Technológiai felépítés, indítási útmutató és ismert korlátozások}
@@ -133,7 +133,7 @@ A \texttt{data.js} modul (\texttt{window.SPERA\_DATA}) tartalmazza a szintetikus
 
 \section{A betegút-ábrázolás magyarázata}
 
-A prototípus \textit{Betegút} nézete öt, egymásra épülő ellátási állomáson keresztül mutatja be a nőgyógyászati-endokrinológiai gondozást. Minden állomáshoz tartozik a beteg aktuális döntési helyzete, a magyar ellátórendszerben gyakori elakadás, valamint a dashboard konkrét támogatási pontja és közvetlen navigációs gombja:
+A prototípus \textit{Betegúttérkép} nézete öt, egymásra épülő ellátási állomáson keresztül mutatja be a nőgyógyászati-endokrinológiai gondozást. Minden állomáshoz tartozik a beteg aktuális döntési helyzete, a magyar ellátórendszerben gyakori elakadás, valamint a dashboard konkrét támogatási pontja és közvetlen navigációs gombja:
 
 \begin{center}
 \small

@@ -39,7 +39,7 @@ Ez a dokumentum a **Spera** (FIESZTA 2026, jelige: **Manci**) webes prototípus�
 
 Exportált objektumok és függvények:
 - `ENDOCRINE_PROFILES`: `pcos` (`E28.2 / E11.9`), `hashimoto` (`E06.3 / E03.9`), `endometriosis` (`N80`).
-- `SELF_MANAGEMENT_META`: 4-szintű önmenedzsment-rendszer címkéi és SVG ikonjai (gyógyszerszabály, energia 1–5, hangulat 1–5, hangulatcímkék, alvásminőség, vérzés, méhnyaknyák, kismedencei fájdalom, bőr/haj trend).
+- `SELF_MANAGEMENT_META`: 4-szintű önmenedzsment-rendszer címkéi és SVG ikonjai (gyógyszerszabály, energia 1–5, hangulat 1–5, hangulatcímkék, alvásminőség, vérzés, méhnyaknyák, kismedencei fájdalom, bőr/haj trend, `missedDosesChoice`, `weightChangeType`).
 - `SYMPTOM_LIBRARY`: fázis- és kórképspecifikus tünetlisták.
 - `BIOMARKERS`: `tsh`, `ft4`, `homa`, `progesterone`, `estradiol`, `vitd`, `ferritin` referencia- és optimális tartományokkal.
 - `NUTRITION_GUIDE`: ciklusfázis, kórkép és trimeszter szerinti étrendi és mikrotápanyag-ajánlások.
@@ -54,6 +54,7 @@ Exportált objektumok és függvények:
 
 - **Tárolókulcs:** `STORAGE_KEY = "spera_fieszta_2026_v1"`
 - **Életciklus:** `createEmptyState()` $\rightarrow$ `loadSavedFromStorage()` / `normalizeState(raw)` $\rightarrow$ `saveState()`.
+- **Felső szintű `state` mezők:** `onboarded`, `isDemo`, `mode`, `journeyStep`, `profile`, `visitPrep`, `conditions`, `medications`, `intakeLogs`, `cycleHistory`, `smartAlertDismissedForAvg`, `labResults`, `symptomLogs`, `settings`. A `settings` objektum tartalmazza a `largeText`, `soundEnabled`, `notificationsEnabled` és `showMedicalWhy` kapcsolókat.
 - **Kötelező szinkron:** Ha új mezőt adsz a `state` struktúrához, **mindhárom helyen** frissíteni kell:
   1. `createEmptyState()` (`app.js`)
   2. `normalizeState(raw)` (`app.js`)
@@ -74,8 +75,10 @@ Exportált objektumok és függvények:
 
 ## 6. Nézetek (7 tab) és arculat
 
-- **Tabok (`data-tab`):** `dashboard` (*Áttekintő & Naptár*), `meds` (*Gyógyszerek & Betegségadatok*), `symptoms` (*Önmenedzsment & Napló*), `analytics` (*Elemzések*), `nutrition` (*Étrend & Vitamin*), `journey` (*Betegút*), `summary` (*Orvosi összefoglaló*).
+- **Tabok (`data-tab`):** `dashboard` (*Áttekintő & Naptár*), `meds` (*Gyógyszerek & Betegségek*), `symptoms` (*Önmenedzsment & Napló*), `analytics` (*Elemzések & Laborok*), `nutrition` (*Étrend & Vitaminok*), `journey` (*Betegúttérkép*), `summary` (*Orvosi összefoglaló*).
 - **Élethelyzet-váltó (`MODE_LABELS`):** `cycle` (*Cikluskövetés*) $\leftrightarrow$ `ttc` (*Baba tervezése*) $\leftrightarrow$ `pregnancy` (*Várandósság követése*).
+- **Modális ablakok (`index.html`):** `conditionModal` (betegség/fázis), `medicationModal` (gyógyszer/emlékeztető), `labModal` (új laboreredmény), `cycleModal` (tényleges ciklushossz).
+- **Kiegészítő funkciók:** fejlécben `A+` (`largeText`) akadálymentes betűméret-váltó; a `meds` fülön helyi JSON export/import biztonsági mentés; az `analytics` fülön 30 napos önmenedzsment-mintázatok összesítő (`renderSelfManagementAnalytics()`).
 - **Színpaletta (`styles.css`):**
   - Háttér: `#FAF6F2` (meleg homok)
   - Kiemelés: `#C86D51` (terrakotta)
@@ -87,11 +90,12 @@ Exportált objektumok és függvények:
 
 ## 7. Ellenőrzési és tesztelési lista módosítások után
 
-1. Futtasd a gyökérben lévő ellenőrző pipeline-t:
+1. Szinkronizáld a kísérő dokumentációt (`docs/spera_dokumentacio.tex`) és ezt a fejlesztői jegyzetet (`proj/NOTES.md`) a projekt módosításaival.
+2. Futtasd a gyökérben lévő teljes ellenőrző és csomagoló pipeline-t (beleértve a LaTeX fordítást is, hogy a `dist/spera_Manci_dokumentacio.pdf` és a `dist/spera_Manci_prototipus.zip` naprakész maradjon):
    ```bash
-   python3 pipeline.py --stages validate,zip,verify
+   python3 pipeline.py
    ```
-2. Ha van telepített `node`, ellenőrizd a JS szintaxist: `node --check proj/data.js && node --check proj/app.js`.
-3. Nyisd meg a kicsomagolt `index.html`-t `file://` protokollon, kikapcsolt hálózattal (Chrome / Edge / Firefox):
+3. Ha van telepített `node`, ellenőrizd a JS szintaxist: `node --check proj/data.js && node --check proj/app.js`.
+4. Nyisd meg a kicsomagolt `index.html`-t `file://` protokollon, kikapcsolt hálózattal (Chrome / Edge / Firefox):
    - Teszteld az üres onboardingot és a *„Demó profil automatikus kitöltése”* gombot.
    - Ellenőrizd a Smart Alertet, az Élethelyzet-váltót (beleértve a Várandósság módot), a 7 tabot, az SVG grafikonokat és a nyomtatási előnézetet (`Orvosi összefoglaló`).
