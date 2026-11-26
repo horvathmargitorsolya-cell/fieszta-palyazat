@@ -30,7 +30,8 @@ Ez a dokumentum az AI-kódoló ágensek belépési útmutatója a **Spera** proj
 2. **Szintetikus adatok és helyi tárolás:** Kizárólag fiktív betegadatok (`Szabó Eszter`) és `localStorage` használható; minden dinamikus DOM-kiíráshoz kötelező az `escapeHtml()`.
 3. **Magyar nyelvű felület és dokumentáció:** Minden UI szöveg és a max. 5 oldalas PDF magyar nyelvű.
 4. **Állapotszinkron:** Új `state` mező felvételekor frissítsd egyszerre a `createEmptyState()`, `normalizeState()` (`proj/app.js`) és `createDemoState()` (`proj/data.js`) függvényeket.
-5. **Szemantikus, atomi commitok és push:** Minden új funkciót atomi, önállóan értelmezhető commitokban kell rögzíteni szemantikus (Conventional Commits) üzenetekkel (pl. `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`), és minden commit vagy commit-csomag után push-olni kell a távoli tárolóba.
+5. **Dokumentáció- és jegyzetszinkron:** A projekt bármilyen módosításakor (kód, UI, adatmodell, funkció, build-folyamat) kötelező naprakészen szinkronizálni a kísérő dokumentációt (`docs/spera_dokumentacio.tex`, majd `python3 pipeline.py` futtatással a `dist/spera_Manci_dokumentacio.pdf` frissítése) és a technikai fejlesztői jegyzetet (`proj/NOTES.md`), valamint szükség esetén az `AGENTS.md` fájlt is.
+6. **Szemantikus, atomi commitok és push:** Minden új funkciót atomi, önállóan értelmezhető commitokban kell rögzíteni szemantikus (Conventional Commits) üzenetekkel (pl. `feat:`, `fix:`, `docs:`, `refactor:`, `chore:`), és minden commit vagy commit-csomag után push-olni kell a távoli tárolóba.
 
 ---
 
@@ -52,7 +53,7 @@ python3 pipeline.py --clean
 ## Hátralévő pályázati teendők
 
 - [x] **Pályázati jelige** kiválasztása (`Manci`)
-- [ ] **LaTeX PDF dokumentáció** lefordítása (`python3 pipeline.py --stages latex,verify`) és ellenőrzése ($\le$ 5 oldal, $\le$ 8 MB)
+- [x] **LaTeX PDF dokumentáció** lefordítása (`python3 pipeline.py --stages latex,verify`) és ellenőrzése ($\le$ 5 oldal, $\le$ 8 MB)
 - [ ] **Offline tesztelés** (`file://` protokollról, kikapcsolt internettel, Chrome/Edge/Firefox böngészőben)
 - [ ] **Friss kicsomagolásos próba** a `dist/spera_Manci_prototipus.zip` fájlból
 - [ ] **Beadás** az online űrlapon (2026. nov. 27. 18:00 előtt)
