@@ -1,0 +1,163 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+\else
+  \usepackage{fontspec}
+\fi
+
+\usepackage[magyar]{babel}
+\usepackage[a4paper,margin=1.75cm,top=1.9cm,bottom=1.85cm]{geometry}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{hyperref}
+
+% Spera arculati szinek
+\definecolor{speraSand}{HTML}{FAF6F2}
+\definecolor{speraTerracotta}{HTML}{C86D51}
+\definecolor{speraPeach}{HTML}{E8C3A3}
+\definecolor{speraSage}{HTML}{7DA690}
+\definecolor{speraInk}{HTML}{2D2A26}
+\definecolor{speraMuted}{HTML}{6B645C}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=speraTerracotta,
+  urlcolor=speraTerracotta,
+  pdftitle={Spera -- FIESZTA 2026 Dokumentacio},
+  pdfauthor={Jelige: Manci}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlist[itemize]{leftmargin=1.2em,itemsep=2pt,topsep=2pt,parsep=0pt}
+\setlist[enumerate]{leftmargin=1.4em,itemsep=2pt,topsep=2pt,parsep=0pt}
+
+\titleformat{\section}
+  {\large\bfseries\color{speraTerracotta}}
+  {\thesection.}{0.5em}{}[\vspace{-4pt}\textcolor{speraPeach}{\rule{\linewidth}{0.8pt}}]
+\titlespacing*{\section}{0pt}{9pt}{4pt}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{speraInk}}
+  {\thesubsection}{0.5em}{}
+\titlespacing*{\subsection}{0pt}{6pt}{2pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{speraMuted}Spera -- Nőgyógyászati-endokrinológiai személyes egészségügyi dashboard}
+\fancyhead[R]{\small\color{speraMuted}FIESZTA 2026 | Jelige: \textbf{Manci}}
+\fancyfoot[C]{\small\color{speraMuted}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+% Cimfejlec es metaadat-sav
+\noindent\colorbox{speraSand}{%
+  \parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+    \vspace{4pt}
+    {\Large\bfseries\color{speraTerracotta} Spera} \hfill
+    {\small\bfseries\color{speraSage} FIESZTA 2026 Pályázat \,|\, Jelige: Manci}\\[3pt]
+    {\normalsize\bfseries\color{speraInk} Menstruációs cikluskövetéssel integrált, nőgyógyászati-endokrinológiai személyes egészségügyi dashboard}\\[4pt]
+    {\small\color{speraMuted} Kísérő dokumentáció, betegút-elemzés, indítási útmutató és üzleti-fejlesztési összefoglaló (max. 5 oldal).}
+    \vspace{4pt}
+  }%
+}
+
+\vspace{2pt}
+
+\section{Bevezetés, választott kórképek és fiktív célfelhasználó}
+
+A \textbf{Spera} egy 100\%-ban offline működő, betegközpontú személyes egészségügyi dashboard, amely a menstruációs cikluskövetést kapcsolja össze a krónikus nőgyógyászati-endokrinológiai állapotok mindennapi önmenedzsmentjével. A rendszer modulárisan, egymással kombinálhatóan támogatja a reproduktív korú nőket leginkább érintő három kórképcsoportot -- valamint az általános cikluskövetést és kivizsgálás alatti állapotot:
+\begin{itemize}
+  \item \textbf{PCOS / Inzulinrezisztencia (IR)} (\texttt{E28.2 / E11.9}): ciklusszabályosság, eltolódott ovuláció, HOMA-IR és vércukor-ingadozás követése.
+  \item \textbf{Hashimoto-thyreoiditis / pajzsmirigy-alulműködés} (\texttt{E06.3 / E03.9}): TSH és fT4 trendek, L-tiroxin időzítés és mikrotápanyag-kölcsönhatások figyelése.
+  \item \textbf{Endometriózis / ösztrogéndominancia} (\texttt{N80}): kismedencei fájdalom, vérzésintenzitás, gyulladáscsökkentő étrend és vasraktárak követése.
+\end{itemize}
+
+\textbf{Fiktív célfelhasználó (persona):} \textit{Szabó Eszter} (29 éves, vércsoport: A Rh+, allergiák: penicillin -- súlyos, laktóz -- enyhe). 2022-ben PCOS/IR, 2023-ban emelkedett anti-TPO (215~IU/ml) alapján Hashimoto-thyreoiditis diagnózist kapott. Jelenlegi terápiája: \textit{Letrox 50~$\mu$g} (06:30, éhgyomorra), \textit{Merckformin XR 500~mg} (08:00 és 20:00), \textit{Mio-inozitol + D3-vitamin 2000~NE} (13:00), \textit{Magnézium-biszglicinát 300~mg} (21:30). Bár az alapértelmezett ciklushossza 28~nap, az elmúlt három ciklusa 33--35~naposra nyúlt, miközben 5~nap múlva esedékes endokrinológiai és nőgyógyászati kontrollvizite előtt áll, és babatervezést fontolgat.
+
+\section{A megoldandó probléma és a dashboard célja}
+
+Az endokrin és nőgyógyászati krónikus betegséggel élő nők egészségügyi adatai a gyakorlatban széttagoltak: a vérzésnapló egy általános ciklusalkalmazásban van, a hormonlaborok PDF-ként az EESZT-ben, az ultrahang-leletek papíron, míg a gyógyszerek és mikrotápanyagok bevételi szabályai fejben maradnak. Ebből négy kritikus probléma fakad:
+\begin{enumerate}
+  \item \textbf{Kontextus nélküli tünetek:} az általános ciklusappok nem kezelik az endokrin kórképek fázisfüggő tüneteit (pl. luteális fázisban felerősödő pajzsmirigy-fáradtság, étkezés utáni álmosság).
+  \item \textbf{Rosszul időzített hormonlaborok:} egy 34~napos ciklusban a sematikusan a 21. napra kért progeszteronvétel még az ovuláció előtt történik, így tévesen alacsony eredményt ad.
+  \item \textbf{Gyógyszer--mikrotápanyag ütközések:} az L-tiroxin felszívódását a túl korán bevitt vas, kalcium vagy kávé jelentősen rontja.
+  \item \textbf{Szűkös vizitidő:} a 10--15 perces szakorvosi konzultáción a beteg gyakran nem tudja pontosan felidézni az elmúlt hónapok ciklushosszát, gyógyszerhűségét (adherence) és kérdéseit.
+\end{enumerate}
+
+A \textbf{Spera célja}, hogy mindezeket egyetlen, nyugodt és átlátható felületen egyesítse, elősegítve az adatok értelmezését, a helyes labor- és gyógyszer-időzítést, valamint a felkészült orvos--beteg kommunikációt.
+
+\section{Fő funkciók, technológiai felépítés és indítási útmutató}
+
+\subsection{A prototípus főbb funkciói (7 integrált nézet)}
+\begin{itemize}
+  \item \textbf{Áttekintő \& Naptár:} aktuális ciklusnap és fázis, becsült következő menstruáció és termékeny ablak, \textit{Smart Alert} (ha a mért átlagos ciklushossz eltér a beállítottól, 1 kattintással frissíthető), ciklusnap-függő hormonlabor-emlékeztető (3--5. napi panel; ovuláció + 7. napi progeszteron), napi gyógyszerbevételi lista és élő vizit-visszaszámláló.
+  \item \textbf{Egykattintásos Élethelyzet-váltó:} a fejlécben bármikor váltható a \textit{Cikluskövetés}, \textit{Baba tervezése} és \textit{Várandósság követése} mód. Várandósság módban a felület 1--40. terhességi hétre és trimeszterre áll át, azonnali endokrin riasztásokkal (Hashimoto esetén TSH-ellenőrzés, PCOS/IR esetén korai OGTT-szűrés).
+  \item \textbf{Gyógyszerek \& Betegségadatok:} strukturált kórkép-adattár (BNO-kód, fázis, kezelőorvos), gyógyszer- és vitamin-ütemező hang- és vizuális emlékeztetővel, allergialista.
+  \item \textbf{Önmenedzsment \& Napló (4-szintű rendszer):} (1) napi gyors check-in (gyógyszerszabály, energia, agyi köd, alvás, hangulat), (2) ciklusfázis-biomarkerek és bazális testhőmérséklet (BBT), (3) heti metabolikus mikrotünetek, (4) vizit előtti felkészítő űrlap. Első helyen a fázisnak és kórképnek megfelelő tüneteket ajánlja fel.
+  \item \textbf{Elemzések:} interaktív, inline SVG grafikonok -- ciklushossz-trend (21--35 napos referencia-sávval), szűrhető endokrin labor-grafikon normál és optimális célérték-sávokkal, valamint BBT- és tünetintenzitás-görbe.
+  \item \textbf{Étrend \& Vitamin + Kölcsönhatás-figyelő:} fázis- és kórképspecifikus mikrotápanyag-útmutató, valamint automatikus időzítési figyelmeztetések (pl. L-tiroxin $\leftrightarrow$ vas/kalcium $\ge 4$ óra, kávé $\ge 45$ perc).
+  \item \textbf{Betegút \& Orvosi összefoglaló:} interaktív 5 állomásos betegúttérkép és 1 képernyős, nyomtatható (\texttt{.no-print} szabályokkal optimalizált) orvosi összefoglaló szöveges másolás funkcióval.
+\end{itemize}
+
+\subsection{Technológiai felépítés, indítási útmutató és ismert korlátozások}
+A prototípus külső keretrendszer, webszerver, build lépés, adatbázis és internetkapcsolat nélkül, tiszta HTML5, CSS3 és ES6+ Vanilla JavaScript (\texttt{index.html}, \texttt{styles.css}, \texttt{data.js}, \texttt{app.js}) technológiával készült. Minden grafikon inline SVG-ként renderelődik, a stílusok és a favicon beágyazottak, nincs \texttt{fetch()} hívás vagy külső CDN, így \texttt{file://} protokollon CORS-hiba nélkül fut. A felhasználói adatok kizárólag helyben, a böngésző \texttt{localStorage} tárhelyén (\texttt{spera\_fieszta\_2026\_v1}) tárolódnak, minden dinamikus DOM-kiírás XSS-védett (\texttt{escapeHtml()}).
+
+\textbf{Indítási útmutató:}
+\begin{enumerate}
+  \item Csomagold ki a \texttt{spera\_Manci\_prototipus.zip} állományt egy tetszőleges helyi mappába.
+  \item Nyisd meg az \texttt{index.html} fájlt dupla kattintással Chrome, Edge vagy Firefox böngészőben (\texttt{file://} protokoll, internet nélkül is működik).
+  \item Az induló kérdőív kitölthető saját adatokkal, vagy a képernyő alján található \textit{„Demó profil automatikus kitöltése”} gombbal azonnal betölthető \textit{Szabó Eszter} teljes szintetikus betegprofilja.
+\end{enumerate}
+
+\textbf{Ismert technikai korlátozások:} a helyi \texttt{localStorage} böngészőhöz és eszközhöz kötött (eszközök közötti felhőszinkron nélkül); a demóadatok teljes mértékben szintetikusak; a prototípus tájékoztató és önmenedzsment-támogató eszköz, nem minősül orvostechnikai eszköznek és nem helyettesíti a szakorvosi ellátást.
+
+\section{Szintetikus adatok és orvosszakmai források}
+
+A \texttt{data.js} modul (\texttt{window.SPERA\_DATA}) tartalmazza a szintetikus betegprofilt és a szakmai tudásbázist. A \texttt{shiftDate()} segédfüggvény a mindenkori aktuális dátumhoz viszonyítva generálja a ciklusnapokat, a vizit előtti 5 napos visszaszámlálást és a laboridőpontokat, így a demó bármikor megnyitva naprakész. A 7 követett biomarker (\texttt{TSH}, \texttt{fT4}, \texttt{HOMA-IR}, \texttt{Progeszteron}, \texttt{Ösztradiol}, \texttt{D-vitamin}, \texttt{Ferritin}) normál és optimális/babatervezési célsávjai az alábbi nemzetközi irányelvekre épülnek:
+\begin{itemize}
+  \item \textbf{PCOS / IR:} \textit{International Evidence-based Guideline for the Assessment and Management of PCOS (ESHRE/ASRM, 2023)} -- cikluszavarok, HOMA-IR, mio-inozitol és életmód-terápia.
+  \item \textbf{Pajzsmirigy és várandósság:} \textit{American Thyroid Association (ATA, 2017) Guidelines for Thyroid Disease During Pregnancy and the Postpartum} -- babatervezési TSH céltartomány ($<2{,}5$~mIU/l), L-tiroxin felszívódási interakciók (vas, kalcium, kávé).
+  \item \textbf{Endometriózis:} \textit{ESHRE Endometriosis Guideline (2022)} -- fájdalomnaplózás, gyulladáscsökkentő étrendi támogatás és vaspótlás erős vérzés esetén.
+\end{itemize}
+
+\section{A betegút-ábrázolás magyarázata}
+
+A prototípus \textit{Betegút} nézete öt, egymásra épülő ellátási állomáson keresztül mutatja be a nőgyógyászati-endokrinológiai gondozást. Minden állomáshoz tartozik a beteg aktuális döntési helyzete, a magyar ellátórendszerben gyakori elakadás, valamint a dashboard konkrét támogatási pontja és közvetlen navigációs gombja:
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.18}
+\begin{tabularx}{\linewidth}{@{}p{3.1cm} X X X@{}}
+\toprule
+\textbf{Ellátási állomás} & \textbf{Beteg döntési helyzete} & \textbf{Tipikus elakadás} & \textbf{Spera támogatási pont} \\
+\midrule
+\textbf{1. Tünetfelismerés és önmegfigyelés} & Normális ciklus-ingadozás vagy endokrin kivizsgálást igénylő jel? & Tünetek szétaprózottsága, a ciklusfázis és a panaszok közti kapcsolat fel nem ismerése. & Fázis- és kórképspecifikus tünetnapló, BBT- és metabolikus mikrotünet-követés. \\
+\textbf{2. Első ellátási pont} (háziorvos / nőgyógyász) & Elegendő-e a tüneti kezelés, vagy szakorvosi beutalás indokolt? & Panaszok elbagatellizálása, kivizsgálás nélküli terápia, viziten elfelejtett adatok. & 1 kattintásos, nyomtatható Orvosi összefoglaló konzultációs kérdésekkel és adherence-aránnyal. \\
+\textbf{3. Célzott endokrin diagnosztika} & Melyik ciklusnapon történjen a vérvétel az értékelhető eredményhez? & Hosszabb ciklusban a 21. napon levett progeszteron tévesen alacsony értéket mutat. & Smart Alert a valódi ciklushosszhoz, 3--5. napi és ovuláció + 7. napi labor-emlékeztető. \\
+\textbf{4. Diagnózis és személyre szabott terápia} & Hogyan illeszthetők össze biztonságosan a gyógyszerek és vitaminok? & Bonyolult bevételi szabályok (L-tiroxin vs. vas/kávé), kimaradó adagok miatti visszaesés. & Kórkép-adattár, időzített gyógyszer-emlékeztető és automatikus kölcsönhatás-figyelő. \\
+\textbf{5. Hosszú távú gondozás és családtervezés} & Hogyan változnak a célértékek (pl. TSH) babatervezés vagy terhesség alatt? & Pozitív teszt után elkésett TSH-kontroll vagy elmaradó korai OGTT szűrés. & Egykattintásos Élethelyzet-váltó és azonnali trimeszter-specifikus endokrin riasztások. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\section{Üzleti, megvalósíthatósági és továbbfejlesztési koncepció}
+
+\begin{itemize}
+  \item \textbf{Célcsoport és értékajánlat:} Magyarországon a reproduktív korú nők mintegy 10--15\%-a érintett PCOS-ben, pajzsmirigy-alulműködésben vagy endometriózisban. A Spera a betegek számára csökkenti a mentális terhet és javítja a terápiahűséget, az endokrinológusok és nőgyógyászok számára pedig strukturált, azonnal áttekinthető anamnézist ad a vizitek elején.
+  \item \textbf{Továbbfejlesztés és rendszerkapcsolatok:} A jelenlegi offline váz moduláris adatmodellje (\texttt{window.SPERA\_DATA} és normalizált állapot) közvetlenül alkalmas \textbf{EESZT / HL7 FHIR} (\texttt{Observation}, \texttt{MedicationStatement}, \texttt{Condition}) alapú automatikus laborimportra, hordozható eszközökről (okosóra, BBT-gyűrű) érkező hőmérséklet- és alvásadatok szinkronizálására, valamint PDF/QR-kódos leletátadásra.
+  \item \textbf{Adatvédelmi és szabályozási feltételek:} Egészségügyi adatok esetén (GDPR 9. cikk szerinti különleges adatok) a \textit{local-first} architektúra minimális adatkezelési kockázatot jelent; későbbi felhőszinkron esetén végponti titkosítás és explicit beteg-hozzájárulás szükséges. Klinikai döntéstámogató funkciók bővítésekor az EU MDR (2017/745) szoftver-osztályozási (SaMD) követelményei irányadók.
+  \item \textbf{Fenntarthatósági és finanszírozási modell:} Kétlépcsős, hibrid modell: (1) \textbf{B2C Freemium} -- az alapvető cikluskövetés, tünetnapló és betegút ingyenes, míg a fejlett labor-trend elemzés és export előfizetéses; (2) \textbf{B2B2C magánklinikai licenc} -- nőgyógyászati-endokrinológiai centrumok számára fehér címkés vizit-előkészítő modulként, csökkentve az adminisztrációs vizitidőt.
+\end{itemize}
+
+\end{document}
