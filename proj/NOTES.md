@@ -45,6 +45,7 @@ Exportált objektumok és függvények:
 - `NUTRITION_GUIDE`: ciklusfázis, kórkép és trimeszter szerinti étrendi és mikrotápanyag-ajánlások.
 - `INTERACTION_RULES`: gyógyszer–vitamin–étkezés kölcsönhatási szabályok (pl. L-tiroxin vs. vas/kalcium $\ge 4$ óra, kávé $\ge 45$ perc).
 - `PATIENT_JOURNEY`: 5 állomásos betegúttérkép (döntési pont, tipikus elakadás, Spera támogatási pont, cél-tab).
+- `PREGNANCY_MILESTONES`, `PRENATAL_CHECKLIST`, `TTC_CHECKLIST`: 4–40. heti magzati fejlődési mérföldkövek (gyümölcs/zöldség méret-összehasonlítással), kötelező várandóssági szűrések és prekoncepciós orvosi ellenőrzőlista.
 - `createDemoState()`: **Szabó Eszter (29 éves)** teljes szintetikus profilja. Szándékosan `cycleLength: 28` értékkel indul, miközben a `cycleHistory` utolsó 3 eleme 33–35 napos – ezzel demonstrálja a Smart Alertet.
 - `shiftDate(daysOffset)`: relatív ISO dátumok generálása a mai naphoz képest, hogy a demó bármikor megnyitva naprakész maradjon.
 
@@ -54,7 +55,7 @@ Exportált objektumok és függvények:
 
 - **Tárolókulcs:** `STORAGE_KEY = "spera_fieszta_2026_v1"`
 - **Életciklus:** `createEmptyState()` $\rightarrow$ `loadSavedFromStorage()` / `normalizeState(raw)` $\rightarrow$ `saveState()`.
-- **Felső szintű `state` mezők:** `onboarded`, `isDemo`, `mode`, `journeyStep`, `profile`, `visitPrep`, `conditions`, `medications`, `intakeLogs`, `cycleHistory`, `smartAlertDismissedForAvg`, `labResults`, `symptomLogs`, `settings`. A `settings` objektum tartalmazza a `largeText`, `soundEnabled`, `notificationsEnabled` és `showMedicalWhy` kapcsolókat.
+- **Felső szintű `state` mezők:** `onboarded`, `isDemo`, `mode`, `journeyStep`, `profile`, `visitPrep`, `conditions`, `medications`, `intakeLogs`, `cycleHistory`, `smartAlertDismissedForAvg`, `prenatalChecklist`, `ttcChecklist`, `labResults`, `symptomLogs`, `settings`. A `settings` objektum tartalmazza a `largeText`, `soundEnabled`, `notificationsEnabled` és `showMedicalWhy` kapcsolókat.
 - **Kötelező szinkron:** Ha új mezőt adsz a `state` struktúrához, **mindhárom helyen** frissíteni kell:
   1. `createEmptyState()` (`app.js`)
   2. `normalizeState(raw)` (`app.js`)
@@ -73,14 +74,16 @@ Exportált objektumok és függvények:
 
 ---
 
-## 6. Nézetek (7 tab) és arculat
+## 6. Nézetek (4 tab, csúszka nélkül) és arculat
 
-- **Tabok (`data-tab`):** `dashboard` (*Áttekintő & Naptár*), `meds` (*Gyógyszerek & Betegségek*), `symptoms` (*Önmenedzsment & Napló*), `analytics` (*Elemzések & Laborok*), `nutrition` (*Étrend & Vitaminok*), `journey` (*Betegúttérkép*), `summary` (*Orvosi összefoglaló*).
+- **Tabok (`data-tab`):** `dashboard` (*Áttekintő*), `symptoms` (*Gyorsteszt & Napló*), `analytics` (*Elemzések & Laborok*), `journey` (*Betegút & Orvosi adatok*). Mobilon (`<= 720px`) fix alsó navigációs sávként jelenik meg.
+- **Áttekintő:** 6 hetes (1,5 hónapos) gördülő ciklusnaptár mind a 4 fázis színkódolásával és napra pontos menstruáció-előrejelzéssel, Mai gyógyszerek gyors-pipálás, főoldali Étrend & Vitamin ajánló, valamint Babatervező / Várandósság orvosi fókuszblokk.
+- **Betegút & Orvosi adatok:** 5 állomásos Betegúttérkép, alatta közvetlen funkcióként a kinyitható/nyomtatható **Orvosi összefoglaló (Állapotlap)**, majd a betegségek, gyógyszer-törzsadatok, emlékeztető-vezérlés, allergiák, kórelőzmény és helyi JSON export/import.
 - **Élethelyzet-váltó (`MODE_LABELS`):** `cycle` (*Cikluskövetés*) $\leftrightarrow$ `ttc` (*Baba tervezése*) $\leftrightarrow$ `pregnancy` (*Várandósság követése*).
 - **Modális ablakok (`index.html`):** `conditionModal` (betegség/fázis), `medicationModal` (gyógyszer/emlékeztető), `labModal` (új laboreredmény), `cycleModal` (tényleges ciklushossz).
-- **Kiegészítő funkciók:** fejlécben `A+` (`largeText`) akadálymentes betűméret-váltó; a `meds` fülön helyi JSON export/import biztonsági mentés; az `analytics` fülön 30 napos önmenedzsment-mintázatok összesítő (`renderSelfManagementAnalytics()`).
-- **Színpaletta (`styles.css`):**
-  - Háttér: `#FAF6F2` (meleg homok)
+- **Színpaletta (`styles.css` – szemkímélő, kevesebb fehér):**
+  - Oldalháttér: `#EFE5DA` (meleg homok)
+  - Kártyák / felületek: `#F8F2EB` (lágy krém) és `#E7DACB` (meleg bézs)
   - Kiemelés: `#C86D51` (terrakotta)
   - Másodlagos: `#E8C3A3` (púderes barack)
   - Egyensúly / pozitív: `#7DA690` (lágy zsályazöld)
