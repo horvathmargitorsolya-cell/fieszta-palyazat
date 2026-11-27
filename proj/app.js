@@ -158,6 +158,7 @@
       ttcChecklist: {},
       labResults: [],
       symptomLogs: [],
+      medicalReports: [],
       settings: {
         largeText: false,
         soundEnabled: true,
@@ -201,6 +202,7 @@
       ttcChecklist: raw.ttcChecklist && typeof raw.ttcChecklist === "object" ? raw.ttcChecklist : {},
       labResults: Array.isArray(raw.labResults) ? raw.labResults : [],
       symptomLogs: Array.isArray(raw.symptomLogs) ? raw.symptomLogs : [],
+      medicalReports: Array.isArray(raw.medicalReports) ? raw.medicalReports : [],
       settings: { ...base.settings, ...(raw.settings || {}) }
     };
   }
@@ -1284,8 +1286,49 @@
   // ------------------------------------------------------------------------
   // 4. Betegúttérkép + Orvosi összefoglaló + Fontos Orvosi Adataim
   // ------------------------------------------------------------------------
+  function renderReports() {
+    const el = document.getElementById("reportsList");
+    if (!el) return;
+    const reports = [...(state.medicalReports || [])].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+    if (reports.length === 0) {
+      el.innerHTML = `<div class="empty-state">Még nincs rögzített ultrahang- vagy szakorvosi lelet. Kattints a „+ Új lelet / UH” gombra!</div>`;
+      return;
+    }
+    const types = DATA.REPORT_TYPES || {};
+    el.innerHTML = reports
+      .map((r) => {
+        const typeLbl = types[r.type] || "Vizsgálati lelet";
+        return `
+          <article class="entity-card">
+            <div class="entity-header">
+              <div>
+                <h4 class="entity-title">${escapeHtml(r.title)}</h4>
+                <div class="entity-subtitle">${escapeHtml(formatHuDate(r.date))}${r.doctor ? ` • ${escapeHtml(r.doctor)}` : ""}</div>
+              </div>
+              <span class="pill pill-peach">${escapeHtml(typeLbl)}</span>
+            </div>
+            <p class="entity-desc">${escapeHtml(r.findings)}</p>
+            ${
+              r.nextStep
+                ? `<div class="entity-meta-list"><div><strong>Javaslat / teendő:</strong> ${escapeHtml(r.nextStep)}</div></div>`
+                : ""
+            }
+            <div class="entity-footer">
+              <span></span>
+              <div class="header-actions">
+                <button type="button" class="btn btn-secondary btn-sm" data-edit-report="${escapeHtml(r.id)}">Szerkesztés</button>
+                <button type="button" class="btn btn-danger-outline btn-sm" data-delete-report="${escapeHtml(r.id)}">Törlés</button>
+              </div>
+            </div>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
   function renderJourneyAndMedicalData() {
     renderJourneyMap();
+    renderReports();
 
     // Kölcsönhatás-figyelő
     const interactions = getActiveInteractions();
@@ -1841,6 +1884,8 @@
     renderLabChart();
     renderCycleTrendChart();
     renderBbtSymptomChart();
+    renderGlucoseTrendChart();
+    renderPainVasChart();
   }
 
   function renderSelfManagementAnalytics() {
@@ -2158,6 +2203,174 @@
     `;
   }
 
+  function renderGlucoseTrendChart() {
+    const wrap = document.getElementById("glucoseChartContainer");
+    const sumEl = document.getElementById("glucoseTrendSummary");
+    if (!wrap) return;
+
+    const isPreg = state.mode === "pregnancy";
+    const fastingLimit = isPreg ? 5.1 : 5.5;
+    const postLimit = isPreg ? 7.0 : 7.8;
+
+    const rows = [...(state.symptomLogs || [])]
+      .map((l) => ({
+        date: l.date,
+        day: l.cycleDay,
+        fasting: l.glucoseFasting ?? l.pregnancyCheckin?.glucoseFasting ?? null,
+        post: l.glucosePostMeal ?? l.pregnancyCheckin?.glucosePostMeal ?? null
+      }))
+      .filter((r) => r.fasting !== null || r.post !== null)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-14);
+
+    if (sumEl) {
+      sumEl.textContent = isPreg
+        ? `Várandóssági (GDM) célértékek: éhgyomri < 5,1 mmol/l • étkezés utáni < 7,0 mmol/l`
+        : `Normál / IR célértékek: éhgyomri < 5,5 mmol/l • étkezés utáni < 7,8 mmol/l`;
+    }
+
+    if (rows.length === 0) {
+      wrap.innerHTML = `<div class="empty-state">Még nincs rögzített vércukorérték. Add meg a Gyorsteszt &amp; Napló fülön!</div>`;
+      return;
+    }
+
+    const W = 480, H = 246, padL = 44, padR = 20, padT = 30, padB = 38;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+    const allVals = rows.flatMap((r) => [r.fasting, r.post].filter((v) => v !== null).map(Number));
+    const minY = Math.min(3.5, Math.floor((Math.min(...allVals) - 0.5) * 2) / 2);
+    const maxY = Math.max(postLimit + 0.8, Math.ceil((Math.max(...allVals) + 0.6) * 2) / 2);
+    const yPos = (v) => padT + plotH - ((v - minY) / (maxY - minY)) * plotH;
+    const xPos = (i) => (rows.length === 1 ? padL + plotW / 2 : padL + (i / (rows.length - 1)) * plotW);
+
+    let gridSvg = "";
+    for (let i = 0; i <= 4; i++) {
+      const v = minY + ((maxY - minY) * i) / 4;
+      const y = yPos(v);
+      gridSvg += `
+        <line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="#2D3E54" stroke-dasharray="3,3"/>
+        <text x="${padL - 6}" y="${(y + 4).toFixed(1)}" text-anchor="end" font-size="10.5" fill="#8FA3B8">${v.toFixed(1)}</text>
+      `;
+    }
+
+    const fastingBandTop = yPos(fastingLimit);
+    const fastingBandBot = yPos(3.9);
+    const postLineY = yPos(postLimit);
+
+    const fPts = rows.map((r, i) => (r.fasting !== null ? { x: xPos(i), y: yPos(Number(r.fasting)), v: Number(r.fasting), d: r.date } : null)).filter(Boolean);
+    const pPts = rows.map((r, i) => (r.post !== null ? { x: xPos(i), y: yPos(Number(r.post)), v: Number(r.post), d: r.date } : null)).filter(Boolean);
+
+    const drawLine = (pts, col) =>
+      pts.length >= 2 ? `<polyline fill="none" stroke="${col}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" points="${pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ")}"/>` : "";
+
+    const drawDots = (pts, okCol, limit, lbl) =>
+      pts
+        .map((p) => {
+          const over = p.v >= limit;
+          return `
+            <g>
+              <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5" fill="${over ? "#C96B8C" : okCol}" stroke="#1A2432" stroke-width="2">
+                <title>${escapeHtml(formatHuDate(p.d))} – ${lbl}: ${p.v.toFixed(1)} mmol/l</title>
+              </circle>
+              <text x="${p.x.toFixed(1)}" y="${(p.y - 9).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#EBF1F6">${p.v.toFixed(1)}</text>
+            </g>
+          `;
+        })
+        .join("");
+
+    const xLabels = rows
+      .map((r, i) => `<text x="${xPos(i).toFixed(1)}" y="${H - 14}" text-anchor="middle" font-size="10" fill="#A9BACE">${escapeHtml(r.date.slice(5))}</text>`)
+      .join("");
+
+    wrap.innerHTML = `
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Vércukor-trend grafikon">
+        <rect x="${padL}" y="${fastingBandTop.toFixed(1)}" width="${plotW}" height="${Math.max(2, fastingBandBot - fastingBandTop).toFixed(1)}" fill="#368A6B" opacity="0.18"/>
+        <line x1="${padL}" y1="${postLineY.toFixed(1)}" x2="${W - padR}" y2="${postLineY.toFixed(1)}" stroke="#D6A146" stroke-width="1.6" stroke-dasharray="5,4"/>
+        ${gridSvg}
+        ${drawLine(fPts, "#4DB88E")}
+        ${drawLine(pPts, "#54B2CC")}
+        ${drawDots(fPts, "#4DB88E", fastingLimit, "Éhgyomri")}
+        ${drawDots(pPts, "#54B2CC", postLimit, "Étkezés u.")}
+        ${xLabels}
+        <g transform="translate(${padL}, 13)">
+          <circle cx="5" cy="-3" r="4" fill="#4DB88E"/>
+          <text x="14" y="1" font-size="10" fill="#7CE0B6" font-weight="700">Éhgyomri (&lt; ${fastingLimit})</text>
+          <circle cx="132" cy="-3" r="4" fill="#54B2CC"/>
+          <text x="141" y="1" font-size="10" fill="#7FD1E8" font-weight="700">Étkezés u. (&lt; ${postLimit})</text>
+          <line x1="265" y1="-3" x2="283" y2="-3" stroke="#D6A146" stroke-width="1.8" stroke-dasharray="4,3"/>
+          <text x="288" y="1" font-size="10" fill="#F0C674">Felső határ</text>
+        </g>
+      </svg>
+    `;
+  }
+
+  function renderPainVasChart() {
+    const wrap = document.getElementById("painChartContainer");
+    const sumEl = document.getElementById("painTrendSummary");
+    if (!wrap) return;
+
+    const logs = [...(state.symptomLogs || [])]
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .slice(-14);
+
+    if (logs.length === 0) {
+      if (sumEl) sumEl.textContent = "Még nincs rögzített fájdalom-érték.";
+      wrap.innerHTML = `<div class="empty-state">Rögzíts napi bejegyzéseket a fájdalom (VAS 0–10) és ciklusfázis korrelációhoz!</div>`;
+      return;
+    }
+
+    const vasArr = logs.map((l) => Number(l.painVas) || 0);
+    const maxVas = Math.max(...vasArr);
+    const avgVas = (vasArr.reduce((s, v) => s + v, 0) / vasArr.length).toFixed(1);
+    if (sumEl) {
+      sumEl.textContent = `Max. fájdalom: ${maxVas}/10 • Átlag: ${String(avgVas).replace(".", ",")}/10 (utolsó ${logs.length} nap)`;
+    }
+
+    const W = 480, H = 246, padL = 36, padR = 16, padT = 30, padB = 38;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+    const yPos = (v) => padT + plotH - (Math.min(10, Math.max(0, v)) / 10) * plotH;
+    const slotW = plotW / logs.length;
+    const barW = Math.min(26, slotW * 0.58);
+
+    const barsSvg = logs
+      .map((l, idx) => {
+        const vas = Number(l.painVas) || 0;
+        const cx = padL + slotW * idx + slotW / 2;
+        const top = yPos(vas);
+        const h = Math.max(vas > 0 ? 4 : 2, padT + plotH - top);
+        const pInfo = PHASE_INFO[l.phase] || PHASE_INFO.follicular;
+        const hasMigraine = l.headache === "migraine";
+        return `
+          <g>
+            <rect x="${(cx - barW / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="4" fill="${pInfo.color}" opacity="${vas > 0 ? "0.9" : "0.28"}">
+              <title>${escapeHtml(formatHuDate(l.date))} (${l.cycleDay || idx + 1}. nap, ${escapeHtml(pInfo.name)}): VAS ${vas}/10${hasMigraine ? " + Hormonális migrén" : ""}</title>
+            </rect>
+            ${vas > 0 ? `<text x="${cx.toFixed(1)}" y="${(top - 5).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="#EBF1F6">${vas}</text>` : ""}
+            ${hasMigraine ? `<circle cx="${cx.toFixed(1)}" cy="${Math.max(padT + 4, top - 16).toFixed(1)}" r="3.5" fill="#E5B85C"><title>Hormonális migrén</title></circle>` : ""}
+            <text x="${cx.toFixed(1)}" y="${H - 14}" text-anchor="middle" font-size="10" fill="#A9BACE">${l.cycleDay || idx + 1}.n</text>
+          </g>
+        `;
+      })
+      .join("");
+
+    wrap.innerHTML = `
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Fájdalom VAS 0-10 grafikon">
+        <line x1="${padL}" y1="${yPos(3).toFixed(1)}" x2="${W - padR}" y2="${yPos(3).toFixed(1)}" stroke="#2D3E54" stroke-dasharray="3,3"/>
+        <text x="${padL - 6}" y="${(yPos(3) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#8FA3B8">3</text>
+        <line x1="${padL}" y1="${yPos(7).toFixed(1)}" x2="${W - padR}" y2="${yPos(7).toFixed(1)}" stroke="#C96B8C" stroke-dasharray="4,4"/>
+        <text x="${padL - 6}" y="${(yPos(7) + 4).toFixed(1)}" text-anchor="end" font-size="10" fill="#C96B8C">7</text>
+        ${barsSvg}
+        <g transform="translate(${padL}, 13)">
+          <rect x="0" y="-8" width="11" height="10" rx="2" fill="#C96B8C"/>
+          <text x="16" y="1" font-size="10" fill="#A9BACE">Oszlop színe = ciklusfázis</text>
+          <circle cx="170" cy="-3" r="3.5" fill="#E5B85C"/>
+          <text x="179" y="1" font-size="10" fill="#F0C674">Hormonális migrén</text>
+        </g>
+      </svg>
+    `;
+  }
+
     // ------------------------------------------------------------------------
   // 5. Interaktív Betegúttérkép (Patient Journey Map)
   // ------------------------------------------------------------------------
@@ -2453,6 +2666,34 @@
           : ""
       }
 
+      ${
+        (state.medicalReports || []).length > 0
+          ? `
+            <section class="sheet-section">
+              <h4 class="sheet-section-title">3B. Ultrahang- és szakorvosi leletek (${state.medicalReports.length})</h4>
+              <table class="data-table">
+                <thead><tr><th>Dátum</th><th>Vizsgálat</th><th>Szakorvos</th><th>Megállapítás &amp; javaslat</th></tr></thead>
+                <tbody>
+                  ${[...state.medicalReports]
+                    .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+                    .map(
+                      (r) => `
+                      <tr>
+                        <td>${escapeHtml(formatHuDate(r.date))}</td>
+                        <td><strong>${escapeHtml(r.title)}</strong><div class="entity-subtitle">${escapeHtml(DATA.REPORT_TYPES?.[r.type] || "")}</div></td>
+                        <td>${escapeHtml(r.doctor || "—")}</td>
+                        <td>${escapeHtml(r.findings)}${r.nextStep ? `<div class="entity-subtitle"><strong>Javaslat:</strong> ${escapeHtml(r.nextStep)}</div>` : ""}</td>
+                      </tr>
+                    `
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </section>
+          `
+          : ""
+      }
+
       <section class="sheet-section">
         <h4 class="sheet-section-title">4. Kórelőzmény, legutóbbi tünetek és kérdések a vizitre</h4>
         <div class="sheet-notes-grid">
@@ -2521,6 +2762,15 @@
       .forEach((m, i) => {
         lines.push(`${i + 1}. ${m.name} – ${m.dosage} | Időpontok: ${(m.times || []).join(", ")} | ${m.mealRelation || ""}`);
       });
+
+    if ((state.medicalReports || []).length > 0) {
+      lines.push("", "ULTRAHANG- ÉS SZAKORVOSI LELETEK:");
+      [...state.medicalReports]
+        .sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+        .forEach((r, i) => {
+          lines.push(`${i + 1}. ${formatHuDate(r.date)} – ${r.title} (${r.doctor || "—"}): ${r.findings}${r.nextStep ? ` [Javaslat: ${r.nextStep}]` : ""}`);
+        });
+    }
 
     if (p.doctorNotes) lines.push("", "KÉRDÉSEK / MEGJEGYZÉSEK AZ ORVOSNAK:", p.doctorNotes);
     return lines.join("\n");
@@ -2647,6 +2897,28 @@
     sel.value = selectedBiomarker;
     document.getElementById("labDate").value = getTodayKey();
     openModal("labModal");
+  }
+
+  function openReportModal(id = null) {
+    const form = document.getElementById("reportForm");
+    form.reset();
+    if (id) {
+      const r = (state.medicalReports || []).find((x) => x.id === id);
+      if (!r) return;
+      document.getElementById("reportModalTitle").textContent = "Lelet szerkesztése";
+      document.getElementById("reportId").value = r.id;
+      document.getElementById("reportType").value = r.type || "pelvic_us";
+      document.getElementById("reportDate").value = r.date || getTodayKey();
+      document.getElementById("reportTitle").value = r.title || "";
+      document.getElementById("reportDoctor").value = r.doctor || "";
+      document.getElementById("reportFindings").value = r.findings || "";
+      document.getElementById("reportNextStep").value = r.nextStep || "";
+    } else {
+      document.getElementById("reportModalTitle").textContent = "Ultrahang- vagy szakorvosi lelet rögzítése";
+      document.getElementById("reportId").value = "";
+      document.getElementById("reportDate").value = getTodayKey();
+    }
+    openModal("reportModal");
   }
 
   // ------------------------------------------------------------------------
@@ -3263,7 +3535,45 @@
       showToast("Kontroll-előkészítő mentve – bekerült az Orvosi PDF tetejére!");
     });
 
-    // Labor & Ciklus modalok
+    // Labor, Ciklus & Lelet modalok
+    document.getElementById("btnAddReport")?.addEventListener("click", () => openReportModal());
+    document.getElementById("reportsList")?.addEventListener("click", (e) => {
+      const edit = e.target.closest("[data-edit-report]");
+      if (edit) return openReportModal(edit.dataset.editReport);
+      const del = e.target.closest("[data-delete-report]");
+      if (del) {
+        if (!confirm("Biztosan törlöd ezt a leletet?")) return;
+        state.medicalReports = (state.medicalReports || []).filter((x) => x.id !== del.dataset.deleteReport);
+        saveState();
+        renderAll();
+        showToast("Lelet törölve.");
+      }
+    });
+    document.getElementById("reportForm")?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!Array.isArray(state.medicalReports)) state.medicalReports = [];
+      const id = document.getElementById("reportId").value;
+      const payload = {
+        id: id || generateId("rep"),
+        type: document.getElementById("reportType").value,
+        date: document.getElementById("reportDate").value,
+        title: document.getElementById("reportTitle").value.trim(),
+        doctor: document.getElementById("reportDoctor").value.trim(),
+        findings: document.getElementById("reportFindings").value.trim(),
+        nextStep: document.getElementById("reportNextStep").value.trim()
+      };
+      if (id) {
+        const idx = state.medicalReports.findIndex((x) => x.id === id);
+        if (idx !== -1) state.medicalReports[idx] = payload;
+      } else {
+        state.medicalReports.unshift(payload);
+      }
+      saveState();
+      closeModal("reportModal");
+      renderAll();
+      showToast("Vizsgálati lelet elmentve.");
+    });
+
     document.getElementById("btnAddLab").addEventListener("click", openLabModal);
     document.getElementById("labForm").addEventListener("submit", (e) => {
       e.preventDefault();

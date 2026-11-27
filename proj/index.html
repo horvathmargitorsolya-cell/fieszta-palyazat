@@ -852,6 +852,29 @@
             <div id="bbtChartContainer" class="svg-chart-wrap"></div>
           </div>
         </div>
+
+        <!-- 4. Vércukor-trend + 5. Fájdalom (VAS 0-10) ciklusfázis szerint -->
+        <div class="charts-grid-2" style="margin-top:1.15rem;">
+          <div class="card chart-card">
+            <div class="chart-header">
+              <div>
+                <h3 class="card-title">Vércukor-trend (Éhgyomri &amp; Étkezés utáni)</h3>
+                <p class="card-subtitle" id="glucoseTrendSummary">Éhgyomri és étkezés utáni vércukorértékek célértéksávval</p>
+              </div>
+            </div>
+            <div id="glucoseChartContainer" class="svg-chart-wrap"></div>
+          </div>
+
+          <div class="card chart-card">
+            <div class="chart-header">
+              <div>
+                <h3 class="card-title">Fájdalom-erősség (VAS 0–10) ciklusfázis szerint</h3>
+                <p class="card-subtitle" id="painTrendSummary">Napi kismedencei fájdalom (0–10) és migrén-jelző</p>
+              </div>
+            </div>
+            <div id="painChartContainer" class="svg-chart-wrap"></div>
+          </div>
+        </div>
       </section>
 
       <!-- ================================================================
@@ -927,6 +950,16 @@
         <div class="form-help no-print" id="notifStatusNote" style="margin-bottom:0.75rem;">Alkalmazáson belüli emlékeztető aktív.</div>
         <div id="interactionAlertsContainer" class="interactions-stack no-print"></div>
         <div id="medicationsList" class="cards-grid no-print"></div>
+
+        <!-- 4B) Ultrahang- és szakorvosi leletek naplója -->
+        <div class="section-bar no-print" style="margin-top: 2rem;">
+          <div>
+            <h3 class="section-heading">Ultrahang- és szakorvosi leletek</h3>
+            <p class="card-subtitle" style="margin-bottom:0;">Kismedencei, pajzsmirigy- és várandóssági UH-eredmények, szakorvosi javaslatok egy helyen (az A4 összefoglalóba is bekerülnek).</p>
+          </div>
+          <button type="button" id="btnAddReport" class="btn btn-primary btn-sm">+ Új lelet / UH</button>
+        </div>
+        <div id="reportsList" class="cards-grid no-print"></div>
 
         <!-- 5) Allergiák, kórelőzmény, alapadatok és JSON mentés -->
         <div class="cards-grid no-print" style="margin-top: 2rem;">
@@ -1192,6 +1225,57 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-ghost" data-close-modal="cycleModal">Mégse</button>
           <button type="submit" class="btn btn-primary">Hozzáadás</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Ultrahang- / szakorvosi lelet modal -->
+  <div id="reportModal" class="modal-backdrop hidden no-print" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="reportModalTitle">Ultrahang- vagy szakorvosi lelet rögzítése</h3>
+        <button type="button" class="btn-icon-close" data-close-modal="reportModal" aria-label="Bezárás">&times;</button>
+      </div>
+      <form id="reportForm" class="modal-body">
+        <input type="hidden" id="reportId" />
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="reportType">Vizsgálat típusa *</label>
+            <select id="reportType" required>
+              <option value="pelvic_us">Kismedencei / nőgyógyászati UH</option>
+              <option value="thyroid_us">Pajzsmirigy ultrahang</option>
+              <option value="pregnancy_us">Várandóssági / genetikai UH</option>
+              <option value="specialist_visit">Szakorvosi konzultáció / lelet</option>
+              <option value="other">Egyéb vizsgálati lelet</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="reportDate">Vizsgálat dátuma *</label>
+            <input type="date" id="reportDate" required />
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="reportTitle">Lelet megnevezése *</label>
+            <input type="text" id="reportTitle" required placeholder="pl. Kismedencei hüvelyi ultrahang" />
+          </div>
+          <div class="form-group">
+            <label for="reportDoctor">Szakorvos / rendelő</label>
+            <input type="text" id="reportDoctor" placeholder="pl. Dr. Tóth Anna – Nőgyógyászat" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="reportFindings">Fő megállapítások *</label>
+          <textarea id="reportFindings" rows="3" required placeholder="pl. Endometrium vastagság, petefészek-tüszők, pajzsmirigy-szerkezet, magzati biometria..."></textarea>
+        </div>
+        <div class="form-group">
+          <label for="reportNextStep">Javaslat / következő teendő (opcionális)</label>
+          <input type="text" id="reportNextStep" placeholder="pl. 3–6 hónap múlva UH-kontroll" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" data-close-modal="reportModal">Mégse</button>
+          <button type="submit" class="btn btn-primary">Mentés</button>
         </div>
       </form>
     </div>

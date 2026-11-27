@@ -210,6 +210,17 @@ window.SPERA_DATA = (function () {
   };
 
   // ------------------------------------------------------------------------
+  // 1C. Ultrahang- és szakorvosi lelettípusok
+  // ------------------------------------------------------------------------
+  const REPORT_TYPES = {
+    pelvic_us: "Kismedencei / nőgyógyászati UH",
+    thyroid_us: "Pajzsmirigy ultrahang",
+    pregnancy_us: "Várandóssági / genetikai UH",
+    specialist_visit: "Szakorvosi konzultáció / lelet",
+    other: "Egyéb vizsgálati lelet"
+  };
+
+  // ------------------------------------------------------------------------
   // 2. Fázis- és betegségspecifikus tünetajánló tudásbázis
   // ------------------------------------------------------------------------
   const SYMPTOM_LIBRARY = {
@@ -1438,6 +1449,35 @@ window.SPERA_DATA = (function () {
           note: "Reggeli hőemelkedés kezdete (+0,33 °C)."
         }
       ],
+      medicalReports: [
+        {
+          id: "rep_demo_1",
+          type: "pelvic_us",
+          date: shiftDate(-45),
+          title: "Kismedencei hüvelyi ultrahang",
+          doctor: "Dr. Tóth Anna – Nőgyógyászat",
+          findings: "PCO jellegű petefészkek (bal 14, jobb 12 apró tüsző), endometrium 6,8 mm (trilamináris), szabad hasűri folyadék nincs.",
+          nextStep: "3–6 hónap múlva kontroll UH vagy ovuláció-követés."
+        },
+        {
+          id: "rep_demo_2",
+          type: "thyroid_us",
+          date: shiftDate(-92),
+          title: "Pajzsmirigy ultrahang-vizsgálat",
+          doctor: "Dr. Kovács Zsófia – Endokrinológia",
+          findings: "Inhomogén, enyhén echoszegény szerkezet (Hashimoto-thyreoiditisre jellemző kép), körülírt göb nem ábrázolódik.",
+          nextStep: "Évenkénti UH-kontroll, félévente TSH/fT4 labor."
+        },
+        {
+          id: "rep_demo_3",
+          type: "specialist_visit",
+          date: shiftDate(-18),
+          title: "Endokrinológiai kontroll és terápiás terv",
+          doctor: "Dr. Kovács Zsófia – Endokrinológia",
+          findings: "Letrox 50 µg és Merckformin XR 2×500 mg folytatása. Babatervezés előtt TSH < 2,0 mIU/l célérték tartandó.",
+          nextStep: "Pozitív terhességi teszt esetén azonnali TSH-vérvétel."
+        }
+      ],
       settings: {
         largeText: false,
         soundEnabled: true,
@@ -1450,6 +1490,7 @@ window.SPERA_DATA = (function () {
   return {
     ENDOCRINE_PROFILES,
     SELF_MANAGEMENT_META,
+    REPORT_TYPES,
     SYMPTOM_LIBRARY,
     BIOMARKERS,
     NUTRITION_GUIDE,
