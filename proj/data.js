@@ -157,6 +157,28 @@ window.SPERA_DATA = (function () {
       unchanged: "Változatlan",
       increased: "Erősödött"
     },
+    glucoseReaction: {
+      stable: "Stabil vércukor",
+      mild_crash: "Álmosság / édességvágy",
+      hypo_signs: "Remegés / izzadás / hirtelen éhség"
+    },
+    headache: {
+      none: "Nincs",
+      mild: "Enyhe fejfájás",
+      migraine: "Hormonális migrén"
+    },
+    giDetail: {
+      none: "Nincs",
+      bloating: "Puffadás / endo-belly",
+      constipation: "Székrekedés / lassult",
+      gi_upset: "Hányinger / hasmenés (pl. metformin)"
+    },
+    thermoDetail: {
+      normal: "Normál",
+      cold: "Fázékonyság / hideg végtagok",
+      edema: "Ödéma / vízvisszatartás",
+      hot_flashes: "Hőhullám / éjszakai izzadás"
+    },
     missedDosesChoice: {
       none: "Nem, minden adag megvolt (0 kihagyás)",
       "1-2": "1–2 alkalommal kimaradt",
@@ -395,148 +417,322 @@ window.SPERA_DATA = (function () {
   };
 
   // ------------------------------------------------------------------------
-  // 4. Étrend- és vitaminajánló (ciklusfázis + trimeszter + kórkép)
+  // 4. Étrend- és vitaminajánló (3 élethelyzet: Cikluskövetés, Babatervezés, Várandósság)
   // ------------------------------------------------------------------------
   const NUTRITION_GUIDE = {
-    menstruation: {
-      title: "Menstruációs fázis – Regeneráció és gyulladáscsökkentés",
-      focus: "Vas- és ásványianyag-pótlás, meleg, könnyen emészthető gyulladáscsökkentő ételek.",
-      items: [
-        {
-          name: "Vas + C-vitamin (pl. vas-biszglicinát)",
-          why: "Pótolja a vérveszteséget és mérsékli a fáradtságot; a C-vitamin segíti a felszívódást.",
-          tags: ["Mindenkinek", "Endometriózis"],
-          timing: "Étkezéssel vagy C-vitaminnal; L-tiroxintól min. 4 órára!"
-        },
-        {
-          name: "Magnézium-biszglicinát (300–400 mg)",
-          why: "Lazítja a méh simaizmait, enyhíti a kismedencei görcsöket és javítja az alvást.",
-          tags: ["Mindenkinek", "Endometriózis"],
-          timing: "Este, vacsora után vagy lefekvés előtt."
-        },
-        {
-          name: "Omega-3 (EPA/DHA, 1000–2000 mg)",
-          why: "Csökkenti a gyulladásos prosztaglandinok termelődését, mérsékli a menstruációs fájdalmat.",
-          tags: ["Endometriózis", "PCOS / IR", "Hashimoto"],
-          timing: "Főétkezés közben, zsiradékkal együtt."
-        }
-      ],
-      dietTips: [
-        "Gyulladáscsökkentő ételek: lazac, dió, lenmag, gyömbér, kurkuma, párolt spenót, cékla.",
-        "Kerüld a finomított cukrot és a túl sok koffeint, mert fokozhatják a görcsöket."
-      ]
+    cycle: {
+      menstruation: {
+        title: "Menstruációs fázis – Regeneráció és gyulladáscsökkentés",
+        focus: "Vas- és ásványianyag-pótlás, meleg, könnyen emészthető gyulladáscsökkentő ételek.",
+        items: [
+          {
+            name: "Vas + C-vitamin (pl. vas-biszglicinát)",
+            why: "Pótolja a vérveszteséget és mérsékli a fáradtságot; a C-vitamin segíti a felszívódást.",
+            tags: ["Mindenkinek", "Endometriózis"],
+            timing: "Étkezéssel vagy C-vitaminnal; L-tiroxintól min. 4 órára!"
+          },
+          {
+            name: "Magnézium-biszglicinát (300–400 mg)",
+            why: "Lazítja a méh simaizmait, enyhíti a kismedencei görcsöket és javítja az alvást.",
+            tags: ["Mindenkinek", "Endometriózis"],
+            timing: "Este, vacsora után vagy lefekvés előtt."
+          },
+          {
+            name: "Omega-3 (EPA/DHA, 1000–2000 mg)",
+            why: "Csökkenti a gyulladásos prosztaglandinok termelődését, mérsékli a menstruációs fájdalmat.",
+            tags: ["Endometriózis", "PCOS / IR", "Hashimoto"],
+            timing: "Főétkezés közben, zsiradékkal együtt."
+          }
+        ],
+        dietTips: [
+          "Gyulladáscsökkentő ételek: lazac, dió, lenmag, gyömbér, kurkuma, párolt spenót, cékla.",
+          "Kerüld a finomított cukrot és a túl sok koffeint, mert fokozhatják a görcsöket."
+        ]
+      },
+      follicular: {
+        title: "Follikuláris fázis – Tüszőérés és inzulinérzékenység",
+        focus: "Friss zöldségek, minőségi fehérjék, tüszőérést és pajzsmirigyet támogató nyomelemek.",
+        items: [
+          {
+            name: "Mio-inozitol (+ D-kiro-inozitol 40:1 arányban)",
+            why: "Javítja az inzulinérzékenységet és támogatja az egészséges tüszőérést, ovulációt.",
+            tags: ["PCOS / IR"],
+            timing: "Reggel és este, vízben feloldva."
+          },
+          {
+            name: "Szelén (100–200 µg szelenometionin) + Cink",
+            why: "Támogatja a T4 → T3 pajzsmirigyhormon-átalakulást és csökkentheti az anti-TPO gyulladást.",
+            tags: ["Hashimoto", "PCOS / IR"],
+            timing: "Ebédhez; L-tiroxintól külön időpontban."
+          },
+          {
+            name: "D3 + K2-vitamin (2000–4000 NE)",
+            why: "Immunmoduláló hatású Hashimoto esetén, és javítja a petesejt-minőséget PCOS-ben.",
+            tags: ["Mindenkinek", "Hashimoto", "PCOS / IR"],
+            timing: "Ebéd közben, zsiradékot tartalmazó étellel."
+          }
+        ],
+        dietTips: [
+          "Lassú felszívódású szénhidrátok (quinoa, zab, hajdina) + bőséges rost minden főétkezéshez.",
+          "Fermentált ételek (savanyú káposzta, natúr kefir – laktózmentesen is) a bélflóra támogatására."
+        ]
+      },
+      ovulation: {
+        title: "Ovulációs ablak – Petesejt-minőség és máj-ösztrogén támogatás",
+        focus: "Antioxidánsok, cink, B-komplex és bőséges folyadékbevitel.",
+        items: [
+          {
+            name: "B-komplex (aktív B6, B9 folát, B12)",
+            why: "Támogatja a sejtosztódást, a hormonlebontást és az ovuláció utáni sárgatest-működést.",
+            tags: ["Mindenkinek", "PCOS / IR"],
+            timing: "Reggeli vagy ebéd közben."
+          },
+          {
+            name: "Cink (15–25 mg) + Antioxidánsok (C-, E-vitamin)",
+            why: "Védi a petesejtet az oxidatív stressztől és csökkenti a bőrgyulladást (akne).",
+            tags: ["PCOS / IR", "Endometriózis"],
+            timing: "Étkezés után (éhgyomorra hányingert okozhat)."
+          },
+          {
+            name: "Mio-inozitol + D3-vitamin",
+            why: "Folyamatos támogatás a rendszeres ovuláció fenntartásához.",
+            tags: ["PCOS / IR", "Hashimoto"],
+            timing: "Napi megszokott rend szerint."
+          }
+        ],
+        dietTips: [
+          "Bogyós gyümölcsök, brokkoli, tökmag, avokádó és napi 2–2,5 liter víz.",
+          "PCOS/IR esetén ne hagyj ki étkezést: a stabil vércukorszint segíti az LH-csúcs létrejöttét."
+        ]
+      },
+      luteal: {
+        title: "Luteális fázis – Progeszteron-támogatás és PMS-csökkentés",
+        focus: "Stabil vércukor, keresztesvirágú zöldségek, B6-vitamin és magnézium.",
+        items: [
+          {
+            name: "B6-vitamin (P-5-P) + Magnézium",
+            why: "Támogatja a sárgatest progeszterontermelését, csökkenti a PMS-t és a vízvisszatartást.",
+            tags: ["Mindenkinek", "Endometriózis", "Hashimoto"],
+            timing: "Délután vagy este."
+          },
+          {
+            name: "Króm + Rostdús, lassú szénhidrátok",
+            why: "Mérsékli a luteális fázisban felerősödő inzulinrezisztenciát és édességvágyat.",
+            tags: ["PCOS / IR"],
+            timing: "Főétkezések mellé."
+          },
+          {
+            name: "Keresztesvirágú zöldségek / Rostkiegészítés",
+            why: "Segíti a máj és a bélrendszer felesleges ösztrogén-eltávolítását (ösztrogéndominancia ellen).",
+            tags: ["Endometriózis"],
+            timing: "Napi rendszerességgel (brokkoli, kelbimbó, karfiol, chiamag)."
+          }
+        ],
+        dietTips: [
+          "Luteális fázisban természetesen nő az anyagcsere-igény: válassz fehérje + egészséges zsír kombinációt uzsonnára.",
+          "Csökkentsd a sós félkész ételeket a vízvisszatartás és mellfeszülés mérséklésére."
+        ]
+      }
     },
-    follicular: {
-      title: "Follikuláris fázis – Tüszőérés és inzulinérzékenység támogatása",
-      focus: "Friss zöldségek, minőségi fehérjék, tüszőérést és pajzsmirigyet támogató nyomelemek.",
-      items: [
-        {
-          name: "Mio-inozitol (+ D-kiro-inozitol 40:1 arányban)",
-          why: "Javítja az inzulinérzékenységet és támogatja az egészséges tüszőérést, ovulációt.",
-          tags: ["PCOS / IR"],
-          timing: "Reggel és este, vízben feloldva."
-        },
-        {
-          name: "Szelén (100–200 µg szelenometionin) + Cink",
-          why: "Támogatja a T4 → T3 pajzsmirigyhormon-átalakulást és csökkentheti az anti-TPO gyulladást.",
-          tags: ["Hashimoto", "PCOS / IR"],
-          timing: "Ebédhez; L-tiroxintól külön időpontban."
-        },
-        {
-          name: "D3 + K2-vitamin (2000–4000 NE)",
-          why: "Immunmoduláló hatású Hashimoto esetén, és javítja a petesejt-minőséget PCOS-ben.",
-          tags: ["Mindenkinek", "Hashimoto", "PCOS / IR"],
-          timing: "Ebéd közben, zsiradékot tartalmazó étellel."
-        }
-      ],
-      dietTips: [
-        "Lassú felszívódású szénhidrátok (quinoa, zab, hajdina) + bőséges rost minden főétkezéshez.",
-        "Fermentált ételek (savanyú káposzta, natúr kefir – laktózmentesen is) a bélflóra támogatására."
-      ]
-    },
-    ovulation: {
-      title: "Ovulációs ablak – Petesejt-minőség és máj-ösztrogén támogatás",
-      focus: "Antioxidánsok, cink, B-komplex és bőséges folyadékbevitel a termékeny nyákért.",
-      items: [
-        {
-          name: "B-komplex (aktív B6, B9 folát, B12)",
-          why: "Támogatja a sejtosztódást, a hormonlebontást és az ovuláció utáni sárgatest-működést.",
-          tags: ["Mindenkinek", "PCOS / IR", "Baba tervezése"],
-          timing: "Reggeli vagy ebéd közben."
-        },
-        {
-          name: "Cink (15–25 mg) + Antioxidánsok (C-, E-vitamin)",
-          why: "Védi a petesejtet az oxidatív stressztől és csökkenti a bőrgyulladást (akne).",
-          tags: ["PCOS / IR", "Endometriózis"],
-          timing: "Étkezés után (éhgyomorra hányingert okozhat)."
-        },
-        {
-          name: "Mio-inozitol + D3-vitamin",
-          why: "Folyamatos támogatás a rendszeres ovuláció fenntartásához.",
-          tags: ["PCOS / IR", "Hashimoto"],
-          timing: "Napi megszokott rend szerint."
-        }
-      ],
-      dietTips: [
-        "Bogyós gyümölcsök, brokkoli, tökmag, avokádó és napi 2–2,5 liter víz.",
-        "PCOS/IR esetén ne hagyj ki étkezést: a stabil vércukorszint segíti az LH-csúcs létrejöttét."
-      ]
-    },
-    luteal: {
-      title: "Luteális fázis – Progeszteron-támogatás és PMS-csökkentés",
-      focus: "Stabil vércukor, ösztrogénlebontást segítő keresztesvirágúak, B6-vitamin és magnézium.",
-      items: [
-        {
-          name: "B6-vitamin (P-5-P) + Magnézium",
-          why: "Támogatja a sárgatest progeszterontermelését, csökkenti a PMS-t és a vízvisszatartást.",
-          tags: ["Mindenkinek", "Endometriózis", "Hashimoto"],
-          timing: "Délután vagy este."
-        },
-        {
-          name: "Króm + Rostdús, lassú szénhidrátok",
-          why: "Mérsékli a luteális fázisban felerősödő inzulinrezisztenciát és édességvágyat.",
-          tags: ["PCOS / IR"],
-          timing: "Főétkezések mellé."
-        },
-        {
-          name: "Keresztesvirágú zöldségek / Rostkiegészítés",
-          why: "Segíti a máj és a bélrendszer felesleges ösztrogén-eltávolítását (ösztrogéndominancia ellen).",
-          tags: ["Endometriózis"],
-          timing: "Napi rendszerességgel (brokkoli, kelbimbó, karfiol, chiamag)."
-        }
-      ],
-      dietTips: [
-        "Luteális fázisban természetesen nő az anyagcsere-igény: válassz fehérje + egészséges zsír kombinációt uzsonnára.",
-        "Csökkentsd a sós félkész ételeket a vízvisszatartás és mellfeszülés mérséklésére."
-      ]
+    ttc: {
+      menstruation: {
+        title: "Babatervezés (Menstruáció) – Folát-telítés és vasraktár-építés",
+        focus: "Prekoncepciós alapozás: optimális ferritin (> 50 µg/l), aktív folát és gyulladáscsökkentés.",
+        items: [
+          {
+            name: "Aktív folát (5-MTHF, 400–800 µg)",
+            why: "A fogantatás előtti hetekben feltölti a folátraktárakat a velőcső-záródás védelméhez.",
+            tags: ["Babatervezés", "Mindenkinek"],
+            timing: "Reggeli vagy ebéd közben, naponta."
+          },
+          {
+            name: "Vas-biszglicinát + C-vitamin (ferritin alapján)",
+            why: "Az alacsony vasraktár rontja az ovuláció esélyét és a korai beágyazódást.",
+            tags: ["Babatervezés", "Endometriózis"],
+            timing: "L-tiroxintól és kávétól min. 4 óra különbséggel!"
+          },
+          {
+            name: "Omega-3 (EPA/DHA 1000 mg)",
+            why: "Csökkenti a méhnyálkahártya mikroszintű gyulladását és javítja a kismedencei keringést.",
+            tags: ["Babatervezés", "Endometriózis"],
+            timing: "Főétkezés közben."
+          }
+        ],
+        dietTips: [
+          "Meleg, vasban gazdag ételek (vörös lencse, spenót, cékla, máj mértékkel) + C-vitamin.",
+          "Babatervezés alatt érdemes az alkoholt teljesen elhagyni, a koffeint napi max. 1–2 eszpresszóra (< 200 mg) csökkenteni."
+        ]
+      },
+      follicular: {
+        title: "Babatervezés (Follikuláris) – Petesejt-minőség és mitokondrium",
+        focus: "Petesejt-érés támogatása (CoQ10, mio-inozitol) és a babatervezési TSH (< 2,0 mIU/l) stabilizálása.",
+        items: [
+          {
+            name: "Koenzim Q10 (ubikinol 200–300 mg)",
+            why: "Támogatja a petesejt mitokondriális energiatermelését és a sejtosztódás minőségét.",
+            tags: ["Babatervezés", "PCOS / IR"],
+            timing: "Reggeli vagy ebéd közben, zsiradékkal."
+          },
+          {
+            name: "Mio-inozitol (2×2000 mg) + D3-vitamin (3000–4000 NE)",
+            why: "PCOS/IR esetén javítja a domináns tüsző érését és a petesejt-minőséget.",
+            tags: ["Babatervezés", "PCOS / IR", "Hashimoto"],
+            timing: "Reggel és este; D3-vitamin ebédhez."
+          },
+          {
+            name: "Szelén (100 µg) + Jód (csak orvosi kontrollal!)",
+            why: "Támogatja a pajzsmirigyhormon-egyensúlyt a fogantatás előtt; Hashimoto esetén az orvos dönt a jód adagjáról.",
+            tags: ["Babatervezés", "Hashimoto"],
+            timing: "Ebédhez, L-tiroxintól külön."
+          }
+        ],
+        dietTips: [
+          "Alacsony glikémiás terhelésű étrend (lassú CH + minőségi fehérje + olívaolaj/diófélék) az inzulin-csúcsok elkerülésére.",
+          "Kerüld a transzzsírokat és a finomított cukrokat, mert közvetlenül rontják a tüszőfolyadék minőségét."
+        ]
+      },
+      ovulation: {
+        title: "Babatervezés (Ovuláció) – Termékeny nyák és oxidatív védelem",
+        focus: "Megfelelő méhnyaknyák-viszkozitás, LH-csúcs támogatása és petesejt-védelem.",
+        items: [
+          {
+            name: "Cink (15–25 mg) + C- és E-vitamin",
+            why: "Antioxidáns védelem az ovuláció pillanatában és a korai zigóta fejlődéséhez.",
+            tags: ["Babatervezés", "PCOS / IR"],
+            timing: "Főétkezés után."
+          },
+          {
+            name: "Aktív B-komplex + N-acetil-cisztein (NAC, opc.)",
+            why: "Támogatja a termékeny, tojásfehérje jellegű nyák képződését és a máj hormonbontását.",
+            tags: ["Babatervezés", "PCOS / IR"],
+            timing: "Reggelihez."
+          },
+          {
+            name: "L-arginin / Omega-3 (étrendi vagy kiegészítő)",
+            why: "Fokozza a méhnyálkahártya és a petefészek véráramlását a termékeny ablakban.",
+            tags: ["Babatervezés"],
+            timing: "Napközben, bőséges folyadékkal."
+          }
+        ],
+        dietTips: [
+          "Legalább 2,5 liter tiszta víz naponta a bőséges, átjárható méhnyaknyákhoz.",
+          "Avokádó, bogyós gyümölcsök, tökmag, tojás – stabil vércukor mellett az LH-csúcs megbízhatóbb."
+        ]
+      },
+      luteal: {
+        title: "Babatervezés (Luteális) – Beágyazódás és sárgatest-támogatás",
+        focus: "Progeszteron-stabilitás, méhnyálkahártya-fogadókészség és „mintha már várandós lennél” biztonság.",
+        items: [
+          {
+            name: "Aktív folát (5-MTHF) + B6-vitamin (P-5-P)",
+            why: "Támogatja a sárgatest progeszterontermelését és a korai beágyazódás sejtosztódását.",
+            tags: ["Babatervezés", "Mindenkinek"],
+            timing: "Reggel/délelőtt étkezéssel."
+          },
+          {
+            name: "Magnézium-biszglicinát (300 mg) + E-vitamin",
+            why: "Csökkenti a méhizomzat feszülését és javítja az endometrium vérellátását.",
+            tags: ["Babatervezés", "Endometriózis"],
+            timing: "Este."
+          },
+          {
+            name: "Omega-3 (DHA-hangsúlyos) + D3-vitamin",
+            why: "Immunmoduláló hatás a beágyazódás toleranciájához, különösen Hashimoto esetén.",
+            tags: ["Babatervezés", "Hashimoto"],
+            timing: "Főétkezés közben."
+          }
+        ],
+        dietTips: [
+          "A kéthetes várakozás alatt kerüld a nyers húst/halat, pasztörizálatlan sajtokat és a túlzott A-vitamint (máj).",
+          "Tartsd a 3 főétkezést + 1–2 fehérjedús kisétkezést a vércukor- és kortizol-ingadozás elkerülésére."
+        ]
+      }
     },
     pregnancy: {
-      title: "Várandósság – Trimeszter-specifikus mikrotápanyagok",
-      focus: "Magzati idegrendszeri fejlődés, fokozott pajzsmirigy- és vércukor-biztonság.",
-      items: [
-        {
-          name: "Aktív folát (5-MTHF, 400–800 µg)",
-          why: "Elengedhetetlen a velőcső-záródáshoz és a sejtosztódáshoz (különösen az I. trimeszterben).",
-          tags: ["I–III. trimeszter"],
-          timing: "Naponta egyszer, étkezéssel."
-        },
-        {
-          name: "DHA / Omega-3 (min. 200–300 mg DHA)",
-          why: "A magzat agy- és látásfejlődésének kulcsfontosságú építőköve (II–III. trimeszterben kiemelt).",
-          tags: ["II–III. trimeszter", "Endometriózis"],
-          timing: "Főétkezés közben."
-        },
-        {
-          name: "Kolin (450 mg) + D3-vitamin + Vas (labor alapján)",
-          why: "Támogatja a méhlepény működését, az idegrendszert és megelőzi a terhességi vérszegénységet.",
-          tags: ["I–III. trimeszter", "Hashimoto"],
-          timing: "Vasat L-tiroxintól szigorúan legalább 4 óra eltéréssel!"
-        }
-      ],
-      dietTips: [
-        "Hashimoto esetén a jódpótlás mértékét minden esetben egyeztesd endokrinológussal!",
-        "PCOS/IR esetén tartsd a napi 5–6 kisebb, lassú felszívódású szénhidrátos étkezést a terhességi diabétesz megelőzésére."
-      ]
+      trimester1: {
+        title: "I. trimeszter (1–12. hét) – Szervfejlődés és korai védelem",
+        focus: "Velőcső-záródás, pajzsmirigy-dózis finomhangolás és a reggeli hányinger kíméletes kezelése.",
+        items: [
+          {
+            name: "Aktív folát (5-MTHF, 400–800 µg)",
+            why: "Kritikus az I. trimeszterben a magzati velőcső-záródás és a sejtosztódás támogatásához.",
+            tags: ["I. trimeszter", "Kötelező alap"],
+            timing: "Naponta egyszer, könnyű étkezéssel."
+          },
+          {
+            name: "B6-vitamin (25–50 mg) + Gyömbér (kíméletes adag)",
+            why: "Bizonyítottan enyhíti a korai terhességi hányingert és émelygést.",
+            tags: ["I. trimeszter"],
+            timing: "Reggel vagy émelygés jelentkezésekor."
+          },
+          {
+            name: "D3-vitamin + Jód (Hashimoto esetén orvosi jóváhagyással!)",
+            why: "A magzat az I. trimeszterben teljes mértékben az anyai pajzsmirigyhormontól függ.",
+            tags: ["I. trimeszter", "Hashimoto"],
+            timing: "L-tiroxintól külön, ebéd közben."
+          }
+        ],
+        dietTips: [
+          "Émelygés ellen: gyakori, kis adagok; reggel felkelés előtt pár szem száraz keksz vagy pirítós.",
+          "Szigorúan kerüld a nyers húst, nyers halat, lágy sajtokat, alkoholt és tartsd a koffeint < 200 mg/nap alatt."
+        ]
+      },
+      trimester2: {
+        title: "II. trimeszter (13–27. hét) – Agyfejlődés, vasraktár és GDM-szűrés",
+        focus: "Magzati agy- és csontfejlődés, vérképzés és a 24–28. heti terheléses vércukor (OGTT) előkészítése.",
+        items: [
+          {
+            name: "DHA / Omega-3 (min. 200–300 mg DHA)",
+            why: "A II. trimesztertől gyorsul a magzati agy és retina fejlődése; a DHA közvetlen építőköve.",
+            tags: ["II. trimeszter", "Kötelező alap"],
+            timing: "Főétkezés közben."
+          },
+          {
+            name: "Vas-biszglicinát + C-vitamin (vérkép alapján)",
+            why: "A megnövekedett vértérfogat miatt gyakori a vashiányos vérszegénység a 20. hét körül.",
+            tags: ["II. trimeszter", "Endometriózis"],
+            timing: "L-tiroxintól és kalciumtól szigorúan min. 4 óra eltéréssel!"
+          },
+          {
+            name: "Kolin (450 mg) + Kalcium (étrendből / kiegészítve)",
+            why: "Támogatja a méhlepény keringését, az idegrendszert és az anyai csontozat védelmét.",
+            tags: ["II. trimeszter", "PCOS / IR"],
+            timing: "Két részletben vagy főétkezéskor (kalciumot vastól külön)."
+          }
+        ],
+        dietTips: [
+          "PCOS/IR és GDM-megelőzés: napi 5–6 kisebb, lassú felszívódású CH-étkezés (teljes kiőrlésű gabona, zöldség + fehérje).",
+          "Heti 2× alacsony higanytartalmú tengeri hal (lazac, szardínia) vagy algás DHA."
+        ]
+      },
+      trimester3: {
+        title: "III. trimeszter (28–40. hét) – Növekedési hajrá és szülésre felkészülés",
+        focus: "Vércukor- és vérnyomás-stabilitás, lábgörcsök/ödéma csökkentése, reflux-kímélő étkezés.",
+        items: [
+          {
+            name: "Magnézium-biszglicinát (300–400 mg)",
+            why: "Enyhíti a III. trimeszteri vádligörcsöket és segíti az alvást (orvosi javaslat szerint 36–37. hétig).",
+            tags: ["III. trimeszter"],
+            timing: "Este, vacsora után."
+          },
+          {
+            name: "DHA + Kolin + D3-vitamin",
+            why: "A magzati súlygyarapodás és agykéreg-érés utolsó nagy szakaszának kulcstápanyagai.",
+            tags: ["III. trimeszter", "Hashimoto"],
+            timing: "Ebéd közben."
+          },
+          {
+            name: "Probiotikum + Oldható rost (pl. zab, útifűmaghéj)",
+            why: "Segít a terhességi székrekedés ellen és támogatja a szülés előtti hüvelyi/bélflóra egyensúlyát.",
+            tags: ["III. trimeszter", "PCOS / IR"],
+            timing: "Bőséges vízzel, reggel vagy este."
+          }
+        ],
+        dietTips: [
+          "Reflux és teltségérzet ellen: kisebb adagok, lassú rágás, lefekvés előtt 2–3 órával már ne egyél nehezet.",
+          "Ödéma vagy emelkedett vérnyomás esetén mérsékeld a hozzáadott sót és igyál napi 2–2,5 liter vizet."
+        ]
+      }
     }
   };
 
@@ -1068,14 +1264,23 @@ window.SPERA_DATA = (function () {
             moodTags: ["Kiegyensúlyozott"]
           },
           bbt: 36.24,
+          glucoseFasting: 4.9,
+          glucosePostMeal: 6.4,
+          painVas: 1,
+          restingPulse: 68,
+          headache: "none",
           bleeding: "none",
           cervicalMucus: "creamy",
           pelvicPain: "none",
           metabolicLogged: true,
           metabolic: {
             reactiveHypo: true,
+            glucoseReaction: "mild_crash",
             bloatingConstipation: false,
+            giDetail: "none",
             coldEdema: false,
+            thermoDetail: "normal",
+            palpitations: false,
             skinHairTrend: "unchanged"
           },
           intensity: 1,
@@ -1096,6 +1301,11 @@ window.SPERA_DATA = (function () {
             moodTags: ["Kiegyensúlyozott"]
           },
           bbt: 36.20,
+          glucoseFasting: 4.8,
+          glucosePostMeal: 6.1,
+          painVas: 0,
+          restingPulse: 67,
+          headache: "none",
           bleeding: "none",
           cervicalMucus: "creamy",
           pelvicPain: "none",
@@ -1119,14 +1329,23 @@ window.SPERA_DATA = (function () {
             moodTags: ["Szorongás"]
           },
           bbt: 36.18,
+          glucoseFasting: 5.2,
+          glucosePostMeal: 7.1,
+          painVas: 2,
+          restingPulse: 74,
+          headache: "mild",
           bleeding: "none",
           cervicalMucus: "watery",
           pelvicPain: "none",
           metabolicLogged: true,
           metabolic: {
             reactiveHypo: true,
+            glucoseReaction: "mild_crash",
             bloatingConstipation: true,
+            giDetail: "bloating",
             coldEdema: false,
+            thermoDetail: "normal",
+            palpitations: false,
             skinHairTrend: "increased"
           },
           intensity: 2,
@@ -1147,6 +1366,11 @@ window.SPERA_DATA = (function () {
             moodTags: ["Kiegyensúlyozott"]
           },
           bbt: 36.15,
+          glucoseFasting: 4.7,
+          glucosePostMeal: 6.0,
+          painVas: 4,
+          restingPulse: 69,
+          headache: "none",
           bleeding: "none",
           cervicalMucus: "eggwhite",
           pelvicPain: "sharp_one_side",
@@ -1154,8 +1378,11 @@ window.SPERA_DATA = (function () {
           metabolicLogged: true,
           metabolic: {
             reactiveHypo: false,
+            glucoseReaction: "stable",
             bloatingConstipation: false,
+            giDetail: "none",
             coldEdema: false,
+            thermoDetail: "normal",
             palpitations: false,
             skinHairTrend: "unchanged"
           },
@@ -1177,6 +1404,11 @@ window.SPERA_DATA = (function () {
             moodTags: ["Kiegyensúlyozott"]
           },
           bbt: 36.48,
+          glucoseFasting: 4.8,
+          glucosePostMeal: 6.2,
+          painVas: 3,
+          restingPulse: 70,
+          headache: "none",
           bleeding: "none",
           cervicalMucus: "eggwhite",
           pelvicPain: "sharp_one_side",
@@ -1184,8 +1416,11 @@ window.SPERA_DATA = (function () {
           metabolicLogged: true,
           metabolic: {
             reactiveHypo: false,
+            glucoseReaction: "stable",
             bloatingConstipation: false,
+            giDetail: "none",
             coldEdema: false,
+            thermoDetail: "normal",
             palpitations: false,
             skinHairTrend: "unchanged"
           },

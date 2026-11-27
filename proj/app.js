@@ -93,8 +93,13 @@
       bleeding: "none",
       cervicalMucus: "",
       pelvicPain: "none",
+      painVas: 0,
+      headache: "none",
       lhTest: "",
       metabolicLogged: true,
+      glucoseReaction: "stable",
+      giDetail: "none",
+      thermoDetail: "normal",
       reactiveHypo: false,
       bloatingConstipation: false,
       coldEdema: false,
@@ -104,6 +109,7 @@
       bpDia: "",
       glucoseFasting: "",
       glucosePostMeal: "",
+      restingPulse: "",
       pregWeight: "",
       fetalMovement: "",
       pregRedFlags: []
@@ -632,15 +638,29 @@
     const effectiveMissed = Math.max(medNoDays, reportedMissed);
     const adherencePct = Math.max(0, Math.min(100, Math.round(((30 - effectiveMissed) / 30) * 100)));
 
-    // Heti metabolikus & hormonális mikrotünetek
+    // Heti metabolikus & hormonális mikrotünetek + vércukor/VAS
     const metaLogs = logs.filter((l) => l.metabolicLogged && l.metabolic).sort((a, b) => b.date.localeCompare(a.date));
     const lastMetabolicDate = metaLogs[0]?.date || null;
     const daysSinceMetabolic = lastMetabolicDate ? diffDays(lastMetabolicDate, todayKey) : null;
-    const reactiveHypoCount = metaLogs.filter((l) => l.metabolic.reactiveHypo).length;
-    const bloatingCount = metaLogs.filter((l) => l.metabolic.bloatingConstipation).length;
-    const coldEdemaCount = metaLogs.filter((l) => l.metabolic.coldEdema).length;
+    const reactiveHypoCount = metaLogs.filter(
+      (l) => (l.metabolic.glucoseReaction && l.metabolic.glucoseReaction !== "stable") || l.metabolic.reactiveHypo
+    ).length;
+    const bloatingCount = metaLogs.filter(
+      (l) => (l.metabolic.giDetail && l.metabolic.giDetail !== "none") || l.metabolic.bloatingConstipation
+    ).length;
+    const coldEdemaCount = metaLogs.filter(
+      (l) => (l.metabolic.thermoDetail && l.metabolic.thermoDetail !== "normal") || l.metabolic.coldEdema
+    ).length;
     const palpitationsCount = metaLogs.filter((l) => l.metabolic.palpitations).length;
     const latestSkinHair = metaLogs[0]?.metabolic?.skinHairTrend || "";
+
+    const fastingVals = logs.map((l) => l.glucoseFasting ?? l.pregnancyCheckin?.glucoseFasting).filter((v) => v !== null && v !== undefined && v !== "");
+    const postVals = logs.map((l) => l.glucosePostMeal ?? l.pregnancyCheckin?.glucosePostMeal).filter((v) => v !== null && v !== undefined && v !== "");
+    const avgGlucoseFasting = fastingVals.length ? (fastingVals.reduce((s, v) => s + Number(v), 0) / fastingVals.length).toFixed(1) : null;
+    const avgGlucosePost = postVals.length ? (postVals.reduce((s, v) => s + Number(v), 0) / postVals.length).toFixed(1) : null;
+    const vasVals = logs.map((l) => l.painVas).filter((v) => v !== null && v !== undefined && Number(v) > 0);
+    const maxPainVas = vasVals.length ? Math.max(...vasVals.map(Number)) : 0;
+    const migraineDays = logs.filter((l) => l.headache === "migraine").length;
 
     // Ciklus- és termékenységi biomarkerek
     const eggWhiteDays = logs.filter((l) => l.cervicalMucus === "eggwhite").length;
@@ -674,6 +694,10 @@
       coldEdemaCount,
       palpitationsCount,
       latestSkinHair,
+      avgGlucoseFasting,
+      avgGlucosePost,
+      maxPainVas,
+      migraineDays,
       eggWhiteDays,
       spottingDays,
       clotDays,
@@ -924,6 +948,8 @@
             <span class="pill pill-neutral">Energia: ${dc.energy}/5</span>
             <span class="pill pill-neutral">Hangulat: ${dc.mood}/5</span>
             <span class="pill pill-neutral">Alvás: ${String(dc.sleepHours).replace(".", ",")} ó (${escapeHtml(DATA.SELF_MANAGEMENT_META.sleepQuality[dc.sleepQuality] || "")})</span>
+            ${todayEntry.glucoseFasting ? `<span class="pill pill-peach">Éhgy. cukor: ${String(todayEntry.glucoseFasting).replace(".", ",")} mmol/l</span>` : ""}
+            ${Number(todayEntry.painVas) > 0 ? `<span class="pill">Fájdalom VAS: ${todayEntry.painVas}/10</span>` : ""}
             ${dc.brainFog ? `<span class="pill">Agyköd: Igen</span>` : `<span class="pill pill-sage">Agyköd: Nem</span>`}
           </div>
           <button type="button" class="btn btn-outline btn-sm" data-jump-tab="symptoms">Szerkesztés / Klinikai jelek &rarr;</button>
@@ -1091,18 +1117,36 @@
   function renderDashboardNutrition() {
     const el = document.getElementById("dashboardNutritionCard");
     if (!el) return;
+    const mode = state.mode || "cycle";
     const cyc = getCycleStatusForDate(getTodayKey());
-    const activePhase = selectedNutritionPhase || (state.mode === "pregnancy" ? "pregnancy" : cyc.phase);
-    const guide = DATA.NUTRITION_GUIDE[activePhase] || DATA.NUTRITION_GUIDE.follicular;
+    const preg = mode === "pregnancy" ? getPregnancyStatus() : null;
+    const modeGuide = DATA.NUTRITION_GUIDE[mode] || DATA.NUTRITION_GUIDE.cycle;
+
+    const phaseTabs =
+      mode === "pregnancy"
+        ? [
+            { key: "trimester1", label: "I. trimeszter" },
+            { key: "trimester2", label: "II. trimeszter" },
+            { key: "trimester3", label: "III. trimeszter" }
+          ]
+        : [
+            { key: "menstruation", label: "Menstr." },
+            { key: "follicular", label: "Follik." },
+            { key: "ovulation", label: "Ovul." },
+            { key: "luteal", label: "Luteális" }
+          ];
+
+    const defaultTab = mode === "pregnancy" ? `trimester${preg.trimester}` : cyc.phase;
+    const activePhase = phaseTabs.some((t) => t.key === selectedNutritionPhase) ? selectedNutritionPhase : defaultTab;
+    const guide = modeGuide[activePhase] || Object.values(modeGuide)[0];
     const activeInteractions = getActiveInteractions();
 
-    const phaseTabs = [
-      { key: "menstruation", label: "Menstr." },
-      { key: "follicular", label: "Follik." },
-      { key: "ovulation", label: "Ovul." },
-      { key: "luteal", label: "Luteális" },
-      { key: "pregnancy", label: "Terhesség" }
-    ];
+    const modeBadge =
+      mode === "pregnancy"
+        ? `Várandósság • ${preg.trimester}. trimeszter`
+        : mode === "ttc"
+        ? "Babatervezés protokoll"
+        : "Cikluskövetés";
 
     el.innerHTML = `
       <div class="card-header-inline">
@@ -1110,6 +1154,7 @@
           <h3 class="card-title">Étrend &amp; Vitamin ajánló</h3>
           <p class="card-subtitle" style="margin-bottom:0;">${escapeHtml(guide.title)}</p>
         </div>
+        <span class="pill ${mode === "pregnancy" ? "pill-sage" : mode === "ttc" ? "pill-peach" : ""}">${escapeHtml(modeBadge)}</span>
       </div>
       <div class="phase-selector-bar" style="margin:0.55rem 0 0.65rem;">
         ${phaseTabs
@@ -1381,6 +1426,12 @@
   // ------------------------------------------------------------------------
   // 3. Spera 4-szintű Önmenedzsment & Tünetnaplózó
   // ------------------------------------------------------------------------
+  function formatPainVasLabel(val) {
+    const n = Number(val) || 0;
+    const desc = n === 0 ? "Nincs" : n <= 3 ? "Enyhe" : n <= 6 ? "Közepes" : "Erős";
+    return `${n} / 10 – ${desc}`;
+  }
+
   function hydrateDraftFromEntry(existing) {
     const def = createDefaultCheckinDraft();
     if (!existing) {
@@ -1390,6 +1441,9 @@
     const dc = existing.dailyCheckin || {};
     const meta = existing.metabolic || {};
     const pv = existing.pregnancyCheckin || {};
+    const glucoseReaction = meta.glucoseReaction || (meta.reactiveHypo ? "mild_crash" : "stable");
+    const giDetail = meta.giDetail || (meta.bloatingConstipation ? "bloating" : "none");
+    const thermoDetail = meta.thermoDetail || (meta.coldEdema ? "cold" : "normal");
     checkinDraft = {
       medRule: dc.medRule || def.medRule,
       energy: Number(dc.energy) || def.energy,
@@ -1401,17 +1455,23 @@
       bleeding: existing.bleeding || "none",
       cervicalMucus: existing.cervicalMucus || "",
       pelvicPain: existing.pelvicPain || "none",
+      painVas: Number(existing.painVas) || 0,
+      headache: existing.headache || "none",
       lhTest: existing.lhTest || "",
       metabolicLogged: true,
-      reactiveHypo: Boolean(meta.reactiveHypo),
-      bloatingConstipation: Boolean(meta.bloatingConstipation),
-      coldEdema: Boolean(meta.coldEdema),
+      glucoseReaction,
+      giDetail,
+      thermoDetail,
+      reactiveHypo: glucoseReaction !== "stable",
+      bloatingConstipation: giDetail !== "none",
+      coldEdema: thermoDetail !== "normal",
       palpitations: Boolean(meta.palpitations),
       skinHairTrend: meta.skinHairTrend || "unchanged",
       bpSys: pv.bpSys || "",
       bpDia: pv.bpDia || "",
-      glucoseFasting: pv.glucoseFasting || "",
-      glucosePostMeal: pv.glucosePostMeal || "",
+      glucoseFasting: existing.glucoseFasting ?? pv.glucoseFasting ?? "",
+      glucosePostMeal: existing.glucosePostMeal ?? pv.glucosePostMeal ?? "",
+      restingPulse: existing.restingPulse ?? "",
       pregWeight: pv.weightKg || "",
       fetalMovement: pv.fetalMovement || "",
       pregRedFlags: Array.isArray(pv.redFlags) ? [...pv.redFlags] : []
@@ -1472,6 +1532,14 @@
       sleepDisp.textContent = `${String(checkinDraft.sleepHours).replace(".", ",")} óra`;
     }
 
+    // Fájdalom VAS 0-10 csúszka
+    const painSlider = document.getElementById("symPainVas");
+    const painDisp = document.getElementById("painVasDisplay");
+    if (painSlider && painDisp) {
+      painSlider.value = String(checkinDraft.painVas || 0);
+      painDisp.textContent = formatPainVasLabel(checkinDraft.painVas || 0);
+    }
+
     // Szegmentált gombok szinkronizálása
     const mapVals = {
       medRule: checkinDraft.medRule,
@@ -1480,11 +1548,12 @@
       bleeding: checkinDraft.bleeding,
       cervicalMucus: checkinDraft.cervicalMucus,
       pelvicPain: checkinDraft.pelvicPain,
+      headache: checkinDraft.headache || "none",
       lhTest: checkinDraft.lhTest,
       fetalMovement: checkinDraft.fetalMovement,
-      reactiveHypo: checkinDraft.reactiveHypo ? "yes" : "no",
-      bloatingConstipation: checkinDraft.bloatingConstipation ? "yes" : "no",
-      coldEdema: checkinDraft.coldEdema ? "yes" : "no",
+      glucoseReaction: checkinDraft.glucoseReaction || "stable",
+      giDetail: checkinDraft.giDetail || "none",
+      thermoDetail: checkinDraft.thermoDetail || "normal",
       palpitations: checkinDraft.palpitations ? "yes" : "no",
       skinHairTrend: checkinDraft.skinHairTrend
     };
@@ -1549,10 +1618,16 @@
       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ""; };
       setVal("pregBpSys", checkinDraft.bpSys);
       setVal("pregBpDia", checkinDraft.bpDia);
-      setVal("pregGlucoseFasting", checkinDraft.glucoseFasting);
-      setVal("pregGlucosePost", checkinDraft.glucosePostMeal);
+      setVal("symGlucoseFasting", checkinDraft.glucoseFasting);
+      setVal("symGlucosePost", checkinDraft.glucosePostMeal);
+      setVal("symPulse", checkinDraft.restingPulse);
       setVal("pregWeight", checkinDraft.pregWeight);
     }
+
+    const fHint = document.getElementById("glucoseFastingHint");
+    const pHint = document.getElementById("glucosePostHint");
+    if (fHint) fHint.textContent = state.mode === "pregnancy" ? "Várandóssági (GDM) cél: < 5,1 mmol/l" : "Normál / IR cél: < 5,5 mmol/l";
+    if (pHint) pHint.textContent = state.mode === "pregnancy" ? "Várandóssági (GDM) cél: < 7,0 mmol/l" : "Normál / IR cél: < 7,8 mmol/l";
 
     const dailyPill = document.getElementById("dailyCompletionPill");
     if (dailyPill) {
@@ -1658,13 +1733,33 @@
           if (l.bleeding && l.bleeding !== "none") pills.push(`<span class="pill">Vérzés: ${escapeHtml(M.bleeding[l.bleeding] || l.bleeding)}</span>`);
           if (l.cervicalMucus) pills.push(`<span class="pill pill-sage">Nyák: ${escapeHtml(M.cervicalMucus[l.cervicalMucus] || l.cervicalMucus)}</span>`);
           if (l.pelvicPain && l.pelvicPain !== "none") pills.push(`<span class="pill pill-peach">Fájdalom: ${escapeHtml(M.pelvicPain[l.pelvicPain] || l.pelvicPain)}</span>`);
+          if (Number(l.painVas) > 0) pills.push(`<span class="pill">VAS: ${l.painVas}/10</span>`);
+          if (l.headache && l.headache !== "none") pills.push(`<span class="pill">${escapeHtml(M.headache?.[l.headache] || l.headache)}</span>`);
+          const gF = l.glucoseFasting ?? l.pregnancyCheckin?.glucoseFasting;
+          const gP = l.glucosePostMeal ?? l.pregnancyCheckin?.glucosePostMeal;
+          if (gF || gP) {
+            pills.push(`<span class="pill pill-peach">Cukor: ${gF ? `${String(gF).replace(".", ",")}` : "—"} / ${gP ? `${String(gP).replace(".", ",")}` : "—"} mmol/l</span>`);
+          }
+          if (l.restingPulse) pills.push(`<span class="pill pill-neutral">Pulzus: ${l.restingPulse}/p</span>`);
           if (l.metabolicLogged && l.metabolic) {
             const flags = [];
-            if (l.metabolic.reactiveHypo) flags.push("Hipoglikémia/cukoréhség");
-            if (l.metabolic.bloatingConstipation) flags.push("Puffadás/székrekedés");
-            if (l.metabolic.coldEdema) flags.push("Fázékonyság/ödéma");
+            if (l.metabolic.glucoseReaction && l.metabolic.glucoseReaction !== "stable") {
+              flags.push(M.glucoseReaction?.[l.metabolic.glucoseReaction] || "Vércukor-ingadozás");
+            } else if (l.metabolic.reactiveHypo) {
+              flags.push("Hipoglikémia/cukoréhség");
+            }
+            if (l.metabolic.giDetail && l.metabolic.giDetail !== "none") {
+              flags.push(M.giDetail?.[l.metabolic.giDetail] || "Emésztési panasz");
+            } else if (l.metabolic.bloatingConstipation) {
+              flags.push("Puffadás/székrekedés");
+            }
+            if (l.metabolic.thermoDetail && l.metabolic.thermoDetail !== "normal") {
+              flags.push(M.thermoDetail?.[l.metabolic.thermoDetail] || "Hőháztartási jel");
+            } else if (l.metabolic.coldEdema) {
+              flags.push("Fázékonyság/ödéma");
+            }
             if (l.metabolic.skinHairTrend === "increased") flags.push("Erősödő bőr/hajtünet");
-            pills.push(`<span class="pill ${flags.length ? "" : "pill-sage"}">Heti szűrés: ${flags.length ? escapeHtml(flags.join(", ")) : "Rendben"}</span>`);
+            pills.push(`<span class="pill ${flags.length ? "" : "pill-sage"}">Endokrin jelek: ${flags.length ? escapeHtml(flags.join(", ")) : "Rendben"}</span>`);
           }
           if (l.bbt) pills.push(`<span class="pill pill-sage">BBT: ${Number(l.bbt).toFixed(2)} °C</span>`);
           return `
@@ -2169,6 +2264,13 @@
     if (stats.bloatingCount) patternParts.push(`Haspuffadás/székrekedés: ${stats.bloatingCount}×`);
     if (stats.coldEdemaCount) patternParts.push(`Fázékonyság/ödéma: ${stats.coldEdemaCount}×`);
     if (stats.palpitationsCount) patternParts.push(`Szívdobogásérzés: ${stats.palpitationsCount}×`);
+    if (stats.avgGlucoseFasting || stats.avgGlucosePost) {
+      patternParts.push(
+        `Átlag vércukor: éhgy. ${stats.avgGlucoseFasting ? `${String(stats.avgGlucoseFasting).replace(".", ",")} mmol/l` : "—"} / étkezés u. ${stats.avgGlucosePost ? `${String(stats.avgGlucosePost).replace(".", ",")} mmol/l` : "—"}`
+      );
+    }
+    if (stats.maxPainVas) patternParts.push(`Max. fájdalom (VAS): ${stats.maxPainVas}/10`);
+    if (stats.migraineDays) patternParts.push(`Hormonális migrén: ${stats.migraineDays} nap`);
     if (stats.latestSkinHair) patternParts.push(`Bőr/hajtünet: ${M.skinHairTrend[stats.latestSkinHair]}`);
     if (stats.eggWhiteDays) patternParts.push(`Tojásfehérje nyák: ${stats.eggWhiteDays} nap`);
     if (stats.sharpPainDays) patternParts.push(`Egyoldali ovulációs szúrás: ${stats.sharpPainDays} nap`);
@@ -3036,6 +3138,12 @@
       if (disp) disp.textContent = `${String(checkinDraft.sleepHours).replace(".", ",")} óra`;
     });
 
+    document.getElementById("symPainVas")?.addEventListener("input", (e) => {
+      checkinDraft.painVas = Number(e.target.value) || 0;
+      const disp = document.getElementById("painVasDisplay");
+      if (disp) disp.textContent = formatPainVasLabel(checkinDraft.painVas);
+    });
+
     document.getElementById("chkShowMedicalWhy").addEventListener("change", (e) => {
       state.settings.showMedicalWhy = e.target.checked;
       saveState();
@@ -3061,9 +3169,13 @@
       const bbtVal = document.getElementById("symBbt").value;
       const bpSysVal = document.getElementById("pregBpSys")?.value;
       const bpDiaVal = document.getElementById("pregBpDia")?.value;
-      const glucFVal = document.getElementById("pregGlucoseFasting")?.value;
-      const glucPVal = document.getElementById("pregGlucosePost")?.value;
+      const glucFVal = document.getElementById("symGlucoseFasting")?.value;
+      const glucPVal = document.getElementById("symGlucosePost")?.value;
+      const pulseVal = document.getElementById("symPulse")?.value;
       const pregWVal = document.getElementById("pregWeight")?.value;
+      const gReaction = checkinDraft.glucoseReaction || "stable";
+      const giDet = checkinDraft.giDetail || "none";
+      const thermoDet = checkinDraft.thermoDetail || "normal";
 
       const entry = {
         date,
@@ -3079,15 +3191,23 @@
           moodTags: [...checkinDraft.moodTags]
         },
         bbt: bbtVal ? Number(bbtVal) : null,
+        glucoseFasting: glucFVal ? Number(glucFVal) : null,
+        glucosePostMeal: glucPVal ? Number(glucPVal) : null,
+        restingPulse: pulseVal ? Number(pulseVal) : null,
+        painVas: Number(checkinDraft.painVas) || 0,
+        headache: checkinDraft.headache || "none",
         bleeding: checkinDraft.bleeding || "none",
         cervicalMucus: checkinDraft.cervicalMucus || "",
         pelvicPain: checkinDraft.pelvicPain || "none",
         lhTest: checkinDraft.lhTest || "",
         metabolicLogged: true,
         metabolic: {
-          reactiveHypo: Boolean(checkinDraft.reactiveHypo),
-          bloatingConstipation: Boolean(checkinDraft.bloatingConstipation),
-          coldEdema: Boolean(checkinDraft.coldEdema),
+          glucoseReaction: gReaction,
+          giDetail: giDet,
+          thermoDetail: thermoDet,
+          reactiveHypo: gReaction !== "stable",
+          bloatingConstipation: giDet !== "none",
+          coldEdema: thermoDet !== "normal",
           palpitations: Boolean(checkinDraft.palpitations),
           skinHairTrend: checkinDraft.skinHairTrend || "unchanged"
         },

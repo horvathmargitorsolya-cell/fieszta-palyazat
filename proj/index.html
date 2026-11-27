@@ -489,7 +489,7 @@
                 </div>
               </div>
 
-              <!-- 2.4 Alhasi fájdalom vagy feszülés -->
+              <!-- 2.4 Alhasi fájdalom vagy feszülés + VAS 0-10 skála -->
               <div class="checkin-question" id="qPelvicPainWrap">
                 <div class="cq-head">
                   <label class="cq-title">Alhasi fájdalom vagy feszülés</label>
@@ -501,18 +501,56 @@
                   <button type="button" class="seg-btn seg-btn-warn" data-value="sharp_one_side">Éles egyoldali szúrás</button>
                   <button type="button" class="seg-btn seg-btn-warn" data-value="strong_cramps">Erős görcsök</button>
                 </div>
+                <div class="pain-vas-box" style="margin-top:0.7rem;">
+                  <div class="sleep-slider-top">
+                    <label for="symPainVas" style="font-weight:700;">Fájdalom erőssége (VAS 0–10):</label>
+                    <strong id="painVasDisplay">0 / 10 – Nincs</strong>
+                  </div>
+                  <input type="range" id="symPainVas" min="0" max="10" step="1" value="0" />
+                  <div class="sleep-slider-ticks"><span>0 (nincs)</span><span>3 (enyhe)</span><span>6 (közepes)</span><span>10 (elviselhetetlen)</span></div>
+                </div>
                 <p class="medical-why">
-                  <strong>Orvosi háttér:</strong> Segít beazonosítani a középidős ovulációs fájdalmat (Mittelschmerz) vagy az endometriózisra utaló krónikus kismedencei fájdalmat.
+                  <strong>Orvosi háttér:</strong> A VAS-skála és a fájdalom típusa segít elkülöníteni a középidős ovulációs szúrást (Mittelschmerz) az endometriózisra utaló krónikus kismedencei fájdalomtól.
                 </p>
               </div>
 
-              <!-- Opcionális BBT alaphőmérséklet -->
-              <div class="bbt-inline-row">
-                <div class="form-group" style="margin-bottom:0; max-width: 240px;">
+              <!-- 2.4B Fejfájás / hormonális migrén -->
+              <div class="checkin-question">
+                <div class="cq-head">
+                  <label class="cq-title">Fejfájás / hormonális migrén</label>
+                  <span class="cq-prompt">„Tapasztaltál ma fejfájást vagy látászavarral/hányingerrel kísért migrént?”</span>
+                </div>
+                <div class="seg-btn-row seg-wrap" data-radio-group="headache" role="group" aria-label="Fejfájás">
+                  <button type="button" class="seg-btn" data-value="none">Nincs</button>
+                  <button type="button" class="seg-btn" data-value="mild">Enyhe fejfájás</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="migraine">Hormonális migrén</button>
+                </div>
+                <p class="medical-why">
+                  <strong>Orvosi háttér:</strong> A menzesz előtti vagy ovuláció körüli ösztrogénszint-esés gyakran vált ki ciklusfüggő migrént.
+                </p>
+              </div>
+
+              <!-- Vércukor, BBT és Nyugalmi pulzus (minden élethelyzetben elérhető!) -->
+              <div class="glucose-vitals-grid">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="symGlucoseFasting">Éhgyomri vércukor (mmol/l, opc.)</label>
+                  <input type="number" id="symGlucoseFasting" step="0.1" min="2.0" max="20.0" placeholder="pl. 4.8" />
+                  <span class="form-help" id="glucoseFastingHint">Normál / IR cél: &lt; 5,5 mmol/l</span>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="symGlucosePost">Étkezés u. vércukor 60/120 p (mmol/l, opc.)</label>
+                  <input type="number" id="symGlucosePost" step="0.1" min="2.0" max="25.0" placeholder="pl. 6.2" />
+                  <span class="form-help" id="glucosePostHint">Normál / IR cél: &lt; 7,8 mmol/l</span>
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
                   <label for="symBbt">Reggeli alaphőmérséklet – BBT (°C, opc.)</label>
                   <input type="number" id="symBbt" step="0.01" min="35.0" max="39.0" placeholder="pl. 36.45" />
                 </div>
-                <div class="form-group" style="margin-bottom:0; max-width: 260px;">
+                <div class="form-group" style="margin-bottom:0;">
+                  <label for="symPulse">Nyugalmi pulzus (ütés/perc, opc.)</label>
+                  <input type="number" id="symPulse" step="1" min="35" max="180" placeholder="pl. 68" />
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
                   <label for="symIntensity">Összesített tünetterhelés (1–3)</label>
                   <select id="symIntensity">
                     <option value="1">1 – Enyhe / jól viselhető</option>
@@ -529,37 +567,42 @@
 
               <div class="checkin-question">
                 <div class="cq-head">
-                  <label class="cq-title">Reaktív hipoglikémia / Cukoréhség (IR monitorozás)</label>
-                  <span class="cq-prompt">„Éreztél étkezés után hirtelen álmosságot, kézremegést vagy erős édességvágyat?”</span>
+                  <label class="cq-title">Vércukor-reakció étkezés után (IR monitorozás)</label>
+                  <span class="cq-prompt">„Hogyan reagált a szervezeted a főétkezések után?”</span>
                 </div>
-                <div class="seg-btn-row" data-radio-group="reactiveHypo" role="group" aria-label="Reaktív hipoglikémia">
-                  <button type="button" class="seg-btn" data-value="no">Nem</button>
-                  <button type="button" class="seg-btn seg-btn-warn" data-value="yes">Igen</button>
+                <div class="seg-btn-row seg-wrap" data-radio-group="glucoseReaction" role="group" aria-label="Vércukor-reakció">
+                  <button type="button" class="seg-btn seg-btn-sage" data-value="stable">Stabil</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="mild_crash">Álmosság / sóvárgás</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="hypo_signs">Remegés / izzadás / hirtelen éhség</button>
                 </div>
                 <p class="medical-why">
-                  <strong>Orvosi háttér:</strong> A postprandiális hipoglikémia jelzi, ha a szénhidrátbevitel vagy a metformin/mio-inozitol adagolása finomhangolásra szorul.
+                  <strong>Orvosi háttér:</strong> A postprandiális vércukor-ingadozás jelzi, ha a szénhidrátbevitel vagy a metformin/mio-inozitol adagolása finomhangolásra szorul.
                 </p>
               </div>
 
               <div class="checkin-question">
                 <div class="cq-head">
-                  <label class="cq-title">Emésztés és puffadás (Pajzsmirigy / Metformin mellékhatás)</label>
-                  <span class="cq-prompt">„Tapasztaltál kifejezett haspuffadást vagy székrekedést?”</span>
+                  <label class="cq-title">Emésztés és puffadás (Pajzsmirigy / Endometriózis / Metformin)</label>
+                  <span class="cq-prompt">„Milyen emésztési panaszt tapasztaltál ma?”</span>
                 </div>
-                <div class="seg-btn-row" data-radio-group="bloatingConstipation" role="group" aria-label="Emésztés és puffadás">
-                  <button type="button" class="seg-btn" data-value="no">Nem</button>
-                  <button type="button" class="seg-btn seg-btn-warn" data-value="yes">Igen</button>
+                <div class="seg-btn-row seg-wrap" data-radio-group="giDetail" role="group" aria-label="Emésztés és puffadás">
+                  <button type="button" class="seg-btn" data-value="none">Nincs</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="bloating">Puffadás / endo-belly</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="constipation">Székrekedés</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="gi_upset">Hányinger / hasmenés</button>
                 </div>
               </div>
 
               <div class="checkin-question">
                 <div class="cq-head">
-                  <label class="cq-title">Hőháztartás és ödéma (Hypothyreosis jelző)</label>
-                  <span class="cq-prompt">„Fáztál a megszokottnál jobban, vagy tapasztaltál kéz-/láb-/szemkörüli duzzanatot?”</span>
+                  <label class="cq-title">Hőháztartás és vízvisszatartás (Pajzsmirigy / Hormonális jelző)</label>
+                  <span class="cq-prompt">„Tapasztaltál fázékonyságot, duzzanatot vagy hőhullámot?”</span>
                 </div>
-                <div class="seg-btn-row" data-radio-group="coldEdema" role="group" aria-label="Hőháztartás és ödéma">
-                  <button type="button" class="seg-btn" data-value="no">Nem</button>
-                  <button type="button" class="seg-btn seg-btn-warn" data-value="yes">Igen</button>
+                <div class="seg-btn-row seg-wrap" data-radio-group="thermoDetail" role="group" aria-label="Hőháztartás és vízvisszatartás">
+                  <button type="button" class="seg-btn" data-value="normal">Normál</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="cold">Fázékonyság</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="edema">Ödéma / vizesedés</button>
+                  <button type="button" class="seg-btn seg-btn-warn" data-value="hot_flashes">Hőhullám / éjszakai izzadás</button>
                 </div>
               </div>
 
@@ -592,7 +635,7 @@
               <!-- VÁRANDÓSSÁGI ORVOSI MÉRÉSEK (csak Várandósság módban látható) -->
               <div id="secPregnancyVitals" class="pregnancy-vitals-box hidden">
                 <div class="endo-inline-divider">
-                  <span class="tier-badge tier-visit">Várandóssági orvosi paraméterek (GDM &amp; Praeeclampsia szűrés)</span>
+                  <span class="tier-badge tier-visit">Várandóssági orvosi paraméterek (Praeeclampsia &amp; magzatmozgás szűrés)</span>
                 </div>
                 <div class="form-grid-3">
                   <div class="form-group">
@@ -606,16 +649,6 @@
                   <div class="form-group">
                     <label for="pregWeight">Testsúly (kg)</label>
                     <input type="number" id="pregWeight" step="0.1" min="35" max="180" placeholder="pl. 64.5" />
-                  </div>
-                </div>
-                <div class="form-grid-2">
-                  <div class="form-group">
-                    <label for="pregGlucoseFasting">Éhgyomri vércukor (mmol/l)</label>
-                    <input type="number" id="pregGlucoseFasting" step="0.1" min="2.0" max="20.0" placeholder="pl. 4.8 (cél < 5,1)" />
-                  </div>
-                  <div class="form-group">
-                    <label for="pregGlucosePost">Étkezés utáni vércukor 60/120 p (mmol/l)</label>
-                    <input type="number" id="pregGlucosePost" step="0.1" min="2.0" max="25.0" placeholder="pl. 6.2 (cél < 7,0)" />
                   </div>
                 </div>
                 <div class="checkin-question">
