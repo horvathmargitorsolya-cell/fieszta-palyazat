@@ -39,10 +39,10 @@ Ez a dokumentum a **Spera** (FIESZTA 2026, jelige: **Manci**) webes prototípus�
 
 Exportált objektumok és függvények:
 - `ENDOCRINE_PROFILES`: `pcos` (`E28.2 / E11.9`), `hashimoto` (`E06.3 / E03.9`), `endometriosis` (`N80`).
-- `SELF_MANAGEMENT_META`: 4-szintű önmenedzsment-rendszer címkéi és SVG ikonjai (gyógyszerszabály, energia 1–5, hangulat 1–5, hangulatcímkék, alvásminőség, vérzés, méhnyaknyák, kismedencei fájdalom, bőr/haj trend, `missedDosesChoice`, `weightChangeType`).
+- `SELF_MANAGEMENT_META`: 4-szintű önmenedzsment-rendszer címkéi és SVG ikonjai (gyógyszerszabály, energia 1–5, hangulat 1–5, hangulatcímkék, alvásminőség, vérzés, méhnyaknyák, kismedencei fájdalom, `headache`, `glucoseReaction`, `giDetail`, `thermoDetail`, bőr/haj trend, `missedDosesChoice`, `weightChangeType`).
 - `SYMPTOM_LIBRARY`: fázis- és kórképspecifikus tünetlisták.
 - `BIOMARKERS`: `tsh`, `ft4`, `homa`, `progesterone`, `estradiol`, `vitd`, `ferritin` referencia- és optimális tartományokkal.
-- `NUTRITION_GUIDE`: ciklusfázis, kórkép és trimeszter szerinti étrendi és mikrotápanyag-ajánlások.
+- `NUTRITION_GUIDE`: 3 élethelyzetre (`cycle`, `ttc`, `pregnancy`) bontott fázis-, prekoncepciós és I–III. trimeszter-specifikus étrendi és mikrotápanyag-protokollok.
 - `INTERACTION_RULES`: gyógyszer–vitamin–étkezés kölcsönhatási szabályok (pl. L-tiroxin vs. vas/kalcium $\ge 4$ óra, kávé $\ge 45$ perc).
 - `PATIENT_JOURNEY`: 5 állomásos betegúttérkép (döntési pont, tipikus elakadás, Spera támogatási pont, cél-tab).
 - `PREGNANCY_MILESTONES`, `PRENATAL_CHECKLIST`, `TTC_CHECKLIST`: 4–40. heti magzati fejlődési mérföldkövek (gyümölcs/zöldség méret-összehasonlítással), kötelező várandóssági szűrések és prekoncepciós orvosi ellenőrzőlista.
