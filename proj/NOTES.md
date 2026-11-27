@@ -40,6 +40,7 @@ Ez a dokumentum a **Spera** (FIESZTA 2026, jelige: **Manci**) webes prototípus�
 Exportált objektumok és függvények:
 - `ENDOCRINE_PROFILES`: `pcos` (`E28.2 / E11.9`), `hashimoto` (`E06.3 / E03.9`), `endometriosis` (`N80`).
 - `SELF_MANAGEMENT_META`: 4-szintű önmenedzsment-rendszer címkéi és SVG ikonjai (gyógyszerszabály, energia 1–5, hangulat 1–5, hangulatcímkék, alvásminőség, vérzés, méhnyaknyák, kismedencei fájdalom, `headache`, `glucoseReaction`, `giDetail`, `thermoDetail`, bőr/haj trend, `missedDosesChoice`, `weightChangeType`).
+- `REPORT_TYPES`: ultrahang- és szakorvosi lelettípusok (`pelvic_us`, `thyroid_us`, `pregnancy_us`, `specialist_visit`, `other`).
 - `SYMPTOM_LIBRARY`: fázis- és kórképspecifikus tünetlisták.
 - `BIOMARKERS`: `tsh`, `ft4`, `homa`, `progesterone`, `estradiol`, `vitd`, `ferritin` referencia- és optimális tartományokkal.
 - `NUTRITION_GUIDE`: 3 élethelyzetre (`cycle`, `ttc`, `pregnancy`) bontott fázis-, prekoncepciós és I–III. trimeszter-specifikus étrendi és mikrotápanyag-protokollok.
@@ -55,7 +56,7 @@ Exportált objektumok és függvények:
 
 - **Tárolókulcs:** `STORAGE_KEY = "spera_fieszta_2026_v1"`
 - **Életciklus:** `createEmptyState()` $\rightarrow$ `loadSavedFromStorage()` / `normalizeState(raw)` $\rightarrow$ `saveState()`.
-- **Felső szintű `state` mezők:** `onboarded`, `isDemo`, `mode`, `journeyStep`, `profile`, `visitPrep`, `conditions`, `medications`, `intakeLogs`, `cycleHistory`, `smartAlertDismissedForAvg`, `prenatalChecklist`, `ttcChecklist`, `labResults`, `symptomLogs`, `settings`. A `settings` objektum tartalmazza a `largeText`, `soundEnabled`, `notificationsEnabled` és `showMedicalWhy` kapcsolókat.
+- **Felső szintű `state` mezők:** `onboarded`, `isDemo`, `mode`, `journeyStep`, `profile`, `visitPrep`, `conditions`, `medications`, `intakeLogs`, `cycleHistory`, `smartAlertDismissedForAvg`, `prenatalChecklist`, `ttcChecklist`, `labResults`, `symptomLogs`, `medicalReports`, `settings`. A `settings` objektum tartalmazza a `largeText`, `soundEnabled`, `notificationsEnabled` és `showMedicalWhy` kapcsolókat.
 - **Kötelező szinkron:** Ha új mezőt adsz a `state` struktúrához, **mindhárom helyen** frissíteni kell:
   1. `createEmptyState()` (`app.js`)
   2. `normalizeState(raw)` (`app.js`)
@@ -78,9 +79,9 @@ Exportált objektumok és függvények:
 
 - **Tabok (`data-tab`):** `dashboard` (*Áttekintő*), `symptoms` (*Gyorsteszt & Napló*), `analytics` (*Elemzések & Laborok*), `journey` (*Betegút & Orvosi adatok*). Mobilon (`<= 720px`) fix alsó navigációs sávként jelenik meg.
 - **Áttekintő:** 6 hetes (1,5 hónapos) gördülő ciklusnaptár mind a 4 fázis színkódolásával és napra pontos menstruáció-előrejelzéssel, Mai gyógyszerek gyors-pipálás, főoldali Étrend & Vitamin ajánló, valamint Babatervező / Várandósság orvosi fókuszblokk.
-- **Betegút & Orvosi adatok:** 5 állomásos Betegúttérkép, alatta közvetlen funkcióként a kinyitható/nyomtatható **Orvosi összefoglaló (Állapotlap)**, majd a betegségek, gyógyszer-törzsadatok, emlékeztető-vezérlés, allergiák, kórelőzmény és helyi JSON export/import.
+- **Betegút & Orvosi adatok:** 5 állomásos Betegúttérkép, alatta közvetlen funkcióként a kinyitható/nyomtatható **Orvosi összefoglaló (Állapotlap)**, majd a betegségek, gyógyszer-törzsadatok, emlékeztető-vezérlés, **Ultrahang- és szakorvosi leletek**, allergiák, kórelőzmény és helyi JSON export/import.
 - **Élethelyzet-váltó (`MODE_LABELS`):** `cycle` (*Cikluskövetés*) $\leftrightarrow$ `ttc` (*Baba tervezése*) $\leftrightarrow$ `pregnancy` (*Várandósság követése*).
-- **Modális ablakok (`index.html`):** `conditionModal` (betegség/fázis), `medicationModal` (gyógyszer/emlékeztető), `labModal` (új laboreredmény), `cycleModal` (tényleges ciklushossz).
+- **Modális ablakok (`index.html`):** `conditionModal` (betegség/fázis), `medicationModal` (gyógyszer/emlékeztető), `labModal` (új laboreredmény), `cycleModal` (tényleges ciklushossz), `reportModal` (ultrahang-/szakorvosi lelet).
 - **Színpaletta (`styles.css` – északi téli, sötét tónusú arculat, piros dominancia és vakító fehér nélkül):**
   - Oldalháttér: `#111822` (mély éjkék-palaszürke)
   - Kártyák / felületek: `#1A2432` (téli pala), `#1F2B3B` / `#233042` (belső palaszürke felületek), `#141D29` (beviteli mezők)
