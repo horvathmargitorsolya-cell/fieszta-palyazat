@@ -17,7 +17,7 @@ Ez a dokumentum az AI-kódoló ágensek belépési útmutatója a **Spera** proj
 |---|---|
 | `proj/` | A működő, 100% offline HTML/CSS/JS webes prototípus (`index.html`, `styles.css`, `app.js`, `data.js`). |
 | **`proj/NOTES.md`** | **Elsődleges technikai és domain-referencia** a prototípus további fejlesztéséhez (adatmodell, állapotkezelés, függvények, UX és tesztelési szabályok). |
-| `docs/` | LaTeX dokumentáció forrása (`docs/spera_dokumentacio.tex`, max. 5 oldal). |
+| `docs/` | LaTeX dokumentáció (`docs/spera_dokumentacio.tex`, max. 5 oldal), élő bemutató jegyzet (`docs/bemutato_jegyzet.md`) és beadási segédlet (`docs/beadas_urlap_adatok.md`). |
 | `dist/` | A `pipeline.py` által generált végleges beadandó fájlok (`spera_Manci_prototipus.zip`, `spera_Manci_dokumentacio.pdf`). |
 | `pipeline.py` | Szakaszolt Python build-, ellenőrző- és csomagoló szkript. |
 | `fieszta2026_palyazat.html` | Mentett pályázati kiírás (csak referencia, nem része a beadandó ZIP-nek). |
@@ -55,6 +55,6 @@ python3 pipeline.py --clean
 - [x] **Pályázati jelige** kiválasztása (`Manci`)
 - [x] **LaTeX PDF dokumentáció** lefordítása (`python3 pipeline.py --stages latex,verify`) és ellenőrzése ($\le$ 5 oldal, $\le$ 8 MB)
 - [ ] **Offline tesztelés** (`file://` protokollról, kikapcsolt internettel, Chrome/Edge/Firefox böngészőben)
-- [ ] **Friss kicsomagolásos próba** a `dist/spera_Manci_prototipus.zip` fájlból
+- [x] **Friss kicsomagolásos próba** a `dist/spera_Manci_prototipus.zip` fájlból
 - [ ] **Beadás** az online űrlapon (2026. nov. 27. 18:00 előtt)
-- [ ] **5 perces élő demó / poszterséta** forgatókönyv (2026. dec. 3.)
+- [x] **5 perces élő demó / poszterséta** forgatókönyv (2026. dec. 3.) – `docs/bemutato_jegyzet.md`

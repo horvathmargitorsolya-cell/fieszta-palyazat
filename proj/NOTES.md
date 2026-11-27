@@ -28,10 +28,10 @@ Ez a dokumentum a **Spera** (FIESZTA 2026, jelige: **Manci**) webes prototípus�
 
 | Fájl | Sorok | Felelősségi kör |
 |---|---|---|
-| `index.html` | ~1192 | SPA váz: üresen induló `#onboardingScreen` (+ zsűri demóbetöltő gomb), fejléc-élethelyzetváltó, 7 nézet szekciói, modális ablakok. |
-| `styles.css` | ~2499 | Design rendszer (`:root` CSS változók), reszponzív rácsok, kártyák, nyomtatásbarát `.no-print` szabályok. |
-| `data.js` | ~1049 | `window.SPERA_DATA` IIFE: szintetikus adatok és orvosszakmai tudásbázis. |
-| `app.js` | ~3036 | Állapotkezelés, domain számítások, inline SVG grafikonok, nézet-renderelők és eseménykezelés. |
+| `index.html` | ~1289 | SPA váz: üresen induló `#onboardingScreen` (+ zsűri demóbetöltő gomb), fejléc-élethelyzetváltó, 4 nézet szekciói, modális ablakok. |
+| `styles.css` | ~2793 | Design rendszer (`:root` CSS változók), reszponzív rácsok, kártyák, nyomtatásbarát `.no-print` szabályok. |
+| `data.js` | ~1505 | `window.SPERA_DATA` IIFE: szintetikus adatok és orvosszakmai tudásbázis. |
+| `app.js` | ~3672 | Állapotkezelés, domain számítások, inline SVG grafikonok, nézet-renderelők és eseménykezelés. |
 
 ---
 
@@ -104,4 +104,4 @@ Exportált objektumok és függvények:
 3. Ha van telepített `node`, ellenőrizd a JS szintaxist: `node --check proj/data.js && node --check proj/app.js`.
 4. Nyisd meg a kicsomagolt `index.html`-t `file://` protokollon, kikapcsolt hálózattal (Chrome / Edge / Firefox):
    - Teszteld az üres onboardingot és a *„Demó profil automatikus kitöltése”* gombot.
-   - Ellenőrizd a Smart Alertet, az Élethelyzet-váltót (beleértve a Várandósság módot), a 7 tabot, az SVG grafikonokat és a nyomtatási előnézetet (`Orvosi összefoglaló`).
+   - Ellenőrizd a Smart Alertet, az Élethelyzet-váltót (beleértve a Várandósság módot), a 4 tabot, az SVG grafikonokat és a nyomtatási előnézetet (`Orvosi összefoglaló`).
