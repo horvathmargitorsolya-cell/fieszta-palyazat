@@ -1,52 +1,54 @@
 /* ==========================================================================
-   Spera – Erőteljesebb meleg földszínek: égetett terrakotta, borostyán, erdőzöld, eszpresszó
-   Háttér: #E8D7C3 | Terrakotta: #B84326 | Borostyán: #D47E28 | Erdőzöld: #3F6E52
+   Spera – Északi téli paletta: éjkék-pala, gleccserkék, fenyőzöld és téli arany
+   Háttér: #111822 | Pala: #1A2432 | Gleccserkék: #2E7D96 | Fenyő: #368A6B | Arany: #D6A146
    ========================================================================== */
 
 :root {
-  --bg-page: #E8D7C3;
-  --bg-card: #FAF3EA;
-  --bg-warm: #DFC9B0;
-  --bg-subtle: #F2E6D6;
-  --bg-input: #FFFBF5;
-  --border: #D2B89C;
-  --border-strong: #B79776;
+  color-scheme: dark;
+  --bg-page: #111822;
+  --bg-card: #1A2432;
+  --bg-warm: #233042;
+  --bg-subtle: #1F2B3B;
+  --bg-input: #141D29;
+  --border: #2D3E54;
+  --border-strong: #3F5572;
 
-  --text-main: #2A1D17;
-  --text-muted: #5F4B3F;
-  --text-light: #826C5E;
+  --text-main: #EBF1F6;
+  --text-muted: #A9BACE;
+  --text-light: #7E93AB;
 
-  --coral: #B84326;
-  --coral-hover: #933219;
-  --coral-soft: #FCE5DC;
-  --coral-border: #E39C84;
+  --coral: #2E7D96;
+  --coral-hover: #226277;
+  --coral-text: #7FD1E8;
+  --coral-soft: rgba(46, 125, 150, 0.18);
+  --coral-border: rgba(127, 209, 232, 0.36);
 
-  --peach: #D47E28;
-  --peach-soft: #FBEED8;
-  --peach-border: #E5B673;
-  --peach-dark: #80440E;
+  --peach: #D6A146;
+  --peach-soft: rgba(214, 161, 70, 0.16);
+  --peach-border: rgba(214, 161, 70, 0.38);
+  --peach-dark: #F0C674;
 
-  --sage: #3F6E52;
-  --sage-hover: #2E543E;
-  --sage-soft: #E1EFE6;
-  --sage-border: #8FB79E;
-  --sage-dark: #1F3B2B;
+  --sage: #368A6B;
+  --sage-hover: #296E54;
+  --sage-soft: rgba(54, 138, 107, 0.18);
+  --sage-border: rgba(78, 179, 140, 0.38);
+  --sage-dark: #7CE0B6;
 
-  --danger: #A82E26;
-  --danger-soft: #FADEDB;
-  --danger-border: #DF8F88;
+  --danger: #C95B6B;
+  --danger-soft: rgba(201, 91, 107, 0.16);
+  --danger-border: rgba(201, 91, 107, 0.42);
 
-  --info: #34576B;
-  --info-soft: #E1ECF2;
-  --info-border: #93B3C4;
+  --info: #6B8CC7;
+  --info-soft: rgba(107, 140, 199, 0.16);
+  --info-border: rgba(107, 140, 199, 0.40);
 
   --radius-sm: 10px;
   --radius-md: 15px;
   --radius-lg: 22px;
 
-  --shadow-sm: 0 3px 12px rgba(42, 29, 23, 0.08);
-  --shadow-md: 0 10px 28px rgba(42, 29, 23, 0.12);
-  --shadow-lg: 0 22px 54px rgba(42, 29, 23, 0.18);
+  --shadow-sm: 0 4px 14px rgba(4, 9, 16, 0.28);
+  --shadow-md: 0 12px 30px rgba(4, 9, 16, 0.38);
+  --shadow-lg: 0 24px 56px rgba(4, 9, 16, 0.52);
 
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --base-size: 15.5px;
@@ -69,8 +71,8 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   background:
-    radial-gradient(circle at 0% 0%, rgba(212, 126, 40, 0.13), transparent 44%),
-    radial-gradient(circle at 100% 100%, rgba(184, 67, 38, 0.10), transparent 46%),
+    radial-gradient(circle at 0% 0%, rgba(46, 125, 150, 0.18), transparent 45%),
+    radial-gradient(circle at 100% 100%, rgba(54, 138, 107, 0.14), transparent 46%),
     var(--bg-page);
   color: var(--text-main);
   line-height: 1.55;
@@ -102,8 +104,8 @@ button, input, select, textarea {
   justify-content: center;
   padding: 2rem 1rem;
   background:
-    radial-gradient(circle at 14% 16%, rgba(212, 126, 40, 0.28), transparent 46%),
-    radial-gradient(circle at 86% 84%, rgba(184, 67, 38, 0.22), transparent 46%),
+    radial-gradient(circle at 14% 16%, rgba(46, 125, 150, 0.26), transparent 48%),
+    radial-gradient(circle at 86% 84%, rgba(107, 140, 199, 0.22), transparent 48%),
     var(--bg-page);
 }
 
@@ -128,12 +130,12 @@ button, input, select, textarea {
   width: 64px;
   height: 64px;
   border-radius: 18px;
-  background: linear-gradient(145deg, #FFFBF5 0%, var(--peach-soft) 62%, var(--coral-soft) 100%);
-  color: var(--coral);
+  background: linear-gradient(145deg, #1E2E42 0%, #162333 100%);
+  color: var(--coral-text);
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  border: 1.5px solid var(--peach-border);
+  border: 1.5px solid var(--coral-border);
   box-shadow: var(--shadow-sm);
 }
 
@@ -143,7 +145,7 @@ button, input, select, textarea {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--coral-hover);
+  color: var(--coral-text);
   background: var(--coral-soft);
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
@@ -206,7 +208,7 @@ button, input, select, textarea {
 .select-card input:checked + .select-card-body {
   border-color: var(--coral);
   background: var(--coral-soft);
-  box-shadow: 0 0 0 2px rgba(184, 67, 38, 0.22);
+  box-shadow: 0 0 0 2px rgba(46, 125, 150, 0.28);
 }
 
 .mode-radio-row {
@@ -275,9 +277,9 @@ button, input, select, textarea {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: linear-gradient(135deg, #32211A 0%, #261813 100%);
-  border-bottom: 1px solid var(--border-strong);
-  box-shadow: 0 4px 18px rgba(42, 29, 23, 0.18);
+  background: linear-gradient(135deg, #0C141F 0%, #132030 100%);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 18px rgba(4, 9, 16, 0.36);
 }
 
 .header-top {
@@ -301,13 +303,13 @@ button, input, select, textarea {
   width: 44px;
   height: 44px;
   border-radius: 13px;
-  background: linear-gradient(145deg, #FFFBF5 0%, var(--peach-soft) 64%, var(--coral-soft) 100%);
-  color: var(--coral);
-  border: 1px solid var(--peach-border);
+  background: linear-gradient(145deg, #1E2E42 0%, #162333 100%);
+  color: var(--coral-text);
+  border: 1px solid var(--coral-border);
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
 }
 
 .brand-title {
@@ -316,20 +318,20 @@ button, input, select, textarea {
   font-weight: 800;
   letter-spacing: 0.01em;
   line-height: 1.1;
-  color: #FFF8F0;
+  color: #F0F6FA;
 }
 
 .brand-subtitle {
   margin: 0.1rem 0 0;
   font-size: 0.8rem;
-  color: #D8C1AB;
+  color: #9CB1C7;
 }
 
 /* Élethelyzet-váltó (Cikluskövetés ↔ Baba tervezése ↔ Várandósság) */
 .mode-switcher {
   display: inline-flex;
-  background: rgba(255, 243, 230, 0.11);
-  border: 1px solid rgba(255, 230, 204, 0.18);
+  background: rgba(235, 241, 246, 0.08);
+  border: 1px solid rgba(127, 209, 232, 0.18);
   border-radius: 999px;
   padding: 3px;
   gap: 2px;
@@ -338,7 +340,7 @@ button, input, select, textarea {
 .mode-btn {
   border: none;
   background: transparent;
-  color: #E2CEBA;
+  color: #B8C8DA;
   font-weight: 700;
   font-size: 0.84rem;
   padding: 0.42rem 0.85rem;
@@ -349,11 +351,11 @@ button, input, select, textarea {
 }
 
 .mode-btn:hover {
-  color: #FFF8F0;
+  color: #F0F6FA;
 }
 
 .mode-btn.active {
-  background: #C94C2B;
+  background: var(--coral);
   color: #FFFFFF;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
 }
@@ -371,25 +373,25 @@ button, input, select, textarea {
 }
 
 .app-header .header-actions .btn-ghost {
-  color: #F0DFCE;
+  color: #D5E2EE;
 }
 
 .app-header .header-actions .btn-ghost:hover {
-  background: rgba(255, 243, 230, 0.14);
-  color: #FFF8F0;
+  background: rgba(235, 241, 246, 0.12);
+  color: #F0F6FA;
 }
 
 .app-header .header-actions .btn-ghost[aria-pressed="true"] {
-  background: rgba(212, 126, 40, 0.28);
-  color: #FFF8F0;
+  background: rgba(46, 125, 150, 0.34);
+  color: #F0F6FA;
 }
 
 .app-nav {
   width: 100%;
   margin: 0;
   padding: 0 max(1rem, calc((100% - 1200px) / 2));
-  background: #F4E7D7;
-  border-top: 1px solid rgba(255, 235, 215, 0.14);
+  background: #162130;
+  border-top: 1px solid rgba(127, 209, 232, 0.12);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.35rem;
@@ -419,14 +421,14 @@ button, input, select, textarea {
 }
 
 .nav-tab:hover {
-  color: var(--coral-hover);
+  color: var(--coral-text);
   background: var(--coral-soft);
 }
 
 .nav-tab.active {
-  color: var(--coral-hover);
+  color: var(--coral-text);
   border-bottom-color: var(--coral);
-  background: rgba(184, 67, 38, 0.11);
+  background: rgba(46, 125, 150, 0.18);
 }
 
 .nav-badge {
@@ -453,7 +455,7 @@ button, input, select, textarea {
    ========================================================================== */
 
 .alert-banner {
-  background: linear-gradient(90deg, #FCEAC8, #FAD9C9);
+  background: linear-gradient(90deg, rgba(46, 125, 150, 0.24), rgba(214, 161, 70, 0.16)), var(--bg-card);
   border-bottom: 2px solid var(--coral);
   box-shadow: var(--shadow-md);
 }
@@ -481,9 +483,9 @@ button, input, select, textarea {
 }
 
 @keyframes pulseRing {
-  0% { box-shadow: 0 0 0 0 rgba(184, 67, 38, 0.55); }
-  70% { box-shadow: 0 0 0 11px rgba(184, 67, 38, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(184, 67, 38, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(46, 125, 150, 0.55); }
+  70% { box-shadow: 0 0 0 11px rgba(46, 125, 150, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 125, 150, 0); }
 }
 
 .alert-banner-content {
@@ -496,7 +498,7 @@ button, input, select, textarea {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--coral-hover);
+  color: var(--coral-text);
 }
 
 .alert-banner-title {
@@ -629,11 +631,11 @@ button, input, select, textarea {
   color: var(--text-main);
   border-color: var(--border-strong);
 }
-.btn-secondary:hover { background: var(--bg-warm); border-color: var(--coral); color: var(--coral-hover); }
+.btn-secondary:hover { background: var(--bg-warm); border-color: var(--coral); color: var(--coral-text); }
 
 .btn-outline {
   background: transparent;
-  color: var(--coral-hover);
+  color: var(--coral-text);
   border-color: var(--coral-border);
 }
 .btn-outline:hover { background: var(--coral-soft); }
@@ -643,7 +645,7 @@ button, input, select, textarea {
   color: var(--text-muted);
 }
 .btn-ghost:hover { background: var(--bg-warm); color: var(--text-main); }
-.btn-ghost[aria-pressed="true"] { background: var(--coral-soft); color: var(--coral-hover); }
+.btn-ghost[aria-pressed="true"] { background: var(--coral-soft); color: var(--coral-text); }
 
 .btn-danger-outline {
   background: var(--bg-card);
@@ -659,8 +661,8 @@ button, input, select, textarea {
    ========================================================================== */
 
 .smart-alert {
-  background: linear-gradient(135deg, #FCEAC8, #FAD9C9);
-  border: 1.5px solid var(--peach);
+  background: linear-gradient(135deg, rgba(46, 125, 150, 0.22), rgba(214, 161, 70, 0.16)), var(--bg-card);
+  border: 1.5px solid var(--peach-border);
   border-left: 5px solid var(--coral);
   border-radius: var(--radius-md);
   padding: 1rem 1.25rem;
@@ -693,8 +695,8 @@ button, input, select, textarea {
 }
 
 .hero-card {
-  background: linear-gradient(135deg, #B84326 0%, #92321B 58%, #6B2415 100%);
-  border: 1px solid #8E2E17;
+  background: linear-gradient(135deg, #1B4965 0%, #15344A 58%, #0F2335 100%);
+  border: 1px solid #2E6A88;
   border-radius: var(--radius-lg);
   padding: 1.5rem 1.7rem;
   margin-bottom: 1.25rem;
@@ -702,13 +704,13 @@ button, input, select, textarea {
   grid-template-columns: auto 1fr auto;
   gap: 1.5rem;
   align-items: center;
-  color: #FFF8F0;
+  color: #F0F6FA;
   box-shadow: var(--shadow-md);
 }
 
 .hero-card.pregnancy-mode {
-  background: linear-gradient(135deg, #355E46 0%, #244532 100%);
-  border-color: #244532;
+  background: linear-gradient(135deg, #1E5242 0%, #143A2F 100%);
+  border-color: #2E755F;
 }
 
 .cycle-ring-wrap {
@@ -730,13 +732,13 @@ button, input, select, textarea {
   display: block;
   font-size: 1.65rem;
   font-weight: 800;
-  color: #FFF8F0;
+  color: #F0F6FA;
 }
 
 .cycle-ring-label {
   font-size: 0.74rem;
   font-weight: 700;
-  color: rgba(255, 244, 232, 0.85);
+  color: rgba(235, 244, 248, 0.85);
   text-transform: uppercase;
 }
 
@@ -744,12 +746,12 @@ button, input, select, textarea {
   margin: 0.25rem 0 0.35rem;
   font-size: 1.45rem;
   font-weight: 800;
-  color: #FFF8F0;
+  color: #F0F6FA;
 }
 
 .hero-main p {
   margin: 0;
-  color: rgba(255, 244, 232, 0.88);
+  color: rgba(235, 244, 248, 0.88);
   font-size: 0.94rem;
 }
 
@@ -764,15 +766,15 @@ button, input, select, textarea {
 .hero-card .pill-sage,
 .hero-card .pill-peach,
 .hero-card .pill-neutral {
-  background: rgba(255, 248, 240, 0.16);
-  color: #FFF8F0;
-  border-color: rgba(255, 248, 240, 0.28);
+  background: rgba(235, 244, 248, 0.14);
+  color: #F0F6FA;
+  border-color: rgba(235, 244, 248, 0.26);
 }
 
 .hero-card .baby-size-badge {
-  background: rgba(255, 248, 240, 0.14);
-  border-color: rgba(255, 248, 240, 0.26);
-  color: #FFF8F0;
+  background: rgba(235, 244, 248, 0.12);
+  border-color: rgba(235, 244, 248, 0.24);
+  color: #F0F6FA;
 }
 
 .hero-metrics {
@@ -781,7 +783,7 @@ button, input, select, textarea {
   gap: 0.55rem;
   min-width: 215px;
   padding-left: 1.25rem;
-  border-left: 1px solid rgba(255, 244, 232, 0.24);
+  border-left: 1px solid rgba(235, 244, 248, 0.22);
 }
 
 .hero-metric-row {
@@ -791,29 +793,29 @@ button, input, select, textarea {
   font-size: 0.88rem;
 }
 
-.hero-metric-row span { color: rgba(255, 244, 232, 0.82); }
-.hero-metric-row strong { color: #FFF8F0; }
+.hero-metric-row span { color: rgba(235, 244, 248, 0.82); }
+.hero-metric-row strong { color: #F0F6FA; }
 
 .hero-card .btn-primary {
-  background: #FFF8F0;
-  color: #8A2E17;
-  border-color: #FFF8F0;
+  background: #EBF4F8;
+  color: #123347;
+  border-color: #EBF4F8;
 }
 
 .hero-card .btn-primary:hover {
-  background: #FCE5DC;
-  border-color: #FCE5DC;
+  background: #D5EAF2;
+  border-color: #D5EAF2;
 }
 
 .hero-card.pregnancy-mode .btn-sage {
-  background: #FFF8F0;
-  color: #244532;
-  border-color: #FFF8F0;
+  background: #EBF6F1;
+  color: #143A2F;
+  border-color: #EBF6F1;
 }
 
 .hero-card.pregnancy-mode .btn-sage:hover {
-  background: #E1EFE6;
-  border-color: #E1EFE6;
+  background: #D4ECE1;
+  border-color: #D4ECE1;
 }
 
 .alerts-grid {
@@ -952,7 +954,7 @@ button, input, select, textarea {
 
 .cal-day.is-today {
   border: 2.5px solid var(--coral);
-  box-shadow: 0 0 0 2px rgba(184, 67, 38, 0.22);
+  box-shadow: 0 0 0 2px rgba(46, 125, 150, 0.30);
 }
 
 .cal-day.is-expected-period-start {
@@ -962,29 +964,29 @@ button, input, select, textarea {
 }
 
 .cal-day.phase-period {
-  background: #F3B7A4;
-  border-color: #C44D2E;
+  background: rgba(168, 76, 108, 0.28);
+  border-color: #B8617F;
 }
 
 .cal-day.phase-follicular {
-  background: #C2DEC9;
-  border-color: #477A5B;
+  background: rgba(54, 138, 107, 0.26);
+  border-color: #48A883;
 }
 
 .cal-day.phase-ovulation {
-  background: #F5D092;
-  border-color: #D47E28;
+  background: rgba(214, 161, 70, 0.24);
+  border-color: #D6A146;
 }
 
 .cal-day.phase-ovulation-peak {
-  background: #ECB763;
-  border-color: #AD5F14;
-  box-shadow: inset 0 0 0 1px rgba(173, 95, 20, 0.4);
+  background: rgba(214, 161, 70, 0.38);
+  border-color: #EFC26A;
+  box-shadow: inset 0 0 0 1px rgba(239, 194, 106, 0.45);
 }
 
 .cal-day.phase-luteal {
-  background: #DEC7B2;
-  border-color: #96735B;
+  background: rgba(107, 140, 199, 0.24);
+  border-color: #7B9BD4;
 }
 
 .cal-day-top {
@@ -1003,7 +1005,7 @@ button, input, select, textarea {
   font-size: 0.64rem;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--coral-hover);
+  color: var(--coral-text);
 }
 
 .cal-day-cycle {
@@ -1026,12 +1028,12 @@ button, input, select, textarea {
   border-radius: 50%;
 }
 
-.dot-period { background: var(--coral); }
-.dot-follicular { background: var(--sage); }
-.dot-ovulation { background: var(--peach); }
-.dot-luteal { background: #856048; }
-.dot-lab { background: var(--info); }
-.dot-symptom { background: #3A241B; }
+.dot-period { background: #C96B8C; }
+.dot-follicular { background: #4DB88E; }
+.dot-ovulation { background: #E5B85C; }
+.dot-luteal { background: #8AAAE0; }
+.dot-lab { background: #7FD1E8; }
+.dot-symptom { background: #EBF1F6; }
 
 .calendar-next-pill {
   margin-top: 0.35rem;
@@ -1098,7 +1100,7 @@ button, input, select, textarea {
   border: 1px solid var(--border);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: var(--coral-hover);
+  color: var(--coral-text);
   box-shadow: var(--shadow-sm);
 }
 
@@ -1249,7 +1251,7 @@ button, input, select, textarea {
   padding: 0.4rem 0.55rem;
   border-radius: var(--radius-sm);
   background: var(--coral-soft);
-  color: var(--coral-hover);
+  color: var(--coral-text);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
@@ -1320,7 +1322,7 @@ button, input, select, textarea {
 }
 
 .phase-stable { background: var(--sage-soft); border-color: var(--sage-border); color: var(--sage-dark); }
-.phase-early { background: var(--info-soft); border-color: var(--info-border); color: #274463; }
+.phase-early { background: var(--info-soft); border-color: var(--info-border); color: #A8C7F5; }
 .phase-progressive { background: var(--peach-soft); border-color: var(--peach-border); color: var(--peach-dark); }
 .phase-acute { background: var(--danger-soft); border-color: var(--danger-border); color: var(--danger); }
 .phase-remission { background: var(--sage-soft); border-color: var(--sage-border); color: var(--sage-dark); }
@@ -1363,7 +1365,7 @@ button, input, select, textarea {
   font-size: 0.79rem;
   font-weight: 700;
   background: var(--coral-soft);
-  color: var(--coral-hover);
+  color: var(--coral-text);
   border: 1px solid var(--coral-border);
 }
 
@@ -1426,7 +1428,7 @@ button, input, select, textarea {
 .symptom-group-label {
   font-size: 0.84rem;
   font-weight: 800;
-  color: var(--coral-hover);
+  color: var(--coral-text);
   margin-bottom: 0.55rem;
 }
 
@@ -1714,7 +1716,7 @@ button, input, select, textarea {
   margin-bottom: 0.35rem;
 }
 
-.tier-daily { background: var(--coral-soft); color: var(--coral-hover); border: 1px solid var(--coral-border); }
+.tier-daily { background: var(--coral-soft); color: var(--coral-text); border: 1px solid var(--coral-border); }
 .tier-cycle { background: var(--peach-soft); color: var(--peach-dark); border: 1px solid var(--peach-border); }
 .tier-weekly { background: var(--info-soft); color: var(--info); border: 1px solid var(--info-border); }
 .tier-visit { background: var(--sage-soft); color: var(--sage-dark); border: 1px solid var(--sage-border); }
@@ -1800,19 +1802,19 @@ button, input, select, textarea {
   background: var(--coral);
   border-color: var(--coral);
   color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(184, 67, 38, 0.28);
+  box-shadow: 0 2px 8px rgba(46, 125, 150, 0.32);
 }
 
 .seg-btn.seg-btn-sage.active {
   background: var(--sage-hover);
   border-color: var(--sage-hover);
-  box-shadow: 0 2px 8px rgba(63, 110, 82, 0.28);
+  box-shadow: 0 2px 8px rgba(54, 138, 107, 0.32);
 }
 
 .seg-btn.seg-btn-warn.active {
   background: var(--danger);
   border-color: var(--danger);
-  box-shadow: 0 2px 8px rgba(168, 46, 38, 0.28);
+  box-shadow: 0 2px 8px rgba(201, 91, 107, 0.28);
 }
 
 .icon-scale-row {
@@ -1852,7 +1854,7 @@ button, input, select, textarea {
 }
 
 .icon-scale-btn.active .scale-emoji {
-  color: var(--coral-hover);
+  color: var(--coral-text);
 }
 
 .inline-ui-icon {
@@ -1873,8 +1875,8 @@ button, input, select, textarea {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: linear-gradient(145deg, #FFFBF5 0%, var(--peach-soft) 65%, var(--coral-soft) 100%);
-  border: 1px solid var(--peach-border);
+  background: linear-gradient(145deg, #1E2E42 0%, #162333 100%);
+  border: 1px solid var(--coral-border);
   display: inline-grid;
   place-items: center;
   flex-shrink: 0;
@@ -1896,12 +1898,12 @@ button, input, select, textarea {
 .icon-scale-btn.active {
   background: var(--coral-soft);
   border-color: var(--coral);
-  box-shadow: 0 0 0 2px rgba(184, 67, 38, 0.2);
+  box-shadow: 0 0 0 2px rgba(46, 125, 150, 0.26);
 }
 
 .icon-scale-btn.active .scale-num,
 .icon-scale-btn.active .scale-lbl {
-  color: var(--coral-hover);
+  color: var(--coral-text);
 }
 
 .sleep-control-grid {
@@ -1927,7 +1929,7 @@ button, input, select, textarea {
 }
 
 .sleep-slider-top strong {
-  color: var(--coral-hover);
+  color: var(--coral-text);
   font-size: 0.94rem;
 }
 
@@ -2050,7 +2052,7 @@ button, input, select, textarea {
 .visit-countdown-banner.is-soon {
   background: var(--coral-soft);
   border: 1.5px solid var(--coral-border);
-  color: var(--coral-hover);
+  color: var(--coral-text);
 }
 
 .adherence-summary-box {
@@ -2204,7 +2206,7 @@ button, input, select, textarea {
   transition: all 0.14s ease;
 }
 
-.pill-btn:hover { border-color: var(--coral); color: var(--coral-hover); }
+.pill-btn:hover { border-color: var(--coral); color: var(--coral-text); }
 
 .pill-btn.active {
   background: var(--coral);
@@ -2436,7 +2438,7 @@ button, input, select, textarea {
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--coral-hover);
+  color: var(--coral-text);
 }
 
 .sheet-patient-name {
@@ -2476,7 +2478,7 @@ button, input, select, textarea {
   margin: 0 0 0.75rem;
   font-size: 1.08rem;
   font-weight: 800;
-  color: var(--coral-hover);
+  color: var(--coral-text);
   padding-bottom: 0.3rem;
   border-bottom: 1px solid var(--border);
 }
@@ -2541,7 +2543,7 @@ button, input, select, textarea {
 .form-group textarea:focus {
   outline: none;
   border-color: var(--coral);
-  box-shadow: 0 0 0 3px rgba(184, 67, 38, 0.18);
+  box-shadow: 0 0 0 3px rgba(46, 125, 150, 0.25);
 }
 
 .form-help { margin: 0.25rem 0 0; font-size: 0.82rem; color: var(--text-muted); }
@@ -2570,7 +2572,7 @@ button, input, select, textarea {
   border-radius: 999px;
   background: var(--coral-soft);
   border: 1px solid var(--coral-border);
-  color: var(--coral-hover);
+  color: var(--coral-text);
   font-weight: 700;
 }
 .time-chip button { border: none; background: transparent; color: inherit; cursor: pointer; font-size: 1rem; }
@@ -2648,10 +2650,11 @@ button, input, select, textarea {
 }
 
 .toast {
-  background: var(--text-main);
-  color: #FFFFFF;
+  background: #0B111A;
+  color: #EBF1F6;
   padding: 0.78rem 1rem;
   border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
   box-shadow: var(--shadow-lg);
   font-size: 0.88rem;
   font-weight: 600;
@@ -2665,7 +2668,7 @@ button, input, select, textarea {
 
 @media (max-width: 960px) {
   .hero-card { grid-template-columns: 1fr; text-align: left; }
-  .hero-metrics { padding-left: 0; border-left: none; border-top: 1px solid rgba(255, 244, 232, 0.24); padding-top: 0.9rem; }
+  .hero-metrics { padding-left: 0; border-left: none; border-top: 1px solid rgba(235, 244, 248, 0.22); padding-top: 0.9rem; }
   .dashboard-split,
   .self-mgmt-layout,
   .charts-grid-2,
@@ -2685,12 +2688,12 @@ button, input, select, textarea {
     left: 0;
     right: 0;
     z-index: 60;
-    background: rgba(250, 243, 234, 0.98);
+    background: rgba(18, 27, 39, 0.97);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--border-strong);
     padding: 0.25rem 0.25rem calc(0.25rem + env(safe-area-inset-bottom, 0px));
     gap: 0.15rem;
-    box-shadow: 0 -4px 18px rgba(42, 29, 23, 0.14);
+    box-shadow: 0 -6px 22px rgba(4, 9, 16, 0.45);
   }
   .nav-tab {
     flex-direction: column;
@@ -2734,6 +2737,22 @@ button, input, select, textarea {
    ========================================================================== */
 
 @media print {
+  :root {
+    color-scheme: light;
+    --bg-page: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --bg-subtle: #F2F6FA;
+    --bg-input: #FFFFFF;
+    --text-main: #111822;
+    --text-muted: #4A5A6B;
+    --border: #CBD5E1;
+    --coral-text: #1E5A6E;
+    --sage-dark: #1E5742;
+    --peach-dark: #7D5614;
+    --danger: #9B2C3B;
+    --sage-soft: #EBF5F0;
+    --danger-soft: #FDF0F2;
+  }
   body { background: #FFFFFF; color: #000000; font-size: 10.5pt; }
   .no-print,
   .tab-panel:not(#panel-journey) { display: none !important; }

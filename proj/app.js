@@ -22,22 +22,22 @@
   const PHASE_INFO = {
     menstruation: {
       name: "Menstruációs fázis",
-      color: "#B84326",
+      color: "#C96B8C",
       desc: "A méhnyálkahártya leválása, alacsony ösztrogén- és progeszteronszint. A pihenés, vas- és magnéziumpótlás időszaka."
     },
     follicular: {
       name: "Follikuláris fázis",
-      color: "#3F6E52",
+      color: "#4DB88E",
       desc: "Tüszőérés és fokozatosan emelkedő ösztrogénszint. Általában növekvő energia; PCOS/IR esetén fontos a stabil vércukorszint."
     },
     ovulation: {
       name: "Ovulációs ablak",
-      color: "#D47E28",
+      color: "#E5B85C",
       desc: "LH-csúcs és peteérés (termékeny ablak). Az alaphőmérséklet (BBT) az ovuláció után ~0,3 °C-kal megemelkedik."
     },
     luteal: {
       name: "Luteális fázis",
-      color: "#856048",
+      color: "#8AAAE0",
       desc: "A sárgatest progeszteront termel. Pajzsmirigy- és ösztrogéndominancia-tünetek ilyenkor gyakrabban felerősödhetnek."
     }
   };
@@ -748,8 +748,8 @@
         <div class="hero-card pregnancy-mode">
           <div class="cycle-ring-wrap">
             <svg viewBox="0 0 120 120" width="122" height="122">
-              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255, 245, 232, 0.24)" stroke-width="10"/>
-              <circle cx="60" cy="60" r="50" fill="none" stroke="#A6DFB8" stroke-width="10"
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(235, 241, 246, 0.20)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#7CE0B6" stroke-width="10"
                 stroke-linecap="round" stroke-dasharray="${circum}" stroke-dashoffset="${dashOffset}"
                 transform="rotate(-90 60 60)"/>
             </svg>
@@ -789,8 +789,8 @@
         <div class="hero-card">
           <div class="cycle-ring-wrap">
             <svg viewBox="0 0 120 120" width="122" height="122">
-              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255, 245, 232, 0.24)" stroke-width="10"/>
-              <circle cx="60" cy="60" r="50" fill="none" stroke="#F6C177" stroke-width="10"
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(235, 241, 246, 0.20)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="#7FD1E8" stroke-width="10"
                 stroke-linecap="round" stroke-dasharray="${circum}" stroke-dashoffset="${dashOffset}"
                 transform="rotate(-90 60 60)"/>
             </svg>
@@ -1850,8 +1850,8 @@
         const v = minY + ((maxY - minY) * i) / yTicks;
         const y = yPos(v);
         gridSvg += `
-          <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#DFC9B0" stroke-dasharray="3,3"/>
-          <text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="11" fill="#826C5E">${v.toFixed(v < 10 ? 1 : 0)}</text>
+          <line x1="${padL}" y1="${y}" x2="${W - padR}" y2="${y}" stroke="#2D3E54" stroke-dasharray="3,3"/>
+          <text x="${padL - 8}" y="${y + 4}" text-anchor="end" font-size="11" fill="#8FA3B8">${v.toFixed(v < 10 ? 1 : 0)}</text>
         `;
       }
 
@@ -1860,14 +1860,14 @@
           const cx = xPos(i);
           const cy = yPos(r.value);
           const inOpt = r.value >= bio.optimalMin && r.value <= bio.optimalMax;
-          const fill = inOpt ? "#3F6E52" : "#B84326";
+          const fill = inOpt ? "#4DB88E" : "#E5B85C";
           return `
             <g>
-              <circle cx="${cx}" cy="${cy}" r="6.5" fill="${fill}" stroke="#FFFFFF" stroke-width="2.5">
+              <circle cx="${cx}" cy="${cy}" r="6.5" fill="${fill}" stroke="#1A2432" stroke-width="2.5">
                 <title>${escapeHtml(formatHuDate(r.date))}: ${r.value} ${escapeHtml(bio.unit)} ${r.note ? `(${escapeHtml(r.note)})` : ""}</title>
               </circle>
-              <text x="${cx}" y="${cy - 11}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2A1D17">${r.value}</text>
-              <text x="${cx}" y="${H - 16}" text-anchor="middle" font-size="10.5" fill="#5F4B3F">${escapeHtml(r.date.slice(2))}</text>
+              <text x="${cx}" y="${cy - 11}" text-anchor="middle" font-size="11.5" font-weight="700" fill="#EBF1F6">${r.value}</text>
+              <text x="${cx}" y="${H - 16}" text-anchor="middle" font-size="10.5" fill="#A9BACE">${escapeHtml(r.date.slice(2))}</text>
             </g>
           `;
         })
@@ -1876,18 +1876,18 @@
       wrap.innerHTML = `
         <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${escapeHtml(bio.name)} laboreredmény grafikon">
           <!-- Normál referencia sáv -->
-          <rect x="${padL}" y="${normTop}" width="${plotW}" height="${Math.max(2, normBot - normTop)}" fill="#D47E28" opacity="0.18"/>
+          <rect x="${padL}" y="${normTop}" width="${plotW}" height="${Math.max(2, normBot - normTop)}" fill="#D6A146" opacity="0.16"/>
           <!-- Optimális / babatervezési célsáv -->
-          <rect x="${padL}" y="${optTop}" width="${plotW}" height="${Math.max(2, optBot - optTop)}" fill="#3F6E52" opacity="0.24"/>
+          <rect x="${padL}" y="${optTop}" width="${plotW}" height="${Math.max(2, optBot - optTop)}" fill="#368A6B" opacity="0.24"/>
           ${gridSvg}
-          <polyline fill="none" stroke="#B84326" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polyPoints}"/>
+          <polyline fill="none" stroke="#54B2CC" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${polyPoints}"/>
           ${dotsSvg}
           <!-- Jelmagyarázat -->
           <g transform="translate(${padL}, 12)">
-            <rect x="0" y="-8" width="12" height="10" rx="2" fill="#D47E28" opacity="0.45"/>
-            <text x="17" y="1" font-size="10.5" fill="#5F4B3F">Normál sáv (${bio.normalMin}–${bio.normalMax} ${escapeHtml(bio.unit)})</text>
-            <rect x="195" y="-8" width="12" height="10" rx="2" fill="#3F6E52" opacity="0.55"/>
-            <text x="212" y="1" font-size="10.5" fill="#1F3B2B" font-weight="700">${escapeHtml(bio.optimalLabel)}</text>
+            <rect x="0" y="-8" width="12" height="10" rx="2" fill="#D6A146" opacity="0.50"/>
+            <text x="17" y="1" font-size="10.5" fill="#A9BACE">Normál sáv (${bio.normalMin}–${bio.normalMax} ${escapeHtml(bio.unit)})</text>
+            <rect x="195" y="-8" width="12" height="10" rx="2" fill="#368A6B" opacity="0.60"/>
+            <text x="212" y="1" font-size="10.5" fill="#7CE0B6" font-weight="700">${escapeHtml(bio.optimalLabel)}</text>
           </g>
         </svg>
       `;
@@ -1968,12 +1968,12 @@
         const top = yPos(item.length);
         const h = padT + plotH - top;
         const isLong = item.length > 35 || item.length < 21;
-        const color = isLong ? "#B84326" : item.length >= 33 ? "#D47E28" : "#3F6E52";
+        const color = isLong ? "#C96B8C" : item.length >= 33 ? "#D6A146" : "#368A6B";
         return `
           <g>
             <rect x="${(cx - barW / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(4, h).toFixed(1)}" rx="6" fill="${color}"/>
-            <text x="${cx}" y="${top - 6}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#2A1D17">${item.length}</text>
-            <text x="${cx}" y="${H - 14}" text-anchor="middle" font-size="10.5" fill="#5F4B3F">${escapeHtml(item.label)}</text>
+            <text x="${cx}" y="${top - 6}" text-anchor="middle" font-size="11.5" font-weight="800" fill="#EBF1F6">${item.length}</text>
+            <text x="${cx}" y="${H - 14}" text-anchor="middle" font-size="10.5" fill="#A9BACE">${escapeHtml(item.label)}</text>
           </g>
         `;
       })
@@ -1982,13 +1982,13 @@
     wrap.innerHTML = `
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Havi ciklushossz trend">
         <g transform="translate(${padL}, 13)">
-          <rect x="0" y="-8" width="12" height="10" rx="2" fill="#3F6E52" opacity="0.32"/>
-          <text x="17" y="1" font-size="10.5" fill="#1F3B2B" font-weight="700">Normál tartomány (21–35 nap)</text>
-          <line x1="205" y1="-3" x2="225" y2="-3" stroke="#B84326" stroke-width="2" stroke-dasharray="4,3"/>
-          <text x="231" y="1" font-size="10.5" fill="#933219" font-weight="700">Átlag: ${avg} nap</text>
+          <rect x="0" y="-8" width="12" height="10" rx="2" fill="#368A6B" opacity="0.45"/>
+          <text x="17" y="1" font-size="10.5" fill="#7CE0B6" font-weight="700">Normál tartomány (21–35 nap)</text>
+          <line x1="205" y1="-3" x2="225" y2="-3" stroke="#7FD1E8" stroke-width="2" stroke-dasharray="4,3"/>
+          <text x="231" y="1" font-size="10.5" fill="#7FD1E8" font-weight="700">Átlag: ${avg} nap</text>
         </g>
-        <rect x="${padL}" y="${refTop}" width="${plotW}" height="${refBot - refTop}" fill="#3F6E52" opacity="0.16"/>
-        <line x1="${padL}" y1="${avgY}" x2="${W - padR}" y2="${avgY}" stroke="#B84326" stroke-width="1.8" stroke-dasharray="5,4"/>
+        <rect x="${padL}" y="${refTop}" width="${plotW}" height="${refBot - refTop}" fill="#368A6B" opacity="0.16"/>
+        <line x1="${padL}" y1="${avgY}" x2="${W - padR}" y2="${avgY}" stroke="#7FD1E8" stroke-width="1.8" stroke-dasharray="5,4"/>
         ${barsSvg}
       </svg>
     `;
@@ -2032,7 +2032,7 @@
     const dots = bbtPts
       .map(
         (p) => `
-        <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="#B84326" stroke="#FFFFFF" stroke-width="2">
+        <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4.5" fill="#54B2CC" stroke="#1A2432" stroke-width="2">
           <title>${p.day}. nap – BBT: ${p.val.toFixed(2)} °C</title>
         </circle>
       `
@@ -2040,24 +2040,24 @@
       .join("");
 
     const xLabels = logs
-      .map((l, i) => `<text x="${xPos(i)}" y="${H - 14}" text-anchor="middle" font-size="10" fill="#5F4B3F">${l.cycleDay || i + 1}.n</text>`)
+      .map((l, i) => `<text x="${xPos(i)}" y="${H - 14}" text-anchor="middle" font-size="10" fill="#A9BACE">${l.cycleDay || i + 1}.n</text>`)
       .join("");
 
     wrap.innerHTML = `
       <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="BBT és tünetintenzitás görbe">
-        <line x1="${padL}" y1="${yTemp(36.2)}" x2="${W - padR}" y2="${yTemp(36.2)}" stroke="#DFC9B0" stroke-dasharray="3,3"/>
-        <text x="${padL - 6}" y="${yTemp(36.2) + 4}" text-anchor="end" font-size="10" fill="#826C5E">36.2°</text>
-        <line x1="${padL}" y1="${yTemp(36.5)}" x2="${W - padR}" y2="${yTemp(36.5)}" stroke="#DFC9B0" stroke-dasharray="3,3"/>
-        <text x="${padL - 6}" y="${yTemp(36.5) + 4}" text-anchor="end" font-size="10" fill="#826C5E">36.5°</text>
+        <line x1="${padL}" y1="${yTemp(36.2)}" x2="${W - padR}" y2="${yTemp(36.2)}" stroke="#2D3E54" stroke-dasharray="3,3"/>
+        <text x="${padL - 6}" y="${yTemp(36.2) + 4}" text-anchor="end" font-size="10" fill="#8FA3B8">36.2°</text>
+        <line x1="${padL}" y1="${yTemp(36.5)}" x2="${W - padR}" y2="${yTemp(36.5)}" stroke="#2D3E54" stroke-dasharray="3,3"/>
+        <text x="${padL - 6}" y="${yTemp(36.5) + 4}" text-anchor="end" font-size="10" fill="#8FA3B8">36.5°</text>
         ${bars}
-        ${bbtPts.length >= 2 ? `<polyline fill="none" stroke="#B84326" stroke-width="2.6" points="${lineStr}"/>` : ""}
+        ${bbtPts.length >= 2 ? `<polyline fill="none" stroke="#54B2CC" stroke-width="2.6" points="${lineStr}"/>` : ""}
         ${dots}
         ${xLabels}
         <g transform="translate(${padL}, 12)">
-          <circle cx="5" cy="-3" r="4" fill="#B84326"/>
-          <text x="14" y="1" font-size="10.5" fill="#2A1D17" font-weight="700">Alaphőmérséklet (BBT °C)</text>
-          <rect x="175" y="-8" width="11" height="10" rx="2" fill="#3F6E52" opacity="0.45"/>
-          <text x="191" y="1" font-size="10.5" fill="#5F4B3F">Tünetintenzitás (fázis szerint)</text>
+          <circle cx="5" cy="-3" r="4" fill="#54B2CC"/>
+          <text x="14" y="1" font-size="10.5" fill="#EBF1F6" font-weight="700">Alaphőmérséklet (BBT °C)</text>
+          <rect x="175" y="-8" width="11" height="10" rx="2" fill="#368A6B" opacity="0.55"/>
+          <text x="191" y="1" font-size="10.5" fill="#A9BACE">Tünetintenzitás (fázis szerint)</text>
         </g>
       </svg>
     `;
@@ -2190,10 +2190,10 @@
           <div class="sheet-brand-row">
             <span class="sheet-brand-emblem" aria-hidden="true">
               <svg viewBox="0 0 48 48" width="22" height="22" fill="none">
-                <path d="M11.5 17.5C14.5 7.5 29.5 6.5 36.2 14.8C41.2 21 39.5 30.8 32.8 35.8" stroke="#B84326" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M36.5 30.5C33.5 40.5 18.5 41.5 11.8 33.2C6.8 27 8.5 17.2 15.2 12.2" stroke="#3F6E52" stroke-width="2.5" stroke-linecap="round"/>
-                <path d="M23.8 32.4C18.6 31.8 18.2 25.4 22.6 20.4C24.2 18.5 25.8 16.8 27.6 15.2C28.6 18.6 28.8 24.2 27 28.4C25.8 31 24.2 32.4 22.8 32.4C21.8 32.4 22.2 29.5 23.8 27.2" stroke="#2A1D17" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="23.8" cy="25.8" r="2.2" fill="#B84326"/>
+                <path d="M11.5 17.5C14.5 7.5 29.5 6.5 36.2 14.8C41.2 21 39.5 30.8 32.8 35.8" stroke="#4FA8C2" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M36.5 30.5C33.5 40.5 18.5 41.5 11.8 33.2C6.8 27 8.5 17.2 15.2 12.2" stroke="#48A883" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M23.8 32.4C18.6 31.8 18.2 25.4 22.6 20.4C24.2 18.5 25.8 16.8 27.6 15.2C28.6 18.6 28.8 24.2 27 28.4C25.8 31 24.2 32.4 22.8 32.4C21.8 32.4 22.2 29.5 23.8 27.2" stroke="#EBF1F6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="23.8" cy="25.8" r="2.2" fill="#7FD1E8"/>
               </svg>
             </span>
             <div class="sheet-eyebrow">Spera • Nőgyógyászati-Endokrinológiai Orvosi Állapotlap</div>
