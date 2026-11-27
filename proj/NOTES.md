@@ -81,13 +81,14 @@ Exportált objektumok és függvények:
 - **Betegút & Orvosi adatok:** 5 állomásos Betegúttérkép, alatta közvetlen funkcióként a kinyitható/nyomtatható **Orvosi összefoglaló (Állapotlap)**, majd a betegségek, gyógyszer-törzsadatok, emlékeztető-vezérlés, allergiák, kórelőzmény és helyi JSON export/import.
 - **Élethelyzet-váltó (`MODE_LABELS`):** `cycle` (*Cikluskövetés*) $\leftrightarrow$ `ttc` (*Baba tervezése*) $\leftrightarrow$ `pregnancy` (*Várandósság követése*).
 - **Modális ablakok (`index.html`):** `conditionModal` (betegség/fázis), `medicationModal` (gyógyszer/emlékeztető), `labModal` (új laboreredmény), `cycleModal` (tényleges ciklushossz).
-- **Színpaletta (`styles.css` – erőteljesebb meleg földszínek, eszpresszó–terrakotta–borostyán–erdőzöld arculat):**
-  - Oldalháttér: `#E8D7C3` (meleg pörkölt homokkő)
-  - Kártyák / felületek: `#FAF3EA` (meleg len-elefántcsont) és `#F2E6D6` / `#DFC9B0` (pergamen / meleg agyag)
-  - Fejléc sáv: `#32211A` – `#261813` (mély pörkölt eszpresszó)
-  - Kiemelés: `#B84326` (égetett terrakotta)
-  - Másodlagos: `#D47E28` (telt borostyán / méz-okker)
-  - Egyensúly / pozitív: `#3F6E52` (telt botanikai erdőzöld)
+- **Színpaletta (`styles.css` – északi téli, sötét tónusú arculat, piros dominancia és vakító fehér nélkül):**
+  - Oldalháttér: `#111822` (mély éjkék-palaszürke)
+  - Kártyák / felületek: `#1A2432` (téli pala), `#1F2B3B` / `#233042` (belső palaszürke felületek), `#141D29` (beviteli mezők)
+  - Fejléc sáv: `#0C141F` – `#132030` (mély éjkék), alatta `#162130` navigációs sáv
+  - Kiemelés (fő akcentus): `#2E7D96` (gleccser-türkizkék, világos jégkék szövegszín: `#7FD1E8`)
+  - Másodlagos: `#D6A146` (téli gyertyafény-arany)
+  - Egyensúly / pozitív: `#368A6B` (örökzöld fenyőzöld)
+  - Menstruációs / figyelmeztető tónus: `#C95B6B` / `#C96B8C` (visszafogott téli szilva)
 - **Logó:** két egymásba fonódó lágy ív (ciklikusság és hormonális egyensúly), középpontjában folytonos vonallal rajzolt mag/hajtás szimbólum.
 
 ---
