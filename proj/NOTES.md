@@ -81,12 +81,13 @@ Exportált objektumok és függvények:
 - **Betegút & Orvosi adatok:** 5 állomásos Betegúttérkép, alatta közvetlen funkcióként a kinyitható/nyomtatható **Orvosi összefoglaló (Állapotlap)**, majd a betegségek, gyógyszer-törzsadatok, emlékeztető-vezérlés, allergiák, kórelőzmény és helyi JSON export/import.
 - **Élethelyzet-váltó (`MODE_LABELS`):** `cycle` (*Cikluskövetés*) $\leftrightarrow$ `ttc` (*Baba tervezése*) $\leftrightarrow$ `pregnancy` (*Várandósság követése*).
 - **Modális ablakok (`index.html`):** `conditionModal` (betegség/fázis), `medicationModal` (gyógyszer/emlékeztető), `labModal` (új laboreredmény), `cycleModal` (tényleges ciklushossz).
-- **Színpaletta (`styles.css` – szemkímélő, kevesebb fehér):**
-  - Oldalháttér: `#EFE5DA` (meleg homok)
-  - Kártyák / felületek: `#F8F2EB` (lágy krém) és `#E7DACB` (meleg bézs)
-  - Kiemelés: `#C86D51` (terrakotta)
-  - Másodlagos: `#E8C3A3` (púderes barack)
-  - Egyensúly / pozitív: `#7DA690` (lágy zsályazöld)
+- **Színpaletta (`styles.css` – erőteljesebb meleg földszínek, eszpresszó–terrakotta–borostyán–erdőzöld arculat):**
+  - Oldalháttér: `#E8D7C3` (meleg pörkölt homokkő)
+  - Kártyák / felületek: `#FAF3EA` (meleg len-elefántcsont) és `#F2E6D6` / `#DFC9B0` (pergamen / meleg agyag)
+  - Fejléc sáv: `#32211A` – `#261813` (mély pörkölt eszpresszó)
+  - Kiemelés: `#B84326` (égetett terrakotta)
+  - Másodlagos: `#D47E28` (telt borostyán / méz-okker)
+  - Egyensúly / pozitív: `#3F6E52` (telt botanikai erdőzöld)
 - **Logó:** két egymásba fonódó lágy ív (ciklikusság és hormonális egyensúly), középpontjában folytonos vonallal rajzolt mag/hajtás szimbólum.
 
 ---
